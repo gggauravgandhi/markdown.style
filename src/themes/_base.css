@@ -1,0 +1,64 @@
+/* Base layer shared by all themes: reset, structure, knob defaults, print scaffolding.
+   Content is plain flowing blocks — no flex/grid wrappers (Paged.js v2 constraint). */
+:root {
+  --mds-accent: #0f62fe;
+  --mds-font-scale: 1;
+  --mds-page-width: 760px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body { margin: 0; padding: 0; }
+
+body {
+  background: var(--mds-bg);
+  color: var(--mds-fg);
+  font-family: var(--mds-font-body);
+  font-size: calc(16px * var(--mds-font-scale));
+  line-height: 1.65;
+  -webkit-text-size-adjust: 100%;
+}
+
+.mds-content {
+  max-width: var(--mds-page-width);
+  margin: 0 auto;
+  padding: 48px 24px 96px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--mds-font-heading);
+  line-height: 1.25;
+  overflow-wrap: break-word;
+}
+
+img { max-width: 100%; height: auto; }
+
+pre { overflow-x: auto; }
+
+table { border-collapse: collapse; width: 100%; }
+
+.mds-mermaid { margin: 1.5em 0; text-align: center; }
+.mds-mermaid svg { max-width: 100%; height: auto; }
+
+.mds-error {
+  border: 1px solid #b91c1c;
+  border-radius: 6px;
+  padding: 12px 16px;
+  margin: 1.5em 0;
+  background: #fef2f2;
+  color: #7f1d1d;
+}
+.mds-error-title { margin: 0 0 8px; font-weight: 600; }
+.mds-error pre { margin: 0; }
+
+input[type='checkbox'] { accent-color: var(--mds-accent); }
+
+@page { margin: 18mm 16mm; }
+
+@media print {
+  body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .mds-content { max-width: none; padding: 0; }
+  pre, table, figure, blockquote, .mds-mermaid { break-inside: avoid; }
+  h1, h2, h3, h4, h5, h6 { break-after: avoid; }
+  a { text-decoration: none; color: inherit; }
+}

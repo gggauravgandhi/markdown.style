@@ -1,0 +1,62 @@
+/* Paper — warm, book-like reading theme. */
+:root {
+  --mds-bg: #faf6ef;
+  --mds-fg: #2b2622;
+  --mds-font-body: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+  --mds-font-heading: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+  --mds-muted: #7a6f63;
+  --mds-rule: #e2d9c8;
+  --mds-code-bg: #f1ead9;
+}
+
+h1 { font-size: 2.1em; letter-spacing: -0.01em; border-bottom: 2px solid var(--mds-accent); padding-bottom: 0.3em; }
+h2 { font-size: 1.55em; margin-top: 2em; }
+h3 { font-size: 1.25em; margin-top: 1.6em; }
+h4, h5, h6 { font-size: 1.05em; color: var(--mds-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+
+a { color: var(--mds-accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+
+blockquote {
+  margin: 1.5em 0;
+  padding: 0.2em 1.2em;
+  border-left: 3px solid var(--mds-accent);
+  color: var(--mds-muted);
+  font-style: italic;
+}
+
+hr { border: 0; border-top: 1px solid var(--mds-rule); margin: 2.5em auto; width: 60%; }
+
+code {
+  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 0.88em;
+  background: var(--mds-code-bg);
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+}
+
+pre { border-radius: 8px; padding: 16px 20px; font-size: 0.88em; }
+pre code { background: none; padding: 0; font-size: 1em; }
+/* Shiki emits its own background via inline style; keep our radius/padding. */
+pre.shiki { border: 1px solid var(--mds-rule); }
+
+table { margin: 1.5em 0; font-size: 0.95em; }
+th {
+  text-align: left;
+  border-bottom: 2px solid var(--mds-accent);
+  padding: 8px 12px;
+  font-variant-caps: small-caps;
+}
+td { border-bottom: 1px solid var(--mds-rule); padding: 8px 12px; }
+tbody tr:nth-child(even) { background: rgba(226, 217, 200, 0.25); }
+
+ul, ol { padding-left: 1.6em; }
+li { margin: 0.3em 0; }
+li::marker { color: var(--mds-accent); }
+
+.footnotes { font-size: 0.85em; color: var(--mds-muted); border-top: 1px solid var(--mds-rule); margin-top: 3em; }
+
+@media print {
+  :root { --mds-bg: #ffffff; }
+  body { font-size: 11pt; }
+  pre { border: 1px solid var(--mds-rule); }
+}
