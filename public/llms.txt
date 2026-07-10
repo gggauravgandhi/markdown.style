@@ -5,5 +5,6 @@
 ## Key pages
 
 - Editor (the tool): https://markdown.style/editor
+- Theme gallery (all eight looks on one report): https://markdown.style/themes
 - What it does and why: https://markdown.style/
 - Privacy: https://markdown.style/privacy

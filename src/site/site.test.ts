@@ -71,24 +71,15 @@ describe('crawl files', () => {
     expect(robots).toContain('Sitemap: https://markdown.style/sitemap.xml')
   })
 
-  it('sitemap covers exactly the live routes and every route has a page file', () => {
-    const sitemap = read('public/sitemap.xml')
-    const urls = [...sitemap.matchAll(/<loc>(.*?)<\/loc>/g)].map(m => m[1])
-    expect(urls).toEqual([
-      'https://markdown.style/',
-      'https://markdown.style/editor',
-      'https://markdown.style/privacy',
-      'https://markdown.style/terms',
-    ])
-    for (const page of ['index.html', 'editor.html', 'privacy.html', 'terms.html']) {
-      expect(() => read(page)).not.toThrow()
-    }
+  it('the generated sitemap is the single source of routes (static copy removed)', () => {
+    expect(() => read('public/sitemap.xml')).toThrow() // generator owns it now
   })
 
   it('llms.txt describes the tool and lists key pages', () => {
     const llms = read('public/llms.txt')
     expect(llms).toContain('# markdown.style')
     expect(llms).toContain('https://markdown.style/editor')
+    expect(llms).toContain('https://markdown.style/themes')
   })
 })
 
