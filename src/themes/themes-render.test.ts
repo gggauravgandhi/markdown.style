@@ -39,4 +39,10 @@ describe('registered lineup', () => {
     expect(ids).toContain('slate')
     expect(ids).toContain('carbon')
   })
+
+  it('swiss and contrast exist', () => {
+    const ids = themes.map(t => t.id)
+    expect(ids).toContain('swiss')
+    expect(ids).toContain('contrast')
+  })
 })

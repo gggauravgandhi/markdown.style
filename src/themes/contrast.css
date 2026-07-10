@@ -1,0 +1,59 @@
+/* Contrast — bold, poster-like. Big type, hard rules, zero subtlety. */
+:root {
+  --mds-bg: #ffffff;
+  --mds-fg: #000000;
+  --mds-font-body: 'Avenir Next', 'Segoe UI', system-ui, sans-serif;
+  --mds-font-heading: 'Arial Black', 'Avenir Next Heavy', system-ui, sans-serif;
+  --mds-muted: #444444;
+  --mds-rule: #000000;
+  --mds-code-bg: #f0f0f0;
+}
+
+h1 {
+  font-size: 2.6em;
+  line-height: 1.05;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  border-bottom: 6px solid var(--mds-accent);
+  padding-bottom: 0.25em;
+}
+h2 { font-size: 1.6em; margin-top: 1.8em; text-transform: uppercase; }
+h3 { font-size: 1.2em; margin-top: 1.5em; }
+h4, h5, h6 { font-size: 1em; background: var(--mds-fg); color: var(--mds-bg); display: inline-block; padding: 0.1em 0.5em; }
+
+a { color: var(--mds-fg); text-decoration: underline; text-decoration-color: var(--mds-accent); text-decoration-thickness: 3px; }
+
+blockquote {
+  margin: 1.5em 0;
+  padding: 0.8em 1.2em;
+  border: 3px solid var(--mds-fg);
+  font-weight: 600;
+}
+
+hr { border: 0; border-top: 6px solid var(--mds-fg); margin: 2.5em 0; }
+
+code {
+  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 0.85em;
+  background: var(--mds-code-bg);
+  border: 2px solid var(--mds-fg);
+  padding: 0.1em 0.35em;
+}
+
+pre { border: 3px solid var(--mds-fg); padding: 16px; font-size: 0.85em; }
+pre code { background: none; border: 0; padding: 0; font-size: 1em; }
+
+table { margin: 1.5em 0; border: 3px solid var(--mds-fg); }
+th { text-align: left; background: var(--mds-fg); color: var(--mds-bg); padding: 10px 12px; text-transform: uppercase; }
+td { border: 1px solid var(--mds-fg); padding: 10px 12px; }
+
+ul, ol { padding-left: 1.6em; }
+li { margin: 0.3em 0; }
+li::marker { color: var(--mds-accent); font-weight: 900; }
+
+.footnotes { font-size: 0.85em; border-top: 3px solid var(--mds-fg); margin-top: 3em; }
+
+@media print {
+  body { font-size: 10.5pt; }
+  h1 { font-size: 2.1em; }
+}

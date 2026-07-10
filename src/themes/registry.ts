@@ -1,8 +1,10 @@
 import type { MermaidTheme } from '../pipeline/types'
 import baseCssRaw from './_base.css?raw'
 import carbonCss from './carbon.css?raw'
+import contrastCss from './contrast.css?raw'
 import paperCss from './paper.css?raw'
 import slateCss from './slate.css?raw'
+import swissCss from './swiss.css?raw'
 
 export interface Theme {
   id: string
@@ -43,6 +45,24 @@ export const themes: readonly Theme[] = [
     shikiTheme: 'github-dark',
     mermaidTheme: 'dark',
     css: carbonCss,
+  },
+  {
+    id: 'swiss',
+    name: 'Swiss',
+    description: 'Minimal typographic — whitespace, uppercase labels, one red line.',
+    defaultAccent: '#e30613',
+    shikiTheme: 'min-light',
+    mermaidTheme: 'neutral',
+    css: swissCss,
+  },
+  {
+    id: 'contrast',
+    name: 'Contrast',
+    description: 'Bold poster energy — hard rules, big type, zero subtlety.',
+    defaultAccent: '#ffd400',
+    shikiTheme: 'github-light',
+    mermaidTheme: 'neutral',
+    css: contrastCss,
   },
 ]
 
