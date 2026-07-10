@@ -103,6 +103,14 @@ describe('markdownToHtml', () => {
     expect(body).not.toContain('#b91c1c')
   })
 
+  it('renders mid-paragraph $$...$$ as inline display math', async () => {
+    // the removed fork supported this; keep it (LLM output sometimes inlines $$)
+    const { body } = await markdownToHtml('the formula $$x^2$$ is neat')
+    expect(body).toContain('katex')
+    expect(body).not.toContain('$$x^2$$') // not left as literal text
+    expect(body).not.toContain('#b91c1c')
+  })
+
   it('leaves lone dollar amounts as text (no false math)', async () => {
     const { body } = await markdownToHtml('it costs $5 and then $6 today')
     expect(body).not.toContain('katex')

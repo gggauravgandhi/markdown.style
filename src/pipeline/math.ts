@@ -5,8 +5,10 @@ import type StateInline from 'markdown-it/lib/rules_inline/state_inline.mjs'
 
 // Replaces @vscode/markdown-it-katex: that fork's bundled KaTeX lexer breaks
 // under Vite's dep optimizer (control words truncate to one letter — found in
-// browser QA 2026-07-10). Tokenizer logic below is the classic markdown-it-katex
-// delimiter algorithm; rendering calls our own pinned katex directly.
+// browser QA 2026-07-10). Delimiter rules follow the pandoc-style convention
+// (opening $ not followed by space; closing $ not preceded by space nor
+// followed by a digit); rendering calls our own pinned katex directly.
+// `trust` is left at its default (false), so \href/\includegraphics stay blocked.
 
 const KATEX_OPTS = { throwOnError: false, errorColor: '#b91c1c' } as const
 
@@ -61,6 +63,32 @@ function mathInline(state: StateInline, silent: boolean): boolean {
   return true
 }
 
+/** Mid-paragraph `$$...$$` renders as inline display math (matches the old fork). */
+function mathInlineBlock(state: StateInline, silent: boolean): boolean {
+  if (state.src.slice(state.pos, state.pos + 2) !== '$$') return false
+  let pos = state.pos + 2
+  let found = -1
+  while (pos < state.posMax - 1) {
+    if (state.src[pos] === '\\') {
+      pos += 2 // skip escaped char
+      continue
+    }
+    if (state.src.slice(pos, pos + 2) === '$$') {
+      found = pos
+      break
+    }
+    pos += 1
+  }
+  if (found === -1 || found === state.pos + 2) return false // no close, or empty $$$$
+  if (!silent) {
+    const token = state.push('math_inline_block', 'math', 0)
+    token.markup = '$$'
+    token.content = state.src.slice(state.pos + 2, found)
+  }
+  state.pos = found + 2
+  return true
+}
+
 function mathBlock(state: StateBlock, start: number, end: number, silent: boolean): boolean {
   let pos = state.bMarks[start]! + state.tShift[start]!
   let max = state.eMarks[start]!
@@ -100,12 +128,16 @@ function mathBlock(state: StateBlock, start: number, end: number, silent: boolea
 }
 
 export function mathPlugin(md: MarkdownIt): void {
-  md.inline.ruler.after('escape', 'math_inline', mathInline)
+  // $$ inline-block must be tried before single-$ inline
+  md.inline.ruler.after('escape', 'math_inline_block', mathInlineBlock)
+  md.inline.ruler.after('math_inline_block', 'math_inline', mathInline)
   md.block.ruler.after('blockquote', 'math_block', mathBlock, {
     alt: ['paragraph', 'reference', 'blockquote', 'list'],
   })
   md.renderer.rules.math_inline = (tokens, idx) =>
     katex.renderToString(tokens[idx]!.content, KATEX_OPTS)
+  md.renderer.rules.math_inline_block = (tokens, idx) =>
+    katex.renderToString(tokens[idx]!.content, { ...KATEX_OPTS, displayMode: true })
   md.renderer.rules.math_block = (tokens, idx) =>
     `<p class="mds-math-block">${katex.renderToString(tokens[idx]!.content, { ...KATEX_OPTS, displayMode: true })}</p>\n`
 }

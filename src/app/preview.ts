@@ -18,9 +18,10 @@ export function createPreview(
     try {
       result = await render(state.markdown, state.themeId, state.knobs)
     } catch {
+      if (ticket !== seq) return // a newer render already succeeded — stay silent
       // render() is contracted never to throw, but a broken lazy dep must
       // surface as a visible notice, never a silently blank preview
-      onErrors([{ source: 'pipeline', message: 'preview failed to render' }])
+      onErrors([{ source: 'pipeline', message: 'Preview failed to render — try reloading' }])
       return
     }
     if (ticket !== seq) return // superseded by a newer render — drop

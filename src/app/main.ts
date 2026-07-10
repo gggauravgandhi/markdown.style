@@ -68,7 +68,14 @@ export async function mount(root: HTMLElement): Promise<void> {
 
   // --- preview + editor -------------------------------------------------------
   const preview = createPreview(iframe as HTMLIFrameElement, (errors: RenderError[]) => {
-    if (errors.length > 0) notice(`${errors.length} diagram${errors.length > 1 ? 's' : ''} failed to render`)
+    if (errors.length === 0) return
+    // a whole-pipeline failure carries its own message; diagram failures are counted
+    const pipelineError = errors.find(e => e.source === 'pipeline')
+    if (pipelineError) {
+      notice(pipelineError.message)
+      return
+    }
+    notice(`${errors.length} diagram${errors.length > 1 ? 's' : ''} failed to render`)
   })
 
   const view = new EditorView({
