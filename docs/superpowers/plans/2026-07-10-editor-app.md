@@ -48,8 +48,8 @@ src/app/*.test.ts     # colocated vitest tests (jsdom)
 ### Task 1: Vite app scaffold
 
 **Files:**
-- Create: `vite.config.ts`, `editor.html`, `src/app/app.css` (skeleton), `src/app/main.ts` (skeleton)
-- Modify: `package.json` (scripts)
+- Create: `vite.config.ts`, `editor.html`, `vitest.setup.ts`, `src/app/app.css` (skeleton), `src/app/main.ts` (skeleton)
+- Modify: `package.json` (scripts), `vitest.config.ts` (setupFiles)
 
 **Interfaces:**
 - Consumes: nothing new
@@ -103,7 +103,35 @@ export default defineConfig({
 </html>
 ```
 
-- [ ] **Step 4: Create skeleton main.ts and app.css**
+- [ ] **Step 4: Create vitest.setup.ts and wire it into vitest.config.ts**
+
+Node v22+ ships an experimental global `localStorage` getter that returns `undefined` and shadows jsdom's real `Storage` in vitest's `populateGlobal` (verified live on this toolchain: without this fix, Task 2 fails 0/7 and Task 6 fails 0/2). Do NOT fix this by changing `test.pool` — that breaks Plan 1's `render.node.test.ts`.
+
+`vitest.setup.ts` (repo root):
+```ts
+import { JSDOM } from 'jsdom'
+import { vi } from 'vitest'
+
+// Node v22+'s experimental global localStorage getter returns undefined and
+// shadows jsdom's real Storage in vitest's populateGlobal. Tests need a
+// GENUINE Storage instance (store.test.ts spies on Storage.prototype).
+const dom = new JSDOM('', { url: 'http://localhost/' })
+vi.stubGlobal('localStorage', dom.window.localStorage)
+vi.stubGlobal('Storage', dom.window.Storage)
+```
+
+Update `vitest.config.ts`:
+```ts
+import { defineConfig } from 'vitest/config'
+
+export default defineConfig({
+  // css: true is REQUIRED — without it, `?raw` imports of .css files resolve
+  // to empty strings under vitest and Tasks 7/8/10 fail with baffling output.
+  test: { environment: 'jsdom', css: true, setupFiles: ['./vitest.setup.ts'] },
+})
+```
+
+- [ ] **Step 5: Create skeleton main.ts and app.css**
 
 `src/app/main.ts`:
 ```ts
@@ -134,15 +162,15 @@ body { background: var(--app-bg); color: var(--app-fg); font: 14px/1.5 system-ui
 #app { height: 100%; }
 ```
 
-- [ ] **Step 5: Verify build, dev entry, and existing suite**
+- [ ] **Step 6: Verify build, dev entry, and existing suite**
 
 Run: `bun run build`
 Expected: succeeds; `dist/editor.html` exists.
 
 Run: `bun run test && bun run typecheck`
-Expected: 58/58 pass (nothing broken), typecheck clean.
+Expected: 58/58 pass (nothing broken — the setup file must not disturb Plan 1's node-env tests), typecheck clean.
 
-- [ ] **Step 6: Commit**
+- [ ] **Step 7: Commit**
 
 ```bash
 git add -A
@@ -711,12 +739,14 @@ describe('preview', () => {
   it('stale renders never overwrite newer ones', async () => {
     const preview = createPreview(makeIframe(), () => {})
     const iframe = document.querySelector('iframe')!
-    // fire two renders without awaiting the first; the second must win
-    const p1 = preview.renderNow({ ...STATE, markdown: '# Old' })
-    const p2 = preview.renderNow({ ...STATE, markdown: '# New' })
+    // fire two renders without awaiting the first; the second must win.
+    // markers MUST be strings that cannot appear in theme CSS — 'Old' collides
+    // with the paper theme's 'Iowan Old Style' font stack (verified failure).
+    const p1 = preview.renderNow({ ...STATE, markdown: '# ZZZStale' })
+    const p2 = preview.renderNow({ ...STATE, markdown: '# ZZZFresh' })
     await Promise.all([p1, p2])
-    expect(iframe.srcdoc).toContain('New')
-    expect(iframe.srcdoc).not.toContain('Old')
+    expect(iframe.srcdoc).toContain('ZZZFresh')
+    expect(iframe.srcdoc).not.toContain('ZZZStale')
   })
 
   it('applyKnobs mutates iframe css variables without touching srcdoc', () => {
@@ -1197,3 +1227,10 @@ This task CANNOT be completed by an agent alone: browser automation is disabled 
 - CodeMirror-in-jsdom is a known rough edge: the smoke test ships the two standard `Range` shims and instructs narrow additions only.
 - Theme thumbnails use `sandbox=""` (fully locked; no interaction needed) vs the main preview's `allow-same-origin` (knob fast-path needed) — intentional difference.
 - `store.set` knobs-replacement semantics are pinned by test (Task 2) because the reset flow depends on it.
+
+## Advisor-Verified Fixes (applied after a full scratch-copy execution of this plan)
+
+1. `vitest.setup.ts` with a real-JSDOM `localStorage`/`Storage` stub is REQUIRED on this toolchain (Node v26 shadows jsdom's Storage; 9 tests fail without it). Never fix via `test.pool` — that breaks Plan 1's node-env tests.
+2. Stale-render test markers must not collide with theme CSS ('Old' appears in the paper font stack 'Iowan Old Style').
+3. `store.subscribe()` is intentionally pinned-but-unused in Plan 2 (main.ts wires explicit calls); it becomes load-bearing in later plans — reviewers should not flag it as dead code to delete.
+4. Verified clean as written: CodeMirror-in-jsdom with the two Range shims, copyHtml navigator stub, File.text() in jsdom, applyKnobs contentDocument, debounce fake-timer interplay, Vite MPA build incl. the pipeline's dynamic imports.
