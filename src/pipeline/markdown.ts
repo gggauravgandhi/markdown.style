@@ -1,3 +1,8 @@
+import MarkdownIt from 'markdown-it'
+import footnote from 'markdown-it-footnote'
+import taskLists from 'markdown-it-task-lists'
+import type { Fence, MarkdownPass } from './types'
+
 /** Strip a leading YAML frontmatter block (--- ... ---) if present at position 0. */
 export function stripFrontmatter(src: string): string {
   return src.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, '')
@@ -10,4 +15,38 @@ export function stripFrontmatter(src: string): string {
  */
 export function hasMath(src: string): boolean {
   return /\$\$[\s\S]+?\$\$/.test(src) || /\$[^$\n]+\$/.test(src)
+}
+
+export async function markdownToHtml(src: string): Promise<MarkdownPass> {
+  const md = new MarkdownIt({
+    html: false, // security boundary — never enable (spec §2)
+    linkify: true,
+    typographer: true,
+  })
+  md.use(taskLists, { enabled: false, label: true })
+  md.use(footnote)
+
+  const usedMath = hasMath(src)
+  if (usedMath) {
+    const { default: katexPlugin } = await import('@vscode/markdown-it-katex')
+    md.use(katexPlugin, { throwOnError: false, errorColor: '#b91c1c' })
+  }
+
+  const codeFences: Fence[] = []
+  const mermaidFences: Fence[] = []
+
+  md.renderer.rules.fence = (tokens, idx) => {
+    const token = tokens[idx]!
+    const lang = (token.info.trim().split(/\s+/)[0] ?? '').toLowerCase()
+    if (lang === 'mermaid') {
+      const index = mermaidFences.length
+      mermaidFences.push({ index, lang, code: token.content })
+      return `<div data-mds-slot="mermaid:${index}"></div>\n`
+    }
+    const index = codeFences.length
+    codeFences.push({ index, lang, code: token.content })
+    return `<pre data-mds-slot="code:${index}"></pre>\n`
+  }
+
+  return { body: md.render(src), codeFences, mermaidFences, usedMath }
 }
