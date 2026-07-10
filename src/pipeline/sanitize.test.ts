@@ -36,4 +36,21 @@ describe('sanitizeBody', () => {
     expect(out).toContain('checkbox')
     expect(out).toContain('<img')
   })
+
+  it('strips onload from SVG', () => {
+    expect(sanitizeBody('<svg onload="alert(1)"><circle r="1"/></svg>')).not.toContain('onload')
+  })
+
+  it('strips script tags inside SVG', () => {
+    expect(sanitizeBody('<svg><script>alert(1)</script></svg>')).not.toContain('<script')
+  })
+
+  it('strips javascript: URLs from SVG use href/xlink:href', () => {
+    expect(sanitizeBody('<svg><use href="javascript:alert(1)"/></svg>')).not.toContain('javascript:')
+    expect(sanitizeBody('<svg><use xlink:href="javascript:alert(1)"/></svg>')).not.toContain('javascript:')
+  })
+
+  it('strips javascript: URLs from SVG animate attribute values', () => {
+    expect(sanitizeBody('<svg><animate attributeName="href" values="javascript:alert(1)"/></svg>')).not.toContain('javascript:')
+  })
 })
