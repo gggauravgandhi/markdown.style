@@ -1430,6 +1430,11 @@ git commit -m "feat: render() orchestrator with integration + XSS + self-contain
 
 ---
 
+## Execution deviations (source of truth = code, not the snippets below)
+
+- Task 5/6: slot replacement uses a function replacer `() => html` ($-pattern hazard; commits 747b4ff, snippet updated).
+- Task 6 (commit 72a790d): `renderOne` returns `{ html, ok }` and the loop pushes error annotations on `!ok` — the snippet's `html.includes('mds-error')` heuristic was replaced (false-positives on labels containing that string). No-DOM branch is covered by `src/pipeline/mermaid.node.test.ts` (`@vitest-environment node`); its message reads `'diagram requires a browser to render'`.
+
 ## Advisor-Verified Fixes (applied after a full scratch-directory execution of this plan)
 
 An advisor agent executed every task verbatim (real `bun add`, vitest, tsc). These fixes are already folded in above — listed so executors understand why they exist:
