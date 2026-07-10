@@ -58,8 +58,10 @@ body { background: var(--app-bg); color: var(--app-fg); font: 14px/1.5 system-ui
   overflow: hidden;
 }
 .theme-card:hover, .theme-card:focus-visible { border-color: var(--app-accent); }
-/* render at double width and scale down so the sample isn't clipped mid-word */
-.theme-thumb { width: 200%; height: 280px; transform: scale(0.5); transform-origin: top left; border: 0; border-radius: 4px; background: #fff; pointer-events: none; }
+/* render at double width and scale down so the sample isn't clipped mid-word;
+   transforms are paint-only, so the negative margin returns the layout box
+   (grid row) to the 140px the scaled content actually paints */
+.theme-thumb { width: 200%; height: 280px; transform: scale(0.5); transform-origin: top left; margin-bottom: -140px; border: 0; border-radius: 4px; background: #fff; pointer-events: none; }
 .theme-name { font-weight: 600; }
 .theme-desc { color: var(--app-muted); font-size: 12px; }
 

@@ -114,11 +114,13 @@ In `src/themes/swiss.css`, add after the `.footnotes` rule (before `@media print
 In `src/app/app.css`, replace the `.theme-thumb` rule:
 
 ```css
-/* render at double width and scale down so the sample isn't clipped mid-word */
-.theme-thumb { width: 200%; height: 280px; transform: scale(0.5); transform-origin: top left; border: 0; border-radius: 4px; background: #fff; pointer-events: none; }
+/* render at double width and scale down so the sample isn't clipped mid-word;
+   transforms are paint-only, so the negative margin returns the layout box
+   (grid row) to the 140px the scaled content actually paints */
+.theme-thumb { width: 200%; height: 280px; transform: scale(0.5); transform-origin: top left; margin-bottom: -140px; border: 0; border-radius: 4px; background: #fff; pointer-events: none; }
 ```
 
-and add `overflow: hidden;` to the existing `.theme-card` rule at `src/app/app.css:55` (crops the scaled iframe back to the card; the scaled iframe occupies 140px of visual height — 280 × 0.5 — same as before). This is a visual-only app-chrome change; there is deliberately no unit test for it (matches the untested status of the rest of `app.css`) — it gets eyeballed in Task 8.
+and add `overflow: hidden;` to the existing `.theme-card` rule at `src/app/app.css:55` (crops the scaled iframe's horizontal 200% overflow back to the card; the `margin-bottom: -140px` on `.theme-thumb` handles the vertical gap since CSS transforms are paint-only and don't shrink the layout box on their own). This is a visual-only app-chrome change; there is deliberately no unit test for it (matches the untested status of the rest of `app.css`) — it gets eyeballed in Task 8.
 
 - [ ] **Step 4: Run tests to verify they pass**
 
