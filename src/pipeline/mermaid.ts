@@ -8,6 +8,8 @@ function errorBlock(fence: Fence, message: string): string {
   return `<div class="mds-error"><p class="mds-error-title">Mermaid diagram failed: ${escapeHtml(message)}</p><pre><code>${escapeHtml(fence.code)}</code></pre></div>\n`
 }
 
+type StageOutput = { html: string; ok: boolean }
+
 /**
  * Fill mermaid slots with inline SVG; any failure becomes a visible error block.
  * Security: output bypasses DOMPurify by design (see Interfaces note) —
@@ -20,31 +22,37 @@ export async function renderMermaidFences(
 ): Promise<{ body: string; errors: RenderError[] }> {
   const errors: RenderError[] = []
   let out = body
-  let renderOne: (fence: Fence) => Promise<string>
+  let renderOne: (fence: Fence) => Promise<StageOutput>
 
   if (typeof document === 'undefined') {
-    renderOne = async (fence) => errorBlock(fence, 'diagrams require a browser to render')
+    renderOne = async (fence) => ({
+      html: errorBlock(fence, 'diagram requires a browser to render'),
+      ok: false,
+    })
   } else {
     try {
       const { default: mermaid } = await import('mermaid')
       mermaid.initialize({ startOnLoad: false, securityLevel: 'strict', theme: mermaidTheme })
       renderOne = async (fence) => {
         const { svg } = await mermaid.render(`mds-mermaid-${fence.index}`, fence.code)
-        return `<figure class="mds-mermaid">${svg}</figure>\n`
+        return { html: `<figure class="mds-mermaid">${svg}</figure>\n`, ok: true }
       }
     } catch {
-      renderOne = async (fence) => errorBlock(fence, 'mermaid failed to load')
+      renderOne = async (fence) => ({ html: errorBlock(fence, 'mermaid failed to load'), ok: false })
     }
   }
 
   for (const fence of fences) {
-    let html: string
+    let result: StageOutput
     try {
-      html = await renderOne(fence)
+      result = await renderOne(fence)
     } catch (e) {
-      html = errorBlock(fence, e instanceof Error ? e.message.split('\n')[0]! : 'invalid diagram')
+      result = {
+        html: errorBlock(fence, e instanceof Error ? e.message.split('\n')[0]! : 'invalid diagram'),
+        ok: false,
+      }
     }
-    if (html.includes('mds-error')) {
+    if (!result.ok) {
       errors.push({ source: 'mermaid', message: `diagram ${fence.index + 1} failed to render` })
     }
     // mermaid.render can leave an error element behind in the live DOM — remove it.
@@ -53,7 +61,7 @@ export async function renderMermaidFences(
       document.getElementById(`dmds-mermaid-${fence.index}`)?.remove()
     }
     // function replacer: user-authored diagram labels can contain $ sequences
-    out = out.replace(`<div data-mds-slot="mermaid:${fence.index}"></div>`, () => html)
+    out = out.replace(`<div data-mds-slot="mermaid:${fence.index}"></div>`, () => result.html)
   }
   return { body: out, errors }
 }
