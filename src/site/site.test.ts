@@ -112,9 +112,12 @@ describe('landing ↔ registry sync', () => {
 
   it('theme strip mirrors the registry exactly and links every theme page', () => {
     for (const t of themes) {
-      expect(html, t.id).toContain(`href="/themes/${t.id}"`)
-      expect(html, t.id).toContain(`>${t.name}<`)
-      expect(html, t.id).toContain(`background:${t.defaultAccent}`)
+      // one structural match per theme: swatch color, link target, and name
+      // must sit in the SAME strip item — presence-anywhere would let a
+      // cross-wired strip (name A, accent B) slip through
+      expect(html, t.id).toContain(
+        `<span class="swatch" style="background:${t.defaultAccent}"></span><a href="/themes/${t.id}">${t.name}</a>`,
+      )
     }
     expect(html.match(/class="swatch"/g)).toHaveLength(themes.length)
   })
