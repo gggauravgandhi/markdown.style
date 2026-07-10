@@ -8,3 +8,9 @@ declare module 'markdown-it-footnote' {
   const plugin: (md: MarkdownIt) => void
   export default plugin
 }
+declare module 'jsdom' {
+  export class JSDOM {
+    constructor(html?: string, options?: unknown)
+    window: unknown
+  }
+}

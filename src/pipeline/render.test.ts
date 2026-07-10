@@ -89,4 +89,15 @@ describe('render (integration)', () => {
     const { html } = await render('# X', 'not-a-theme')
     expect(html).toContain('--mds-bg')
   })
+
+  it('applies the theme defaultAccent when no accent knob is set', async () => {
+    const { html } = await render('# X', 'paper')
+    expect(html).toContain(':root { --mds-accent: #8b3a2f;')
+  })
+
+  it('user accent knob overrides the theme default', async () => {
+    const { html } = await render('# X', 'paper', { accent: '#112233' })
+    expect(html).toContain(':root { --mds-accent: #112233;')
+    expect(html).not.toContain('#8b3a2f;')
+  })
 })

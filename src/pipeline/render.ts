@@ -18,7 +18,7 @@ export async function render(markdown: string, themeId: string, knobs: Knobs = {
   const pass = await markdownToHtml(src)
   const errors: RenderError[] = []
 
-  let body = sanitizeBody(pass.body)
+  let body = await sanitizeBody(pass.body)
   if (pass.codeFences.length > 0) {
     body = await highlightFences(body, pass.codeFences, theme.shikiTheme)
   }
@@ -30,6 +30,12 @@ export async function render(markdown: string, themeId: string, knobs: Knobs = {
 
   const extraCss = pass.usedMath ? await (await import('./katex-css')).mathCss() : ''
   const title = extractTitle(src)
-  const html = assembleDocument({ body, title, themeCss: theme.css, knobs, extraCss })
+  const html = assembleDocument({
+    body,
+    title,
+    themeCss: theme.css,
+    knobs: { ...knobs, accent: knobs.accent ?? theme.defaultAccent },
+    extraCss,
+  })
   return { html, title, errors }
 }
