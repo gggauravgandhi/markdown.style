@@ -13,7 +13,9 @@ export async function highlightFences(body: string, fences: Fence[], shikiTheme:
       // unknown language or grammar load failure — plain text, never a blank hole
       html = await codeToHtml(fence.code, { lang: 'text', theme: shikiTheme })
     }
-    out = out.replace(`<pre data-mds-slot="code:${fence.index}"></pre>`, html)
+    // function replacer: a string replacement would interpret $$, $&, $`, $'
+    // in the highlighted HTML (shell code!) as substitution patterns
+    out = out.replace(`<pre data-mds-slot="code:${fence.index}"></pre>`, () => html)
   }
   return out
 }
