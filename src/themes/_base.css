@@ -52,6 +52,8 @@ table { border-collapse: collapse; width: 100%; }
 .mds-error pre { margin: 0; }
 
 input[type='checkbox'] { accent-color: var(--mds-accent); }
+li:has(> input[type='checkbox']) { list-style: none; }
+li > input[type='checkbox'] { margin-right: 0.5em; }
 
 @page { margin: 18mm 16mm; }
 

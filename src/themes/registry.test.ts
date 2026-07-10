@@ -28,6 +28,7 @@ describe('theme registry', () => {
     expect(baseCss).toContain('--mds-accent')
     expect(baseCss).toContain('@page')
     expect(baseCss).toContain('break-inside: avoid')
+    expect(baseCss).toContain("li:has(> input[type='checkbox'])")
   })
 
   it('content layout is flowing blocks — no flex/grid on content wrapper (Paged.js constraint)', () => {
