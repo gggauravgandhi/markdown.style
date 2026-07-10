@@ -2,7 +2,9 @@ import type { MermaidTheme } from '../pipeline/types'
 import baseCssRaw from './_base.css?raw'
 import carbonCss from './carbon.css?raw'
 import contrastCss from './contrast.css?raw'
+import editorialCss from './editorial.css?raw'
 import paperCss from './paper.css?raw'
+import scholarCss from './scholar.css?raw'
 import slateCss from './slate.css?raw'
 import swissCss from './swiss.css?raw'
 
@@ -63,6 +65,24 @@ export const themes: readonly Theme[] = [
     shikiTheme: 'github-light',
     mermaidTheme: 'neutral',
     css: contrastCss,
+  },
+  {
+    id: 'editorial',
+    name: 'Editorial',
+    description: 'Elegant magazine serif — display headings, pull quotes, air.',
+    defaultAccent: '#9a2b2b',
+    shikiTheme: 'vitesse-light',
+    mermaidTheme: 'neutral',
+    css: editorialCss,
+  },
+  {
+    id: 'scholar',
+    name: 'Scholar',
+    description: 'Academic restraint — justified text, centered title, footnotes at home.',
+    defaultAccent: '#1f3a93',
+    shikiTheme: 'solarized-light',
+    mermaidTheme: 'neutral',
+    css: scholarCss,
   },
 ]
 

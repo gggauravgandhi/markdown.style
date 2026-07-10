@@ -1,0 +1,55 @@
+/* Editorial — elegant magazine serif. Display headings, comfortable measure. */
+:root {
+  --mds-bg: #ffffff;
+  --mds-fg: #1a1a1a;
+  --mds-font-body: Georgia, 'Times New Roman', serif;
+  --mds-font-heading: 'Didot', 'Bodoni 72', Georgia, serif;
+  --mds-muted: #6b6b6b;
+  --mds-rule: #dddddd;
+  --mds-code-bg: #f7f7f5;
+}
+
+body { line-height: 1.75; }
+
+h1 { font-size: 2.8em; font-weight: 400; line-height: 1.12; letter-spacing: -0.01em; margin-bottom: 0.4em; }
+h1 + p { font-size: 1.15em; color: var(--mds-muted); }
+h2 { font-size: 1.7em; font-weight: 400; margin-top: 2em; }
+h3 { font-size: 1.25em; font-weight: 600; margin-top: 1.7em; font-family: var(--mds-font-body); }
+h4, h5, h6 { font-size: 0.95em; font-family: var(--mds-font-body); text-transform: uppercase; letter-spacing: 0.1em; color: var(--mds-muted); }
+
+a { color: var(--mds-fg); text-decoration: underline; text-decoration-color: var(--mds-accent); text-underline-offset: 3px; }
+
+blockquote {
+  margin: 2em 1.5em;
+  padding: 0;
+  border: 0;
+  font-size: 1.25em;
+  font-style: italic;
+  line-height: 1.5;
+  color: var(--mds-accent);
+  text-align: center;
+}
+
+hr { border: 0; text-align: center; margin: 2.5em 0; }
+hr::before { content: '· · ·'; color: var(--mds-muted); letter-spacing: 0.8em; }
+
+code { font-family: ui-monospace, Menlo, monospace; font-size: 0.82em; background: var(--mds-code-bg); padding: 0.15em 0.4em; border-radius: 3px; }
+pre { border-radius: 6px; padding: 18px; font-size: 0.82em; }
+pre code { background: none; padding: 0; font-size: 1em; }
+pre.shiki { border: 1px solid var(--mds-rule); }
+
+table { margin: 1.8em 0; font-size: 0.9em; font-family: var(--mds-font-body); }
+th { text-align: left; border-top: 2px solid var(--mds-fg); border-bottom: 1px solid var(--mds-fg); padding: 10px 12px; font-variant-caps: small-caps; }
+td { border-bottom: 1px solid var(--mds-rule); padding: 10px 12px; }
+
+ul, ol { padding-left: 1.6em; }
+li { margin: 0.35em 0; }
+li::marker { color: var(--mds-accent); }
+
+.footnotes { font-size: 0.82em; color: var(--mds-muted); border-top: 1px solid var(--mds-rule); margin-top: 3.5em; }
+
+@media print {
+  body { font-size: 11pt; }
+  h1 { font-size: 2.3em; }
+  blockquote { color: #333333; }
+}
