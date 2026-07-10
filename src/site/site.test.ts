@@ -21,11 +21,11 @@ describe('marketing pages', () => {
     // as `<script type="application/ld+json">` (type attribute first)
     expect(html).not.toMatch(/<script(?! type="application\/ld\+json")/)
     // no external requests: only same-origin or inline assets
-    expect(html).not.toMatch(/(href|src)="https?:\/\/(?!markdown\.style)/)
+    expect(html).not.toMatch(/(href|src)="https?:\/\/(?!markdown\.style[/"])/)
     // exactly one h1
     expect(html.match(/<h1[\s>]/g)).toHaveLength(1)
     // internal links extensionless, never hash-routed
-    expect(html).not.toContain('href="/editor.html"')
+    expect(html).not.toMatch(/href="\/[a-z-]+\.html"/)
     expect(html).not.toContain('href="#/')
   })
 
