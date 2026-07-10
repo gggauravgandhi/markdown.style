@@ -29,6 +29,7 @@ describe('every registry theme renders end-to-end', () => {
     expect(html).toContain('shiki')                    // code fence highlighted
     expect(html).toContain(theme.css.slice(0, 40))     // this theme's css inlined
     expect(html).not.toMatch(/url\(\s*['"]?(?!data:)/) // self-contained (no webfonts)
+    expect(html).not.toMatch(/@import/)
     expect(html).not.toMatch(/<script/i)
   })
 })
