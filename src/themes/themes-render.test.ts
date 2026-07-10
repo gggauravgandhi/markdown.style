@@ -51,4 +51,8 @@ describe('registered lineup', () => {
     expect(ids).toContain('editorial')
     expect(ids).toContain('scholar')
   })
+
+  it('pop exists', () => {
+    expect(themes.map(t => t.id)).toContain('pop')
+  })
 })

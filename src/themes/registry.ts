@@ -4,6 +4,7 @@ import carbonCss from './carbon.css?raw'
 import contrastCss from './contrast.css?raw'
 import editorialCss from './editorial.css?raw'
 import paperCss from './paper.css?raw'
+import popCss from './pop.css?raw'
 import scholarCss from './scholar.css?raw'
 import slateCss from './slate.css?raw'
 import swissCss from './swiss.css?raw'
@@ -83,6 +84,15 @@ export const themes: readonly Theme[] = [
     shikiTheme: 'solarized-light',
     mermaidTheme: 'neutral',
     css: scholarCss,
+  },
+  {
+    id: 'pop',
+    name: 'Pop',
+    description: 'Colorful and friendly — rounded corners, warm tint, wavy links.',
+    defaultAccent: '#d81b7a',
+    shikiTheme: 'catppuccin-latte',
+    mermaidTheme: 'forest',
+    css: popCss,
   },
 ]
 

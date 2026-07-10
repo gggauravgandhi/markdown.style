@@ -14,6 +14,12 @@ describe('theme registry', () => {
     expect(getTheme('paper').id).toBe('paper')
   })
 
+  it('ships the full launch lineup, paper first', () => {
+    expect(themes.map(t => t.id)).toEqual([
+      'paper', 'slate', 'carbon', 'swiss', 'contrast', 'editorial', 'scholar', 'pop',
+    ])
+  })
+
   it.each(themes.map(t => [t.id, t] as const))('theme %s satisfies the theme contract', (_id, theme) => {
     for (const prop of REQUIRED_PROPS) {
       expect(theme.css, `missing ${prop}`).toContain(`${prop}:`)
