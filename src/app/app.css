@@ -1,0 +1,13 @@
+/* App chrome only — document styling lives in src/themes (never here). */
+:root {
+  --app-bg: #101014;
+  --app-surface: #1a1a21;
+  --app-border: #2a2a33;
+  --app-fg: #e8e8ee;
+  --app-muted: #9a9aa8;
+  --app-accent: #6d8dff;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { background: var(--app-bg); color: var(--app-fg); font: 14px/1.5 system-ui, sans-serif; }
+#app { height: 100%; }
