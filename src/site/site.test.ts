@@ -2,6 +2,7 @@
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
+import { themes } from '../themes/registry'
 
 const root = join(import.meta.dirname, '..', '..')
 const read = (p: string): string => readFileSync(join(root, p), 'utf8')
@@ -99,5 +100,22 @@ describe('site css', () => {
     const css = read('src/site/site.css')
     expect(css).toContain('.site-nav a:not(.btn-cta)')
     expect(css).not.toMatch(/\.site-nav a\s*\{/) // the unscoped selector must be gone
+  })
+})
+
+describe('landing ↔ registry sync', () => {
+  const html = read('index.html')
+
+  it('links the themes hub from nav and strip section', () => {
+    expect(html).toContain('href="/themes"')
+  })
+
+  it('theme strip mirrors the registry exactly and links every theme page', () => {
+    for (const t of themes) {
+      expect(html, t.id).toContain(`href="/themes/${t.id}"`)
+      expect(html, t.id).toContain(`>${t.name}<`)
+      expect(html, t.id).toContain(`background:${t.defaultAccent}`)
+    }
+    expect(html.match(/class="swatch"/g)).toHaveLength(themes.length)
   })
 })

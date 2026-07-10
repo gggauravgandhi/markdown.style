@@ -55,6 +55,8 @@ section h2 { font-size: 1.5em; letter-spacing: -0.01em; color: var(--site-ink); 
 .theme-strip .swatch { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 8px; }
 .theme-strip strong { color: var(--site-ink); }
 .theme-strip span.desc { display: block; color: var(--site-muted); font-size: 0.9em; margin-top: 4px; }
+.theme-strip strong a { color: inherit; text-decoration: none; }
+.theme-strip strong a:hover, .theme-strip strong a:focus-visible { color: var(--site-accent); text-decoration: underline; }
 
 .site-footer { border-top: 1px solid var(--site-rule); margin-top: 48px; }
 .site-footer .wrap { display: flex; gap: 20px; padding-top: 24px; padding-bottom: 32px; color: var(--site-muted); font-size: 0.9em; flex-wrap: wrap; }
