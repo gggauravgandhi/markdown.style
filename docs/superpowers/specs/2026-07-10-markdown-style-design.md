@@ -117,7 +117,7 @@ Traffic strategy is organic (SEO + answer engines + LLM recommendation), so this
 
 - JSON-LD: `WebApplication` (applicationCategory `DeveloperApplication`, `offers.price: 0`) + `Organization` + `WebSite`. **No** `aggregateRating`/`review` until genuine reviews exist. No `SearchAction`.
 - OG/Twitter cards, 1200×630 image, absolute https URLs.
-- robots.txt explicitly allows citation bots: OAI-SearchBot, ChatGPT-User, PerplexityBot, Claude-SearchBot, Claude-User. **Open policy decision for the owner:** whether to block training bots (GPTBot, ClaudeBot).
+- robots.txt allows **all** crawlers — citation bots (OAI-SearchBot, ChatGPT-User, PerplexityBot, Claude-SearchBot, Claude-User) explicitly listed, training bots (GPTBot, ClaudeBot) allowed too (owner ruling 2026-07-10: allow all; training crawls may help LLM recommendation).
 - Copy is answer-first: each page/section opens with a direct 1–2 sentence answer; H1s/titles/slugs use natural question language matching real queries.
 - Core Web Vitals at architecture level: debounced (or worker-offloaded) preview re-render (INP), preload landing LCP font/element, reserve preview-pane layout space (CLS).
 - llms.txt: ship as a 5-minute add; not a strategy (97% of published files get zero AI requests per Ahrefs 137K-domain study; Google explicitly doesn't read it).
