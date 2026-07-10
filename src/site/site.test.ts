@@ -100,3 +100,13 @@ describe('vite build inputs', () => {
     }
   })
 })
+
+describe('site css', () => {
+  it('scopes the nav-link muted color so it never overrides a CTA button', () => {
+    // regression (browser QA 2026-07-10): `.site-nav a` out-specified `.btn-cta`,
+    // rendering the "Open the editor" button gray-on-purple (WCAG fail).
+    const css = read('src/site/site.css')
+    expect(css).toContain('.site-nav a:not(.btn-cta)')
+    expect(css).not.toMatch(/\.site-nav a\s*\{/) // the unscoped selector must be gone
+  })
+})

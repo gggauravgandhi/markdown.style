@@ -14,7 +14,15 @@ export function createPreview(
   async function renderNow(state: AppState): Promise<void> {
     clearTimeout(timer) // a direct render supersedes any pending debounced one
     const ticket = ++seq
-    const result = await render(state.markdown, state.themeId, state.knobs)
+    let result: Awaited<ReturnType<typeof render>>
+    try {
+      result = await render(state.markdown, state.themeId, state.knobs)
+    } catch {
+      // render() is contracted never to throw, but a broken lazy dep must
+      // surface as a visible notice, never a silently blank preview
+      onErrors([{ source: 'pipeline', message: 'preview failed to render' }])
+      return
+    }
     if (ticket !== seq) return // superseded by a newer render — drop
     iframe.srcdoc = result.html
     onErrors(result.errors)

@@ -87,6 +87,27 @@ describe('markdownToHtml', () => {
     expect(pass.body).toContain('katex')
   })
 
+  it('renders LaTeX control words to real glyphs (not truncated)', async () => {
+    // regression: the old @vscode/markdown-it-katex fork truncated control
+    // words to one letter under Vite's optimizer (\cdot rendered as "d",
+    // \alpha as literal "\a"). Assert genuine KaTeX output instead of a wrapper.
+    const { body } = await markdownToHtml('inline $a \\cdot b$ and $\\alpha + \\sum_{i=1}^{n} i$')
+    expect(body).toContain('⋅') // ⋅  (\cdot)
+    expect(body).toContain('α') // α  (\alpha)
+    expect(body).not.toContain('#b91c1c') // no KaTeX parse-error color
+  })
+
+  it('renders display math ($$) as a block', async () => {
+    const { body } = await markdownToHtml('before\n\n$$\n\\frac{1}{2}\n$$\n\nafter')
+    expect(body).toContain('mds-math-block')
+    expect(body).not.toContain('#b91c1c')
+  })
+
+  it('leaves lone dollar amounts as text (no false math)', async () => {
+    const { body } = await markdownToHtml('it costs $5 and then $6 today')
+    expect(body).not.toContain('katex')
+  })
+
   it('does not flag usedMath for plain documents', async () => {
     const pass = await markdownToHtml('plain paragraph')
     expect(pass.usedMath).toBe(false)

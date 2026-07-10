@@ -28,8 +28,9 @@ export async function markdownToHtml(src: string): Promise<MarkdownPass> {
 
   const usedMath = hasMath(src)
   if (usedMath) {
-    const { default: katexPlugin } = await import('@vscode/markdown-it-katex')
-    md.use(katexPlugin, { throwOnError: false, errorColor: '#b91c1c' })
+    // lazy: math.ts statically imports katex, keeping it out of the base graph
+    const { mathPlugin } = await import('./math')
+    md.use(mathPlugin)
   }
 
   const codeFences: Fence[] = []

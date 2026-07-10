@@ -17,8 +17,10 @@ body { background: var(--site-bg); color: var(--site-fg); font: 17px/1.65 system
 .site-header .wrap { display: flex; align-items: center; gap: 24px; padding-top: 16px; padding-bottom: 16px; }
 .brand { font-weight: 750; color: var(--site-fg); text-decoration: none; font-size: 1.05em; }
 .site-nav { margin-left: auto; display: flex; gap: 20px; align-items: center; }
-.site-nav a { color: var(--site-muted); text-decoration: none; }
-.site-nav a:hover, .site-nav a:focus-visible { color: var(--site-fg); }
+/* :not(.btn-cta) so the nav's muted color never overrides a CTA button's
+   white text — otherwise .site-nav a out-specifies .btn-cta (gray on purple). */
+.site-nav a:not(.btn-cta) { color: var(--site-muted); text-decoration: none; }
+.site-nav a:not(.btn-cta):hover, .site-nav a:not(.btn-cta):focus-visible { color: var(--site-fg); }
 
 .btn-cta {
   background: var(--site-accent); color: #ffffff; text-decoration: none;
