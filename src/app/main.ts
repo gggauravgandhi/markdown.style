@@ -27,6 +27,14 @@ export async function mount(root: HTMLElement): Promise<void> {
   const initial: AppState = { markdown: SAMPLE_MARKDOWN, themeId: themes[0]!.id, knobs: {} }
   const store = createStore(initial)
 
+  // gallery deep links: /editor?theme=<id> applies the theme (knobs reset,
+  // same as picking it in the dialog) and then leaves the URL clean
+  const requestedTheme = new URLSearchParams(location.search).get('theme')
+  if (requestedTheme && themes.some(t => t.id === requestedTheme)) {
+    if (requestedTheme !== store.get().themeId) store.set({ themeId: requestedTheme, knobs: {} })
+    history.replaceState(null, '', location.pathname)
+  }
+
   // --- layout ---------------------------------------------------------------
   root.innerHTML = ''
   const app = el('div', { class: 'app', 'data-view': 'split' })
