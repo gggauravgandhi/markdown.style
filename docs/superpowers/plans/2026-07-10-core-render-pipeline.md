@@ -79,7 +79,7 @@ src/pipeline/*.test.ts, src/themes/registry.test.ts   # colocated vitest tests
 
 ```bash
 bun add markdown-it markdown-it-task-lists markdown-it-footnote @vscode/markdown-it-katex katex shiki mermaid dompurify
-bun add -d typescript vitest jsdom @types/markdown-it vite
+bun add -d typescript vitest jsdom @types/markdown-it @types/node @types/bun vite
 ```
 
 Note: `dompurify` ≥3.2 ships its own types. If `bun add @vscode/markdown-it-katex` fails (package renamed), fall back to `bun add @mdit/plugin-katex` and adapt Task 3 Step 3 per that plugin's README.
@@ -97,7 +97,7 @@ Note: `dompurify` ≥3.2 ships its own types. If `bun add @vscode/markdown-it-ka
     "noUncheckedIndexedAccess": true,
     "skipLibCheck": true,
     "noEmit": true,
-    "types": ["vite/client"]
+    "types": ["vite/client", "node", "bun"]
   },
   "include": ["src", "scripts"]
 }
@@ -110,7 +110,9 @@ Note: `dompurify` ≥3.2 ships its own types. If `bun add @vscode/markdown-it-ka
 import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
-  test: { environment: 'jsdom' },
+  // css: true is REQUIRED — without it, `?raw` imports of .css files resolve
+  // to empty strings under vitest and Tasks 7/8/10 fail with baffling output.
+  test: { environment: 'jsdom', css: true },
 })
 ```
 
@@ -138,12 +140,9 @@ declare module 'markdown-it-footnote' {
   const plugin: (md: MarkdownIt) => void
   export default plugin
 }
-declare module '@vscode/markdown-it-katex' {
-  import type MarkdownIt from 'markdown-it'
-  const plugin: (md: MarkdownIt, opts?: Record<string, unknown>) => void
-  export default plugin
-}
 ```
+
+Do NOT add a shim for `@vscode/markdown-it-katex` — it ships its own types; a shim would shadow them.
 
 - [ ] **Step 5: Write smoke test and verify harness**
 
@@ -201,6 +200,9 @@ export interface RenderError {
   source: 'mermaid' | 'pipeline'
   message: string
 }
+
+/** Shared literal union — mermaid.initialize rejects a bare `string` theme. */
+export type MermaidTheme = 'default' | 'dark' | 'neutral' | 'forest'
 
 export interface RenderResult {
   html: string
@@ -627,7 +629,8 @@ git commit -m "feat: shiki highlighting stage with plain-text fallback"
 
 **Interfaces:**
 - Consumes: `Fence`, `RenderError` from `./types`
-- Produces: `renderMermaidFences(body: string, fences: Fence[], mermaidTheme: string): Promise<{ body: string; errors: RenderError[] }>` — fills `<div data-mds-slot="mermaid:N"></div>` with inline SVG, or with a visible `.mds-error` block on any failure. Never throws. Browser-only rendering: without a usable DOM it always produces error blocks (build-time sample docs must avoid mermaid — spec §6).
+- Produces: `renderMermaidFences(body: string, fences: Fence[], mermaidTheme: MermaidTheme): Promise<{ body: string; errors: RenderError[] }>` — fills `<div data-mds-slot="mermaid:N"></div>` with inline SVG, or with a visible `.mds-error` block on any failure. Never throws. Browser-only rendering: without a usable DOM it always produces error blocks (build-time sample docs must avoid mermaid — spec §6).
+- **Documented security decision:** Mermaid SVG is inserted *after* the DOMPurify pass and is not re-sanitized — re-sanitizing SVG has its own mXSS/`foreignObject` caveats. The sole control is `securityLevel: 'strict'` at initialize. Plan 2 browser QA MUST include a hostile diagram (event-handler in a label, `click` directive) to verify strict mode holds.
 
 - [ ] **Step 1: Write failing tests**
 
@@ -679,7 +682,7 @@ Expected: FAIL — module missing.
 - [ ] **Step 3: Implement mermaid.ts**
 
 ```ts
-import type { Fence, RenderError } from './types'
+import type { Fence, MermaidTheme, RenderError } from './types'
 
 function escapeHtml(s: string): string {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -689,11 +692,15 @@ function errorBlock(fence: Fence, message: string): string {
   return `<div class="mds-error"><p class="mds-error-title">Mermaid diagram failed: ${escapeHtml(message)}</p><pre><code>${escapeHtml(fence.code)}</code></pre></div>\n`
 }
 
-/** Fill mermaid slots with inline SVG; any failure becomes a visible error block. */
+/**
+ * Fill mermaid slots with inline SVG; any failure becomes a visible error block.
+ * Security: output bypasses DOMPurify by design (see Interfaces note) —
+ * securityLevel 'strict' is the control; never weaken it.
+ */
 export async function renderMermaidFences(
   body: string,
   fences: Fence[],
-  mermaidTheme: string,
+  mermaidTheme: MermaidTheme,
 ): Promise<{ body: string; errors: RenderError[] }> {
   const errors: RenderError[] = []
   let out = body
@@ -791,7 +798,9 @@ writeFileSync(join(import.meta.dir, '..', 'src', 'pipeline', 'katex-inline.css')
 console.log('wrote src/pipeline/katex-inline.css')
 ```
 
-- [ ] **Step 2: Run the generator**
+- [ ] **Step 2: Pin katex and run the generator**
+
+`@vscode/markdown-it-katex` nests its own `katex@^0.16.x` (which produces the markup), while this generator reads the TOP-LEVEL katex's CSS. Keep them in sync — check with `bun pm ls katex`; if the top-level copy is a different major/minor, pin it: `bun add katex@^0.16.4`.
 
 Run: `bun run prepare:katex`
 Expected: `wrote src/pipeline/katex-inline.css`; file exists, roughly 0.7–1.5 MB.
@@ -851,7 +860,7 @@ git commit -m "feat: katex css with base64-inlined woff2 fonts"
 **Interfaces:**
 - Consumes: nothing
 - Produces:
-  - `registry.ts`: `interface Theme { id: string; name: string; description: string; defaultAccent: string; shikiTheme: string; mermaidTheme: 'default' | 'dark' | 'neutral' | 'forest'; css: string }`; `const themes: readonly Theme[]`; `getTheme(id: string): Theme` (unknown id → first theme); `const baseCss: string`
+  - `registry.ts`: `interface Theme { id: string; name: string; description: string; defaultAccent: string; shikiTheme: string; mermaidTheme: MermaidTheme; css: string }` (`MermaidTheme` imported from `../pipeline/types`); `const themes: readonly Theme[]`; `getTheme(id: string): Theme` (unknown id → first theme); `const baseCss: string`
   - Theme contract (hygiene-tested): every theme CSS defines `--mds-bg`, `--mds-fg`, `--mds-font-body`, `--mds-font-heading` and contains an `@media print` block. Plans 2–4 rely on this exact contract for the remaining 7 themes.
 
 - [ ] **Step 1: Write failing hygiene tests**
@@ -1044,6 +1053,7 @@ li::marker { color: var(--mds-accent); }
 
 `src/themes/registry.ts`:
 ```ts
+import type { MermaidTheme } from '../pipeline/types'
 import baseCssRaw from './_base.css?raw'
 import paperCss from './paper.css?raw'
 
@@ -1053,7 +1063,7 @@ export interface Theme {
   description: string
   defaultAccent: string
   shikiTheme: string
-  mermaidTheme: 'default' | 'dark' | 'neutral' | 'forest'
+  mermaidTheme: MermaidTheme
   css: string
 }
 
@@ -1149,16 +1159,19 @@ describe('assembleDocument', () => {
     expect(html).toContain('--mds-page-width: 480px')
   })
 
+  // NOTE: baseCss (inlined in every document) legitimately declares default
+  // --mds-* variables, so assert on the knob OVERRIDE block (`:root { --mds-…`,
+  // single-line format unique to knobsToCss) — never on bare variable names.
   it('drops CSS-injection attempts in accent', () => {
     const html = assembleDocument({ ...base, knobs: { accent: 'red;}body{background:url(javascript:alert(1))' } })
     expect(html).not.toContain('javascript:alert')
-    expect(html).not.toContain('--mds-accent')
+    expect(html).not.toContain('red;}')
+    expect(html).not.toContain(':root { --mds-accent')
   })
 
-  it('drops non-finite numeric knobs', () => {
+  it('drops non-finite numeric knobs entirely (no override block)', () => {
     const html = assembleDocument({ ...base, knobs: { fontScale: Number.NaN, pageWidth: Infinity } })
-    expect(html).not.toContain('--mds-font-scale')
-    expect(html).not.toContain('--mds-page-width')
+    expect(html).not.toContain(':root { --mds')
   })
 
   it('includes extraCss when provided', () => {
@@ -1335,8 +1348,9 @@ describe('render (integration)', () => {
     ].join('\n\n')
     const { html } = await render(hostile, 'paper')
     expect(html).not.toMatch(/<script/i)
-    expect(html).not.toMatch(/onerror/i)
-    expect(html).not.toMatch(/onload/i)
+    // escaped text legitimately contains the substring "onerror" — only a
+    // handler inside a LIVE tag is a failure, so anchor the match to a real tag
+    expect(html).not.toMatch(/<\w+[^>]*\son\w+=/i)
     expect(html).not.toContain('<iframe')
   })
 
@@ -1412,6 +1426,17 @@ git commit -m "feat: render() orchestrator with integration + XSS + self-contain
 ```
 
 ---
+
+## Advisor-Verified Fixes (applied after a full scratch-directory execution of this plan)
+
+An advisor agent executed every task verbatim (real `bun add`, vitest, tsc). These fixes are already folded in above — listed so executors understand why they exist:
+
+1. `vitest.config.ts` needs `css: true` or every `.css?raw` import is an empty string (Tasks 7/8/10 fail).
+2. Task 9 assertions must target the knob override block, not bare `--mds-*` names (baseCss always contains the defaults).
+3. `@types/node` + `@types/bun` required (`node:fs`, `import.meta.dir`); `MermaidTheme` literal union required (`mermaid.initialize` rejects `string`).
+4. XSS assertions must anchor to live tags — escaped text legitimately contains "onerror".
+5. Mermaid output bypasses DOMPurify by documented decision (securityLevel 'strict' is the control); hostile-diagram check is a Plan 2 browser QA requirement.
+6. No type shim for `@vscode/markdown-it-katex` (ships own types); pin top-level `katex` to the plugin's nested 0.16.x line.
 
 ## Self-Review Notes (already applied)
 
