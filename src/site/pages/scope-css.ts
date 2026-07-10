@@ -19,6 +19,12 @@ function rescopeDocumentSelectors(css: string): string {
 export function scopedSampleCss(theme: Theme): string {
   const scope = `.mds-theme-${theme.id}`
   const sheet = rescopeDocumentSelectors(`${baseCss}\n${theme.css}`)
-  // the accent normally arrives via render() knobs; embeds apply the default
-  return `${scope} {\n${sheet}\n}\n${scope} { --mds-accent: ${theme.defaultAccent}; }`
+  // headings first: host-page selectors like `section h2` (0,0,2) would beat
+  // INHERITED theme colors; this nested pin (0,1,1) restores the theme's fg
+  // while later theme rules of equal specificity still override it
+  return `${scope} {
+h1, h2, h3, h4, h5, h6 { color: inherit; }
+${sheet}
+}
+${scope} { --mds-accent: ${theme.defaultAccent}; }`
 }

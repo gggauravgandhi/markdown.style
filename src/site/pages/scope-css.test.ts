@@ -22,4 +22,13 @@ describe('scopedSampleCss', () => {
     expect(css).toContain('@media print')
     expect(css).toContain('.mds-content') // structural class untouched
   })
+
+  it('pins heading color ahead of the sheet so host-page section h2 rules cannot leak in', () => {
+    for (const theme of themes) {
+      const css = scopedSampleCss(theme)
+      const pin = css.indexOf('h1, h2, h3, h4, h5, h6 { color: inherit; }')
+      expect(pin, theme.id).toBeGreaterThan(-1)
+      expect(pin, theme.id).toBeLessThan(css.indexOf('.mds-content')) // before the sheet
+    }
+  })
 })

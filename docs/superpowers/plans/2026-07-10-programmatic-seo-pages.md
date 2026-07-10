@@ -828,8 +828,14 @@ function rescopeDocumentSelectors(css: string): string {
 export function scopedSampleCss(theme: Theme): string {
   const scope = `.mds-theme-${theme.id}`
   const sheet = rescopeDocumentSelectors(`${baseCss}\n${theme.css}`)
-  // the accent normally arrives via render() knobs; embeds apply the default
-  return `${scope} {\n${sheet}\n}\n${scope} { --mds-accent: ${theme.defaultAccent}; }`
+  // headings first: host-page selectors like `section h2` (0,0,2) would beat
+  // INHERITED theme colors; this nested pin (0,1,1) restores the theme's fg
+  // while later theme rules of equal specificity still override it
+  return `${scope} {
+h1, h2, h3, h4, h5, h6 { color: inherit; }
+${sheet}
+}
+${scope} { --mds-accent: ${theme.defaultAccent}; }`
 }
 ```
 
@@ -1342,7 +1348,7 @@ Append to `src/site/site.css`:
 .theme-card-link { display: block; text-decoration: none; color: inherit; border: 1px solid var(--site-rule); border-radius: 10px; overflow: hidden; }
 .theme-card-link:hover, .theme-card-link:focus-visible { border-color: var(--site-accent); }
 .mini-preview { height: 220px; overflow: hidden; pointer-events: none; }
-.mini-preview .mds-content { width: 200%; transform: scale(0.5); transform-origin: top left; padding: 24px; }
+.theme-card-link .mini-preview .mds-content { width: 200%; transform: scale(0.5); transform-origin: top left; padding: 24px; }
 .theme-card-meta { display: block; padding: 12px 14px; }
 .theme-card-meta .desc { display: block; color: var(--site-muted); font-size: 0.9em; margin-top: 2px; }
 .sample-embed { margin: 24px 0; border: 1px solid var(--site-rule); border-radius: 10px; overflow: hidden; }

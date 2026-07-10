@@ -101,6 +101,11 @@ describe('site css', () => {
     expect(css).toContain('.site-nav a:not(.btn-cta)')
     expect(css).not.toMatch(/\.site-nav a\s*\{/) // the unscoped selector must be gone
   })
+
+  it('hub mini-preview padding out-specifies the scoped theme sheet (0,3,0 beats the 0,2,0 tie)', () => {
+    const css = read('src/site/site.css')
+    expect(css).toContain('.theme-card-link .mini-preview .mds-content')
+  })
 })
 
 describe('landing ↔ registry sync', () => {
