@@ -42,3 +42,27 @@ describe('theme registry', () => {
     expect(contentRule.slice(0, contentRule.indexOf('}'))).not.toMatch(/display:\s*(flex|grid)/)
   })
 })
+
+describe('theme polish (plan 4b pre-pass)', () => {
+  it('contrast and swiss define their own .mds-error styling', () => {
+    for (const id of ['contrast', 'swiss']) {
+      expect(getTheme(id).css, id).toContain('.mds-error')
+    }
+  })
+
+  it('carbon heading prefixes carry empty alt text so screen readers skip them', () => {
+    // CSS alt-text syntax: content: '# ' / '' — unsupported browsers drop the
+    // declaration entirely (decorative # disappears; heading text unaffected).
+    const carbon = getTheme('carbon').css
+    expect(carbon).toContain("content: '# ' / ''")
+    expect(carbon).toContain("content: '## ' / ''")
+    expect(carbon).toContain("content: '### ' / ''")
+  })
+
+  it('base print block no longer carries the dead link rule', () => {
+    // every theme defines an unconditional `a { color }` later in source order,
+    // so the base @media print `a { color: inherit }` could never win — dead code.
+    const printBlock = baseCss.slice(baseCss.indexOf('@media print'))
+    expect(printBlock).not.toMatch(/^\s*a\s*\{/m)
+  })
+})

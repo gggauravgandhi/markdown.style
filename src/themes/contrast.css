@@ -53,6 +53,9 @@ li::marker { color: var(--mds-accent); font-weight: 900; }
 
 .footnotes { font-size: 0.85em; border-top: 3px solid var(--mds-fg); margin-top: 3em; }
 
+/* errors keep the poster language: hard border, no rounding */
+.mds-error { border: 3px solid #b91c1c; border-radius: 0; }
+
 @media print {
   body { font-size: 10.5pt; }
   h1 { font-size: 2.1em; }

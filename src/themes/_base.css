@@ -62,5 +62,4 @@ li > input[type='checkbox'] { margin-right: 0.5em; }
   .mds-content { max-width: none; padding: 0; }
   pre, table, figure, blockquote, .mds-mermaid { break-inside: avoid; }
   h1, h2, h3, h4, h5, h6 { break-after: avoid; }
-  a { text-decoration: none; color: inherit; }
 }
