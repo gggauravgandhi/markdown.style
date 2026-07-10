@@ -20,7 +20,7 @@
 - **robots.txt allows ALL crawlers** — explicit Allow entries for citation bots (OAI-SearchBot, ChatGPT-User, PerplexityBot, Claude-SearchBot, Claude-User) AND training bots (GPTBot, ClaudeBot) allowed — owner ruling 2026-07-10. Sitemap pointer included.
 - Canonical URLs use `https://markdown.style/...`; internal links use extensionless paths (`/editor`, `/privacy`) — production hosts resolve `.html` clean URLs; NEVER hash routing.
 - `sitemap.xml` lists exactly: `/`, `/editor`, `/privacy`, `/terms` (4a scope; 4b extends it).
-- OG/Twitter meta on every page; the 1200×630 OG image is a launch asset the OWNER supplies — reference `/og.png` in meta now and record the TODO in the ledger (do not fabricate a binary).
+- OG meta (`og:title`, `og:description`, `og:url`, `og:type`) on every page; `og:image` + `twitter:card` on the LANDING page only (it's the share target; privacy/terms don't need cards). The 1200×630 OG image is a launch asset the OWNER supplies — reference `/og.png` in meta now and record the TODO in the ledger (do not fabricate a binary).
 - No analytics, no external requests of any kind from marketing pages.
 - A11y basics: semantic landmarks (header/main/footer), one h1 per page, visible focus states.
 - TDD: the site-invariants test suite is written FIRST (failing), then pages are authored to satisfy it.
@@ -75,6 +75,8 @@ describe('marketing pages', () => {
     expect(html).toMatch(/<meta property="og:title"/)
     expect(html).toMatch(/<meta name="description"/)
     // zero JS on citable pages (AI crawlers don't execute it; there is nothing to execute)
+    // NOTE: attribute-order-sensitive — JSON-LD scripts must be written exactly
+    // as `<script type="application/ld+json">` (type attribute first)
     expect(html).not.toMatch(/<script(?! type="application\/ld\+json")/)
     // no external requests: only same-origin or inline assets
     expect(html).not.toMatch(/(href|src)="https?:\/\/(?!markdown\.style)/)
