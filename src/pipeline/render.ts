@@ -6,13 +6,11 @@ import { renderMermaidFences } from './mermaid'
 import { sanitizeBody } from './sanitize'
 import type { Knobs, RenderError, RenderResult } from './types'
 
-/**
- * The one function the product hangs off (spec §2).
- * Preview, HTML download, and print all consume this exact string.
- * Order: markdown(+katex) → sanitize user-authored body → fill trusted
- * slots (shiki, mermaid) → assemble. Never throws; errors are annotated.
- */
-export async function render(markdown: string, themeId: string, knobs: Knobs = {}): Promise<RenderResult> {
+/** The processed document body before assembly — used by the static-page generator. */
+export async function renderBody(
+  markdown: string,
+  themeId: string,
+): Promise<{ body: string; title: string; errors: RenderError[]; usedMath: boolean }> {
   const theme = getTheme(themeId)
   const src = stripFrontmatter(markdown)
   const pass = await markdownToHtml(src)
@@ -27,9 +25,19 @@ export async function render(markdown: string, themeId: string, knobs: Knobs = {
     body = result.body
     errors.push(...result.errors)
   }
+  return { body, title: extractTitle(src), errors, usedMath: pass.usedMath }
+}
 
-  const extraCss = pass.usedMath ? await (await import('./katex-css')).mathCss() : ''
-  const title = extractTitle(src)
+/**
+ * The one function the product hangs off (spec §2).
+ * Preview, HTML download, and print all consume this exact string.
+ * Order: markdown(+katex) → sanitize user-authored body → fill trusted
+ * slots (shiki, mermaid) → assemble. Never throws; errors are annotated.
+ */
+export async function render(markdown: string, themeId: string, knobs: Knobs = {}): Promise<RenderResult> {
+  const theme = getTheme(themeId)
+  const { body, title, errors, usedMath } = await renderBody(markdown, themeId)
+  const extraCss = usedMath ? await (await import('./katex-css')).mathCss() : ''
   const html = assembleDocument({
     body,
     title,

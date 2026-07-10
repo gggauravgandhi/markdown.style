@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { render } from './render'
+import { render, renderBody } from './render'
 
 const FULL_DOC = `---
 generator: llm
@@ -99,5 +99,17 @@ describe('render (integration)', () => {
     const { html } = await render('# X', 'paper', { accent: '#112233' })
     expect(html).toContain(':root { --mds-accent: #112233;')
     expect(html).not.toContain('#8b3a2f;')
+  })
+})
+
+describe('renderBody', () => {
+  it('returns the processed body without document assembly', async () => {
+    const { body, title, errors, usedMath } = await renderBody('# Hi\n\n```ts\nconst a = 1\n```', 'paper')
+    expect(title).toBe('Hi')
+    expect(errors).toEqual([])
+    expect(usedMath).toBe(false)
+    expect(body).toContain('shiki') // fences highlighted
+    expect(body).not.toContain('<!doctype') // not assembled
+    expect(body).not.toContain('<style') // no css — caller owns styling
   })
 })
