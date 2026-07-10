@@ -12,6 +12,7 @@ export function createPreview(
   let seq = 0
 
   async function renderNow(state: AppState): Promise<void> {
+    clearTimeout(timer) // a direct render supersedes any pending debounced one
     const ticket = ++seq
     const result = await render(state.markdown, state.themeId, state.knobs)
     if (ticket !== seq) return // superseded by a newer render — drop

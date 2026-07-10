@@ -50,6 +50,18 @@ describe('preview', () => {
     expect(iframe.srcdoc).not.toContain('ZZZStale')
   })
 
+  it('a direct renderNow cancels any pending debounced render', async () => {
+    vi.useFakeTimers()
+    const preview = createPreview(makeIframe(), () => {})
+    const iframe = document.querySelector('iframe')!
+    preview.scheduleRender({ ...STATE, markdown: '# ZZZQueued' })
+    await preview.renderNow({ ...STATE, markdown: '# ZZZDirect' })
+    await vi.advanceTimersByTimeAsync(RENDER_DEBOUNCE_MS + 50)
+    vi.useRealTimers()
+    expect(iframe.srcdoc).toContain('ZZZDirect')
+    expect(iframe.srcdoc).not.toContain('ZZZQueued')
+  })
+
   it('applyKnobs mutates iframe css variables without touching srcdoc', () => {
     const preview = createPreview(makeIframe(), () => {})
     const iframe = document.querySelector('iframe')!
