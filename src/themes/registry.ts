@@ -6,16 +6,20 @@ import briefingCss from './briefing.css?raw'
 import carbonCss from './carbon.css?raw'
 import contrastCss from './contrast.css?raw'
 import editorialCss from './editorial.css?raw'
+import lectureCss from './lecture.css?raw'
 import ledgerCss from './ledger.css?raw'
 import manualCss from './manual.css?raw'
 import memoCss from './memo.css?raw'
+import notebookCss from './notebook.css?raw'
 import paperCss from './paper.css?raw'
 import popCss from './pop.css?raw'
+import preprintCss from './preprint.css?raw'
 import quarterlyCss from './quarterly.css?raw'
 import scholarCss from './scholar.css?raw'
 import slateCss from './slate.css?raw'
 import swissCss from './swiss.css?raw'
 import terminalCss from './terminal.css?raw'
+import thesisCss from './thesis.css?raw'
 
 export type Category = 'business' | 'technical' | 'academic' | 'editorial' | 'minimal' | 'bold'
 
@@ -209,6 +213,46 @@ export const themes: readonly Theme[] = [
     shikiTheme: 'github-light',
     mermaidTheme: 'neutral',
     css: manualCss,
+  },
+  {
+    id: 'thesis',
+    name: 'Thesis',
+    description: 'Dissertation formality: Times lineage, numbered headings, sober rules.',
+    category: 'academic',
+    defaultAccent: '#1e2f5e',
+    shikiTheme: 'github-light',
+    mermaidTheme: 'neutral',
+    css: thesisCss,
+  },
+  {
+    id: 'preprint',
+    name: 'Preprint',
+    description: 'LaTeX preprint: Computer Modern spirit, justified measure, hyperref links.',
+    category: 'academic',
+    defaultAccent: '#1a4fd6',
+    shikiTheme: 'min-light',
+    mermaidTheme: 'neutral',
+    css: preprintCss,
+  },
+  {
+    id: 'notebook',
+    name: 'Notebook',
+    description: 'Lab notebook: ruled callouts, ballpoint-blue annotations.',
+    category: 'academic',
+    defaultAccent: '#2563eb',
+    shikiTheme: 'catppuccin-latte',
+    mermaidTheme: 'neutral',
+    css: notebookCss,
+  },
+  {
+    id: 'lecture',
+    name: 'Lecture',
+    description: 'Lecture notes: crisp sans, tinted key-point blocks.',
+    category: 'academic',
+    defaultAccent: '#0f766e',
+    shikiTheme: 'snazzy-light',
+    mermaidTheme: 'neutral',
+    css: lectureCss,
   },
 ]
 

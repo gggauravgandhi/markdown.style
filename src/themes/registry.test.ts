@@ -82,6 +82,7 @@ describe('categories', () => {
     const count = (c: string) => themes.filter(t => t.category === c).length
     expect(count('business')).toBe(5)
     expect(count('technical')).toBe(5)
+    expect(count('academic')).toBe(5)
   })
 
   it('descriptions carry no em dashes (UI copy rule)', () => {

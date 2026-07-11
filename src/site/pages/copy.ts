@@ -174,6 +174,42 @@ export const themeCopy: readonly ThemeCopy[] = [
     whoItSuits: 'API references, how-to guides, and README-grade documentation — anything a reader consults rather than reads cover to cover.',
     pairWith: ['slate', 'terminal'],
   },
+  {
+    id: 'thesis',
+    title: 'Thesis theme — dissertation styling for markdown — markdown.style',
+    description: 'See a full report rendered in Thesis: Times lineage, numbered sections, and examiner-grade sobriety. Free, in your browser.',
+    h1: 'Thesis — dissertation formality with numbered sections',
+    intro: 'Thesis sets your markdown the way graduate schools expect: a Times lineage, automatically numbered sections, justified text, and rules that know when to stop. Below is a complete sample rendered in it.',
+    whoItSuits: 'Dissertations, formal literature reviews, and committee-bound documents — writing that will be judged by people who notice margins.',
+    pairWith: ['scholar', 'preprint'],
+  },
+  {
+    id: 'preprint',
+    title: 'Preprint theme — LaTeX-style markdown rendering — markdown.style',
+    description: 'See a full report rendered in Preprint: Computer Modern spirit, booktabs tables, and hyperref-blue links without touching LaTeX. Free, in your browser.',
+    h1: 'Preprint — the LaTeX look without the LaTeX',
+    intro: 'Preprint borrows what people love about a good arXiv paper: the Computer Modern voice, centered booktabs tables, and quiet blue links. Below is a complete sample rendered in it.',
+    whoItSuits: 'Research notes, paper drafts, and technical writeups for readers who live on arXiv — when the content is markdown but the audience expects LaTeX.',
+    pairWith: ['thesis', 'scholar'],
+  },
+  {
+    id: 'notebook',
+    title: 'Notebook theme — lab-notebook styling for markdown — markdown.style',
+    description: 'See a full report rendered in Notebook: warm ruled paper, dashed annotation boxes, and ballpoint-blue accents. Free, in your browser.',
+    h1: 'Notebook — a lab notebook that keeps itself legible',
+    intro: 'Notebook styles your markdown like a well-kept lab book: warm paper, ballpoint-blue rules, and dashed boxes where observations get taped in. Below is a complete sample rendered in it.',
+    whoItSuits: 'Experiment logs, research journals, and working notes — documents that grow daily and still need to read cleanly at review time.',
+    pairWith: ['lecture', 'slate'],
+  },
+  {
+    id: 'lecture',
+    title: 'Lecture theme — lecture-notes styling for markdown — markdown.style',
+    description: 'See a full report rendered in Lecture: crisp humanist sans, tinted key-point blocks, and headings that underline themselves. Free, in your browser.',
+    h1: 'Lecture — notes that teach as clearly as they read',
+    intro: 'Lecture turns your markdown into the notes everyone borrows before the exam: a crisp humanist sans, tinted key-point blocks, and short accent underlines that keep sections scannable. Below is a complete sample rendered in it.',
+    whoItSuits: 'Course notes, tutorials, and study guides — explanatory writing where the key point must be findable in three seconds.',
+    pairWith: ['notebook', 'scholar'],
+  },
 ]
 
 export const useCases: readonly UseCaseCopy[] = [
