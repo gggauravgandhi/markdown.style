@@ -317,7 +317,7 @@ export const useCases: readonly UseCaseCopy[] = [
       },
       {
         q: 'Can I change how it looks before sending?',
-        a: 'Yes — the editor previews live in any of the eight themes, and you can adjust the accent color, font size, and page width. Export is a self-contained HTML file or a print-to-PDF.',
+        a: 'Yes — the editor previews live in any of the 30 themes, and you can adjust the accent color, font size, and page width. Export is a self-contained HTML file or a print-to-PDF.',
       },
     ],
   },
@@ -363,7 +363,7 @@ export const convertPages: readonly ConvertCopy[] = [
   {
     slug: 'markdown-to-pdf',
     title: 'Convert markdown to PDF — styled, free, in your browser — markdown.style',
-    description: 'Paste markdown, pick one of eight themes, print to PDF. Tables, code, math, and diagrams styled properly — free, no upload, no watermark.',
+    description: 'Paste markdown, pick one of 30 themes, print to PDF. Tables, code, math, and diagrams styled properly — free, no upload, no watermark.',
     h1: 'Convert markdown to PDF without the plain-white look',
     intro: 'Paste your markdown, pick a theme, press Print, and choose “Save as PDF” — that is the whole workflow. The difference from other converters is design: a real theme styles your tables, code, and headings, with print CSS that keeps them intact across page breaks.',
     sections: [

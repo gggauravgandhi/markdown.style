@@ -120,6 +120,13 @@ describe('generated page invariants', () => {
     expect(pages.get('/convert/markdown-to-html')!).toContain('href="/convert/markdown-to-pdf"')
     for (const c of convertPages) expect(pages.get(`/convert/${c.slug}`)!).toContain('href="/themes"')
   })
+
+  it('no page references the stale eight-themes count (registry now has 30)', async () => {
+    const pages = await pagesPromise
+    for (const [route, html] of pages) {
+      expect(html, route).not.toMatch(/eight themes?/i)
+    }
+  })
 })
 
 describe('buildSitemap', () => {

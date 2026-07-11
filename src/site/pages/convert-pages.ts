@@ -15,7 +15,7 @@ export function buildConvertPage(copy: ConvertCopy): string {
   <p class="lede">${escapeHtml(copy.intro)}</p>
   <div class="cta-row">
     <a class="btn-cta" href="/editor">Open the editor</a>
-    <a class="btn-ghost" href="/themes">See the eight themes</a>
+    <a class="btn-ghost" href="/themes">Browse all themes</a>
   </div>
 </section>
 

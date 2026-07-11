@@ -36,7 +36,7 @@ ${sections}
 
 <section aria-label="More">
   <h2>More ways in</h2>
-  <p class="answer">Browse <a href="/themes">all eight themes</a>, or go straight to <a href="/convert/markdown-to-pdf">markdown → PDF</a> / <a href="/convert/markdown-to-html">markdown → HTML</a>.</p>
+  <p class="answer">Browse <a href="/themes">all themes</a>, or go straight to <a href="/convert/markdown-to-pdf">markdown → PDF</a> / <a href="/convert/markdown-to-html">markdown → HTML</a>.</p>
 </section>`
   return pageShell({
     title: copy.title,
