@@ -166,11 +166,10 @@ Expected: FAIL — strip has 8 swatches and no browse-all line.
 
 - [ ] **Step 3: Rewrite the strip in `index.html`**
 
-In the theme-strip `<ul class="theme-strip">`: keep the existing `<li>` blocks for `paper`, `slate`, `scholar`, `swiss`, `pop` byte-identical except the description `<span class="desc">` text, which changes to the Task 1 colon-form description. Delete the `carbon`, `contrast`, `editorial` blocks. Add this block after `slate`'s (boardroom ships in Task 3 with accent `#1f3a5f`):
+In the theme-strip `<ul class="theme-strip">`: keep the existing `<li>` blocks for `paper`, `slate`, `scholar`, `swiss`, `pop` byte-identical except the description `<span class="desc">` text, which changes to the Task 1 colon-form description. Delete the `carbon`, `contrast`, `editorial` blocks. Add this block after `slate`'s, structurally identical to the other entries (boardroom ships in Task 3 with accent `#1f3a5f`):
 
 ```html
-      <li><span class="swatch" style="background:#1f3a5f"></span><a href="/themes/boardroom">Boardroom</a>
-        <span class="desc">Confident corporate report: navy authority, disciplined ruled tables.</span></li>
+        <li><strong><span class="swatch" style="background:#1f3a5f"></span><a href="/themes/boardroom">Boardroom</a></strong><span class="desc">Confident corporate report: navy authority, disciplined ruled tables.</span></li>
 ```
 
 Directly after the closing `</ul>` of the strip, update the existing browse-all line's text to exactly:
@@ -178,6 +177,8 @@ Directly after the closing `</ul>` of the strip, update the existing browse-all 
 ```html
     <p><a class="btn-ghost" href="/themes">Browse all 30 themes →</a></p>
 ```
+
+Also update the two remaining "eight theme(s)" copy references elsewhere in index.html to thirty-based phrasing.
 
 - [ ] **Step 4: Run the full suite**
 
