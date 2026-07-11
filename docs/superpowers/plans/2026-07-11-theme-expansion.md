@@ -742,7 +742,8 @@ In `src/site/pages/pages.test.ts`:
 ```ts
       for (const category of Object.keys(CATEGORY_LABELS)) {
         expect(hub).toContain(`id="${category}"`)
-        expect(hub).toContain(CATEGORY_LABELS[category as Category])
+        // labels contain '&', which the builder escapes to '&amp;'
+        expect(hub).toContain(escapeHtml(CATEGORY_LABELS[category as Category]))
       }
 ```
 
