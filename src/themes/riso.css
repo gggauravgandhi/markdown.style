@@ -1,0 +1,41 @@
+/* Riso — risograph print. Two-ink overprint charm on tinted paper. */
+:root {
+  --mds-bg: #fbf7ef;
+  --mds-fg: #33312c;
+  --mds-font-body: 'Segoe UI', Seravek, system-ui, sans-serif;
+  --mds-font-heading: 'Segoe UI', Seravek, system-ui, sans-serif;
+  --mds-muted: #7d7668;
+  --mds-rule: #e5ddcb;
+  --mds-code-bg: #f2ecdd;
+  --mds-ink-2: #2b4bd7;
+}
+
+h1 { font-size: 2.3em; font-weight: 800; letter-spacing: -0.02em; color: var(--mds-accent); }
+h2 { font-size: 1.4em; font-weight: 800; margin-top: 2.2em; color: var(--mds-accent); }
+h2::after { content: '' / ''; display: block; width: 2.4em; border-bottom: 4px solid var(--mds-ink-2); padding-top: 0.2em; }
+h3 { font-size: 1.1em; font-weight: 700; margin-top: 1.7em; color: var(--mds-ink-2); }
+h4, h5, h6 { font-size: 0.95em; font-weight: 700; color: var(--mds-muted); }
+
+a { color: var(--mds-ink-2); text-decoration-thickness: 2px; text-decoration-color: var(--mds-accent); }
+
+blockquote { margin: 1.6em 0; padding: 0.8em 1.2em; background: #edf1ff; border: 0; border-radius: 4px; color: #22368f; }
+
+hr { border: 0; border-top: 3px dotted var(--mds-accent); margin: 2.5em 0; }
+
+code { font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace; font-size: 0.87em; background: var(--mds-code-bg); color: var(--mds-ink-2); padding: 0.15em 0.4em; border-radius: 4px; }
+pre { border-radius: 6px; padding: 16px 20px; font-size: 0.87em; }
+pre code { background: none; color: inherit; padding: 0; font-size: 1em; }
+pre.shiki { border: 2px solid var(--mds-accent); }
+
+table { margin: 1.6em 0; font-size: 0.93em; }
+th { text-align: left; border-bottom: 3px solid var(--mds-accent); padding: 8px 12px; color: var(--mds-ink-2); }
+td { border-bottom: 1px solid var(--mds-rule); padding: 8px 12px; }
+tbody tr:nth-child(even) { background: rgba(43, 75, 215, 0.05); }
+
+ul, ol { padding-left: 1.6em; }
+li { margin: 0.3em 0; }
+li::marker { color: var(--mds-accent); }
+
+.footnotes { font-size: 0.85em; color: var(--mds-muted); border-top: 1px solid var(--mds-rule); margin-top: 3em; }
+
+@media print { :root { --mds-bg: #ffffff; } body { font-size: 10.5pt; } }

@@ -264,6 +264,42 @@ export const themeCopy: readonly ThemeCopy[] = [
     whoItSuits: 'Manifestos, letters, and short strategy notes — writing that gains authority from calm. Not the theme for a 40-page appendix.',
     pairWith: ['mist', 'swiss'],
   },
+  {
+    id: 'neon',
+    title: 'Neon theme — electric dark styling for markdown — markdown.style',
+    description: 'See a full report rendered in Neon: cyan and magenta on violet-black, flipping to a printable light palette on paper. Free, in your browser.',
+    h1: 'Neon — electric dark for documents with a pulse',
+    intro: 'Neon runs your markdown through the night: cyan headings, magenta accents, violet-black depth, and a print stylesheet that lands light. Below is a complete sample rendered in it.',
+    whoItSuits: 'Launch notes, event recaps, and gaming or creative-tech writeups — documents meant to be read on a screen with the lights down.',
+    pairWith: ['pop', 'terminal'],
+  },
+  {
+    id: 'poster',
+    title: 'Poster theme — display-type styling for markdown — markdown.style',
+    description: 'See a full report rendered in Poster: massive uppercase headlines, thick black rules, and reversed pull blocks. Free, in your browser.',
+    h1: 'Poster — headlines that read across the room',
+    intro: 'Poster typesets your markdown like something meant for a wall: enormous uppercase headlines, six-pixel rules, and blockquotes reversed out in black. Below is a complete sample rendered in it.',
+    whoItSuits: 'Announcements, manifestos, and one-page briefs — short documents that win or lose in the first two seconds.',
+    pairWith: ['contrast', 'pop'],
+  },
+  {
+    id: 'riso',
+    title: 'Riso theme — risograph two-ink styling for markdown — markdown.style',
+    description: 'See a full report rendered in Riso: pink and blue inks overprinting on cream stock, straight from the community print shop. Free, in your browser.',
+    h1: 'Riso — two inks, one very charming document',
+    intro: 'Riso borrows the community print-shop look: pink headings, blue working text, dotted rules, and cream stock that makes both inks sing. Below is a complete sample rendered in it.',
+    whoItSuits: 'Zines, event programs, community updates, and side-project docs — writing that should feel hand-made and a little joyful.',
+    pairWith: ['pop', 'retro'],
+  },
+  {
+    id: 'retro',
+    title: 'Retro theme — warm 70s styling for markdown — markdown.style',
+    description: 'See a full report rendered in Retro: burnt orange, mustard rules, rounded corners, and cream paper straight from 1974. Free, in your browser.',
+    h1: 'Retro — 1970s warmth for documents with personality',
+    intro: 'Retro pours your markdown a glass of orange juice in 1974: burnt-orange headings, mustard underlines, rounded blocks, and cream paper. Below is a complete sample rendered in it.',
+    whoItSuits: 'Newsletters, personal sites turned PDFs, and culture-team documents — anywhere warmth beats formality.',
+    pairWith: ['riso', 'paper'],
+  },
 ]
 
 export const useCases: readonly UseCaseCopy[] = [

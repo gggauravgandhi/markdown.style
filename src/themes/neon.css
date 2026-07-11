@@ -1,0 +1,49 @@
+/* Neon — electric dark. Cyan and magenta on violet-black. Prints light. */
+:root {
+  --mds-bg: #0e0716;
+  --mds-fg: #e9e4f7;
+  --mds-font-body: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --mds-font-heading: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --mds-muted: #9b8fbd;
+  --mds-rule: #2e2344;
+  --mds-code-bg: #180f26;
+  --mds-neon-2: #f472b6;
+}
+
+h1 { font-size: 2.2em; font-weight: 800; letter-spacing: -0.02em; color: var(--mds-accent); }
+h2 { font-size: 1.4em; font-weight: 700; margin-top: 2.2em; color: var(--mds-accent); border-bottom: 1px solid var(--mds-rule); padding-bottom: 0.3em; }
+h3 { font-size: 1.1em; font-weight: 700; margin-top: 1.7em; color: var(--mds-neon-2); }
+h4, h5, h6 { font-size: 0.95em; color: var(--mds-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+
+a { color: var(--mds-neon-2); }
+
+blockquote { margin: 1.5em 0; padding: 0.7em 1.2em; border: 1px solid var(--mds-rule); border-radius: 8px; color: var(--mds-muted); background: var(--mds-code-bg); }
+
+hr { border: 0; border-top: 1px solid var(--mds-rule); margin: 2.5em 0; }
+
+code { font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace; font-size: 0.86em; background: var(--mds-code-bg); border: 1px solid var(--mds-rule); padding: 0.15em 0.4em; border-radius: 4px; }
+pre { border-radius: 8px; padding: 16px 20px; font-size: 0.86em; }
+pre code { background: none; border: 0; padding: 0; font-size: 1em; }
+pre.shiki { border: 1px solid var(--mds-rule); }
+
+table { margin: 1.5em 0; font-size: 0.92em; }
+th { text-align: left; border-bottom: 2px solid var(--mds-accent); padding: 8px 12px; color: var(--mds-accent); }
+td { border-bottom: 1px solid var(--mds-rule); padding: 8px 12px; }
+tbody tr:nth-child(even) { background: rgba(255, 255, 255, 0.03); }
+
+ul, ol { padding-left: 1.6em; }
+li { margin: 0.3em 0; }
+li::marker { color: var(--mds-neon-2); }
+
+.mds-error { background: #2b0f1c; border-color: #f472b6; color: #fbcfe8; }
+
+.footnotes { font-size: 0.85em; color: var(--mds-muted); border-top: 1px solid var(--mds-rule); margin-top: 3em; }
+
+@media print {
+  /* electric on screen, printable on paper */
+  :root { --mds-bg: #ffffff; --mds-fg: #2a2438; --mds-muted: #6d6486; --mds-rule: #ddd6ec; --mds-code-bg: #f5f2fb; --mds-neon-2: #be3d84; }
+  blockquote { background: #f5f2fb; }
+  tbody tr:nth-child(even) { background: #f5f2fb; }
+  .mds-error { background: #fef2f2; border-color: #b91c1c; color: #7f1d1d; }
+  body { font-size: 10.5pt; }
+}

@@ -85,6 +85,7 @@ describe('categories', () => {
     expect(count('academic')).toBe(5)
     expect(count('editorial')).toBe(5)
     expect(count('minimal')).toBe(5)
+    expect(count('bold')).toBe(5)
   })
 
   it('descriptions carry no em dashes (UI copy rule)', () => {

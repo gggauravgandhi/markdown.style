@@ -15,12 +15,16 @@ import manualCss from './manual.css?raw'
 import memoCss from './memo.css?raw'
 import mistCss from './mist.css?raw'
 import monoCss from './mono.css?raw'
+import neonCss from './neon.css?raw'
 import notebookCss from './notebook.css?raw'
 import novellaCss from './novella.css?raw'
 import paperCss from './paper.css?raw'
 import popCss from './pop.css?raw'
+import posterCss from './poster.css?raw'
 import preprintCss from './preprint.css?raw'
 import quarterlyCss from './quarterly.css?raw'
+import retroCss from './retro.css?raw'
+import risoCss from './riso.css?raw'
 import scholarCss from './scholar.css?raw'
 import slateCss from './slate.css?raw'
 import swissCss from './swiss.css?raw'
@@ -319,6 +323,46 @@ export const themes: readonly Theme[] = [
     shikiTheme: 'min-light',
     mermaidTheme: 'neutral',
     css: airyCss,
+  },
+  {
+    id: 'neon',
+    name: 'Neon',
+    description: 'Electric dark: neon cyan on deep violet-black.',
+    category: 'bold',
+    defaultAccent: '#22d3ee',
+    shikiTheme: 'synthwave-84',
+    mermaidTheme: 'dark',
+    css: neonCss,
+  },
+  {
+    id: 'poster',
+    name: 'Poster',
+    description: 'Poster type: massive headlines, unapologetic scale jumps.',
+    category: 'bold',
+    defaultAccent: '#ea580c',
+    shikiTheme: 'min-light',
+    mermaidTheme: 'neutral',
+    css: posterCss,
+  },
+  {
+    id: 'riso',
+    name: 'Riso',
+    description: 'Risograph print: two-ink overprint charm, tinted paper.',
+    category: 'bold',
+    defaultAccent: '#ff4d6d',
+    shikiTheme: 'catppuccin-latte',
+    mermaidTheme: 'neutral',
+    css: risoCss,
+  },
+  {
+    id: 'retro',
+    name: 'Retro',
+    description: 'Warm 70s: burnt orange, mustard rules, rounded corners.',
+    category: 'bold',
+    defaultAccent: '#c2410c',
+    shikiTheme: 'gruvbox-light-soft',
+    mermaidTheme: 'forest',
+    css: retroCss,
   },
 ]
 
