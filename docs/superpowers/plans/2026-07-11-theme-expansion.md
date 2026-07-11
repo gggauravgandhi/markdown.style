@@ -20,6 +20,7 @@
 - `themeCopy.pairWith` may only reference theme ids already registered at that task's state (the builder crashes on unknown ids).
 - Every task ends with `bun run test` fully green + `bunx tsc --noEmit` clean + a commit.
 - Categories: `business | technical | academic | editorial | minimal | bold`; labels exactly "Business & Reports", "Technical & Docs", "Academic & Research", "Editorial & Longform", "Minimal & Clean", "Bold & Creative".
+- Do not deploy to production between the Task 2 and Task 3 commits: index.html briefly links /themes/boardroom before that route exists.
 - Final lineup: 30 themes, exactly 5 per category, exactly 6 featured (one per category: boardroom, slate, scholar, paper, swiss, pop). Sitemap ends at 40 URLs, cap assertion ≤50.
 
 ## File Structure
@@ -613,7 +614,7 @@ In `src/app/main.test.ts`, inside the `opens labelled, marks the active theme, a
     })
 ```
 
-If the full-lineup render makes this test exceed the default timeout later in the plan, raise only this test's timeout: `it('opens labelled...', async () => { ... }, 20_000)`. Do not raise global timeouts.
+Also raise THIS test's timeout unconditionally now (the eager fallback renders every registered theme, growing to 30 by Task 10): add `20_000` as the third argument of the `it()` call, i.e. `it('opens labelled, marks the active theme, and closes from its header', async () => { ... }, 20_000)`. Do not raise global timeouts, and never weaken the all-thumbs assertion if it gets slow.
 
 - [ ] **Step 2: Run it to verify it fails**
 
