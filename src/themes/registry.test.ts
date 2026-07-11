@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { baseCss, getTheme, themes } from './registry'
+import { baseCss, CATEGORY_LABELS, getTheme, themes } from './registry'
 
 const REQUIRED_PROPS = ['--mds-bg', '--mds-fg', '--mds-font-body', '--mds-font-heading']
 
@@ -14,8 +14,8 @@ describe('theme registry', () => {
     expect(getTheme('paper').id).toBe('paper')
   })
 
-  it('ships the full launch lineup, paper first', () => {
-    expect(themes.map(t => t.id)).toEqual([
+  it('keeps the original eight first, paper leading', () => {
+    expect(themes.slice(0, 8).map(t => t.id)).toEqual([
       'paper', 'slate', 'carbon', 'swiss', 'contrast', 'editorial', 'scholar', 'pop',
     ])
   })
@@ -64,5 +64,21 @@ describe('theme polish (plan 4b pre-pass)', () => {
     // so the base @media print `a { color: inherit }` could never win — dead code.
     const printBlock = baseCss.slice(baseCss.indexOf('@media print'))
     expect(printBlock).not.toMatch(/^\s*a\s*\{/m)
+  })
+})
+
+describe('categories', () => {
+  it('every theme has a registered category', () => {
+    for (const t of themes) expect(Object.keys(CATEGORY_LABELS), t.id).toContain(t.category)
+  })
+
+  it('featured themes are unique per category', () => {
+    const featured = themes.filter(t => t.featured)
+    expect(new Set(featured.map(t => t.category)).size).toBe(featured.length)
+    expect(featured.length).toBeGreaterThanOrEqual(5)
+  })
+
+  it('descriptions carry no em dashes (UI copy rule)', () => {
+    for (const t of themes) expect(t.description, t.id).not.toContain('—')
   })
 })
