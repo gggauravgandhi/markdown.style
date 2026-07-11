@@ -115,15 +115,13 @@ describe('landing ↔ registry sync', () => {
     expect(html).toContain('href="/themes"')
   })
 
-  it('theme strip mirrors the registry exactly and links every theme page', () => {
-    for (const t of themes) {
-      // one structural match per theme: swatch color, link target, and name
-      // must sit in the SAME strip item — presence-anywhere would let a
-      // cross-wired strip (name A, accent B) slip through
+  it('theme strip mirrors the featured lineup and links a browse-all page', () => {
+    for (const t of themes.filter(t => t.featured)) {
       expect(html, t.id).toContain(
         `<span class="swatch" style="background:${t.defaultAccent}"></span><a href="/themes/${t.id}">${t.name}</a>`,
       )
     }
-    expect(html.match(/class="swatch"/g)).toHaveLength(themes.length)
+    expect(html.match(/class="swatch"/g)).toHaveLength(6) // the final featured count, boardroom included
+    expect(html).toContain('Browse all 30 themes')
   })
 })
