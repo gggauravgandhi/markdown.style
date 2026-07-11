@@ -1,0 +1,42 @@
+/* Airy — air and whitespace. A small text block adrift in generous margins. */
+:root {
+  --mds-bg: #ffffff;
+  --mds-fg: #43464d;
+  --mds-font-body: 'Avenir Next', 'Segoe UI', system-ui, sans-serif;
+  --mds-font-heading: 'Avenir Next', 'Segoe UI', system-ui, sans-serif;
+  --mds-muted: #9599a3;
+  --mds-rule: #eef0f3;
+  --mds-code-bg: #f5f6f8;
+}
+
+body { font-size: calc(15px * var(--mds-font-scale)); line-height: 1.9; }
+.mds-content { padding: 96px 32px 140px; }
+
+h1 { font-size: 1.9em; font-weight: 500; letter-spacing: -0.01em; margin-bottom: 1.8em; color: #2c2f35; }
+h2 { font-size: 0.85em; font-weight: 600; margin-top: 4em; margin-bottom: 1.6em; text-transform: uppercase; letter-spacing: 0.22em; color: var(--mds-accent); }
+h3 { font-size: 1.05em; font-weight: 600; margin-top: 2.2em; color: #2c2f35; }
+h4, h5, h6 { font-size: 0.9em; font-weight: 600; color: var(--mds-muted); }
+
+a { color: var(--mds-accent); text-underline-offset: 3px; }
+
+blockquote { margin: 2.4em 0; padding: 0 1.6em; border-left: 1px solid var(--mds-accent); color: var(--mds-muted); }
+
+hr { border: 0; text-align: center; margin: 4em 0; }
+hr::after { content: '·' / ''; color: var(--mds-muted); font-size: 1.4em; }
+
+code { font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace; font-size: 0.85em; background: var(--mds-code-bg); padding: 0.15em 0.45em; border-radius: 5px; }
+pre { border-radius: 8px; padding: 20px 24px; font-size: 0.85em; }
+pre code { background: none; padding: 0; font-size: 1em; }
+pre.shiki { border: 1px solid var(--mds-rule); }
+
+table { margin: 2.2em 0; font-size: 0.92em; }
+th { text-align: left; border-bottom: 1px solid var(--mds-rule); padding: 10px 14px; font-weight: 600; font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.08em; color: var(--mds-muted); }
+td { border-bottom: 1px solid var(--mds-rule); padding: 10px 14px; }
+
+ul, ol { padding-left: 1.5em; }
+li { margin: 0.5em 0; }
+li::marker { color: var(--mds-accent); }
+
+.footnotes { font-size: 0.85em; color: var(--mds-muted); border-top: 1px solid var(--mds-rule); margin-top: 4em; }
+
+@media print { body { font-size: 10.5pt; } .mds-content { padding: 0; } }

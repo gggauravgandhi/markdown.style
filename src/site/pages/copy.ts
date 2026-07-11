@@ -237,6 +237,33 @@ export const themeCopy: readonly ThemeCopy[] = [
     whoItSuits: 'Op-eds, position pieces, and persuasive memos — writing built around quotable lines that deserve to be displayed, not buried.',
     pairWith: ['gazette', 'quarterly'],
   },
+  {
+    id: 'mist',
+    title: 'Mist theme — hairline minimal styling for markdown — markdown.style',
+    description: 'See a full report rendered in Mist: feather-light rules, a soft gray-blue voice, and hierarchy you feel more than see. Free, in your browser.',
+    h1: 'Mist — minimalism at the hairline weight',
+    intro: 'Mist keeps everything at a whisper: hairline rules, a light title weight, and gray-blue restraint. Below is a complete sample rendered in it.',
+    whoItSuits: 'Design documents, product notes, and portfolios of thought — for readers who consider heavy borders a personal insult.',
+    pairWith: ['swiss', 'airy'],
+  },
+  {
+    id: 'mono',
+    title: 'Mono theme — typewriter monospace styling for markdown — markdown.style',
+    description: 'See a full report rendered in Mono: one monospace family, two weights, underlined links, and no decoration at all. Free, in your browser.',
+    h1: 'Mono — one family, two weights, nothing else',
+    intro: 'Mono is the plaintext ideal taken seriously: a single monospace family for everything, underlined links, and ruled headings. Below is a complete sample rendered in it.',
+    whoItSuits: 'Changelogs, RFCs, and engineering notes — documents whose authors trust content over costume.',
+    pairWith: ['contrast', 'terminal'],
+  },
+  {
+    id: 'airy',
+    title: 'Airy theme — whitespace-first styling for markdown — markdown.style',
+    description: 'See a full report rendered in Airy: a small measured text block, oversized margins, and section labels in tracked-out caps. Free, in your browser.',
+    h1: 'Airy — whitespace doing the heavy lifting',
+    intro: 'Airy gives your markdown room: an unhurried line height, tracked-out section labels, and margins most themes would call wasteful. Below is a complete sample rendered in it.',
+    whoItSuits: 'Manifestos, letters, and short strategy notes — writing that gains authority from calm. Not the theme for a 40-page appendix.',
+    pairWith: ['mist', 'swiss'],
+  },
 ]
 
 export const useCases: readonly UseCaseCopy[] = [

@@ -1,0 +1,39 @@
+/* Mono — typewriter monospace. One family, two weights, zero decoration. */
+:root {
+  --mds-bg: #ffffff;
+  --mds-fg: #26282b;
+  --mds-font-body: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --mds-font-heading: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --mds-muted: #75797f;
+  --mds-rule: #e4e6e8;
+  --mds-code-bg: #f4f5f6;
+}
+
+body { font-size: calc(14.5px * var(--mds-font-scale)); line-height: 1.7; }
+
+h1 { font-size: 1.55em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em; }
+h2 { font-size: 1.2em; font-weight: 700; margin-top: 2.4em; border-bottom: 1px solid var(--mds-fg); padding-bottom: 0.25em; }
+h3 { font-size: 1.05em; font-weight: 700; margin-top: 1.8em; }
+h4, h5, h6 { font-size: 1em; font-weight: 700; color: var(--mds-muted); }
+
+a { color: var(--mds-accent); text-decoration: underline; }
+
+blockquote { margin: 1.5em 0; padding: 0 0 0 1.4em; border-left: 1px solid var(--mds-fg); color: var(--mds-muted); }
+
+hr { border: 0; border-top: 1px solid var(--mds-rule); margin: 2.5em 0; }
+
+code { font-size: 1em; background: var(--mds-code-bg); padding: 0.1em 0.3em; }
+pre { padding: 14px 16px; font-size: 0.95em; background: var(--mds-code-bg); }
+pre code { background: none; padding: 0; font-size: 1em; }
+pre.shiki { border: 1px solid var(--mds-rule); }
+
+table { margin: 1.5em 0; font-size: 0.95em; }
+th { text-align: left; border-bottom: 1px solid var(--mds-fg); padding: 6px 10px; }
+td { border-bottom: 1px solid var(--mds-rule); padding: 6px 10px; }
+
+ul, ol { padding-left: 1.8em; }
+li { margin: 0.25em 0; }
+
+.footnotes { font-size: 0.9em; color: var(--mds-muted); border-top: 1px solid var(--mds-rule); margin-top: 3em; }
+
+@media print { body { font-size: 9.5pt; } }

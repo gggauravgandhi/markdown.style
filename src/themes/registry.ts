@@ -1,5 +1,6 @@
 import type { MermaidTheme } from '../pipeline/types'
 import baseCssRaw from './_base.css?raw'
+import airyCss from './airy.css?raw'
 import blueprintCss from './blueprint.css?raw'
 import boardroomCss from './boardroom.css?raw'
 import briefingCss from './briefing.css?raw'
@@ -12,6 +13,8 @@ import lectureCss from './lecture.css?raw'
 import ledgerCss from './ledger.css?raw'
 import manualCss from './manual.css?raw'
 import memoCss from './memo.css?raw'
+import mistCss from './mist.css?raw'
+import monoCss from './mono.css?raw'
 import notebookCss from './notebook.css?raw'
 import novellaCss from './novella.css?raw'
 import paperCss from './paper.css?raw'
@@ -286,6 +289,36 @@ export const themes: readonly Theme[] = [
     shikiTheme: 'one-light',
     mermaidTheme: 'neutral',
     css: columnistCss,
+  },
+  {
+    id: 'mist',
+    name: 'Mist',
+    description: 'Hairline minimal: feather rules, whispered hierarchy.',
+    category: 'minimal',
+    defaultAccent: '#64748b',
+    shikiTheme: 'min-light',
+    mermaidTheme: 'neutral',
+    css: mistCss,
+  },
+  {
+    id: 'mono',
+    name: 'Mono',
+    description: 'Typewriter monospace: one family, two weights, zero decoration.',
+    category: 'minimal',
+    defaultAccent: '#374151',
+    shikiTheme: 'min-light',
+    mermaidTheme: 'neutral',
+    css: monoCss,
+  },
+  {
+    id: 'airy',
+    name: 'Airy',
+    description: 'Air and whitespace: a small text block adrift in generous margins.',
+    category: 'minimal',
+    defaultAccent: '#6366f1',
+    shikiTheme: 'min-light',
+    mermaidTheme: 'neutral',
+    css: airyCss,
   },
 ]
 
