@@ -210,6 +210,33 @@ export const themeCopy: readonly ThemeCopy[] = [
     whoItSuits: 'Course notes, tutorials, and study guides — explanatory writing where the key point must be findable in three seconds.',
     pairWith: ['notebook', 'scholar'],
   },
+  {
+    id: 'gazette',
+    title: 'Gazette theme — newspaper styling for markdown — markdown.style',
+    description: 'See a full report rendered in Gazette: double-ruled masthead, condensed headlines, and newsroom density. Free, in your browser.',
+    h1: 'Gazette — front-page energy for dense reporting',
+    intro: 'Gazette lays your markdown out like a broadsheet front page: a double-ruled masthead title, condensed bold headlines, and a measure tuned for density. Below is a complete sample rendered in it.',
+    whoItSuits: 'Newsletters, digests, and weekly roundups — documents that carry many stories at once and want the reader to skim like a front page.',
+    pairWith: ['editorial', 'columnist'],
+  },
+  {
+    id: 'novella',
+    title: 'Novella theme — manuscript styling for markdown — markdown.style',
+    description: 'See a full report rendered in Novella: serene serif, first-line indents, and chapter ornaments with nothing else in the way. Free, in your browser.',
+    h1: 'Novella — manuscript serenity for writing that flows',
+    intro: 'Novella removes everything between the reader and the prose: indented paragraphs, centered chapter heads under a small ornament, and a warm page. Below is a complete sample rendered in it.',
+    whoItSuits: 'Fiction drafts, essays, and personal writing — longform where the typography should disappear into the reading.',
+    pairWith: ['paper', 'editorial'],
+  },
+  {
+    id: 'columnist',
+    title: 'Columnist theme — opinion-page styling for markdown — markdown.style',
+    description: 'See a full report rendered in Columnist: oversized pull quotes, byline italics, and an argument that looks like it belongs in print. Free, in your browser.',
+    h1: 'Columnist — opinion-page conviction for arguments in print',
+    intro: 'Columnist treats every blockquote as a pull quote: oversized, italic, and ruled in your accent color, with byline-style italics under the headline. Below is a complete sample rendered in it.',
+    whoItSuits: 'Op-eds, position pieces, and persuasive memos — writing built around quotable lines that deserve to be displayed, not buried.',
+    pairWith: ['gazette', 'quarterly'],
+  },
 ]
 
 export const useCases: readonly UseCaseCopy[] = [

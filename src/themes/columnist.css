@@ -1,0 +1,42 @@
+/* Columnist — opinion page. Assertive pull-quote blockquotes, byline italics. */
+:root {
+  --mds-bg: #ffffff;
+  --mds-fg: #1f1c1c;
+  --mds-font-body: Georgia, 'Times New Roman', serif;
+  --mds-font-heading: Georgia, 'Times New Roman', serif;
+  --mds-muted: #6f6664;
+  --mds-rule: #e2dbd9;
+  --mds-code-bg: #f5f1f0;
+}
+
+h1 { font-size: 2.3em; font-weight: 700; letter-spacing: -0.02em; line-height: 1.08; }
+h1 + p { font-style: italic; color: var(--mds-muted); }
+h2 { font-size: 1.4em; margin-top: 2.3em; }
+h3 { font-size: 1.1em; margin-top: 1.7em; font-style: italic; }
+h4, h5, h6 { font-size: 0.95em; color: var(--mds-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+
+a { color: var(--mds-accent); }
+
+blockquote {
+  margin: 2em 0; padding: 0.4em 0 0.4em 1.4em; border-left: 4px solid var(--mds-accent);
+  font-size: 1.25em; line-height: 1.45; font-style: italic; color: var(--mds-fg);
+}
+
+hr { border: 0; border-top: 1px solid var(--mds-rule); margin: 2.5em auto; width: 25%; }
+
+code { font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace; font-size: 0.85em; background: var(--mds-code-bg); padding: 0.12em 0.35em; border-radius: 3px; }
+pre { padding: 14px 18px; font-size: 0.85em; border-radius: 4px; }
+pre code { background: none; padding: 0; font-size: 1em; }
+pre.shiki { border: 1px solid var(--mds-rule); }
+
+table { margin: 1.5em 0; font-size: 0.93em; }
+th { text-align: left; border-bottom: 2px solid var(--mds-accent); padding: 8px 12px; }
+td { border-bottom: 1px solid var(--mds-rule); padding: 8px 12px; }
+
+ul, ol { padding-left: 1.6em; }
+li { margin: 0.3em 0; }
+li::marker { color: var(--mds-accent); }
+
+.footnotes { font-size: 0.85em; color: var(--mds-muted); border-top: 1px solid var(--mds-rule); margin-top: 3em; }
+
+@media print { body { font-size: 11pt; } blockquote { font-size: 1.15em; } }

@@ -4,13 +4,16 @@ import blueprintCss from './blueprint.css?raw'
 import boardroomCss from './boardroom.css?raw'
 import briefingCss from './briefing.css?raw'
 import carbonCss from './carbon.css?raw'
+import columnistCss from './columnist.css?raw'
 import contrastCss from './contrast.css?raw'
 import editorialCss from './editorial.css?raw'
+import gazetteCss from './gazette.css?raw'
 import lectureCss from './lecture.css?raw'
 import ledgerCss from './ledger.css?raw'
 import manualCss from './manual.css?raw'
 import memoCss from './memo.css?raw'
 import notebookCss from './notebook.css?raw'
+import novellaCss from './novella.css?raw'
 import paperCss from './paper.css?raw'
 import popCss from './pop.css?raw'
 import preprintCss from './preprint.css?raw'
@@ -253,6 +256,36 @@ export const themes: readonly Theme[] = [
     shikiTheme: 'snazzy-light',
     mermaidTheme: 'neutral',
     css: lectureCss,
+  },
+  {
+    id: 'gazette',
+    name: 'Gazette',
+    description: 'Front-page gazette: condensed headlines, uppercase kickers, dense measure.',
+    category: 'editorial',
+    defaultAccent: '#9f1239',
+    shikiTheme: 'github-light',
+    mermaidTheme: 'neutral',
+    css: gazetteCss,
+  },
+  {
+    id: 'novella',
+    name: 'Novella',
+    description: 'Fiction manuscript: serene serif, first-line indents, zero clutter.',
+    category: 'editorial',
+    defaultAccent: '#6b4226',
+    shikiTheme: 'solarized-light',
+    mermaidTheme: 'neutral',
+    css: novellaCss,
+  },
+  {
+    id: 'columnist',
+    name: 'Columnist',
+    description: 'Opinion page: assertive pull-quote blockquotes, byline italics.',
+    category: 'editorial',
+    defaultAccent: '#be123c',
+    shikiTheme: 'one-light',
+    mermaidTheme: 'neutral',
+    css: columnistCss,
   },
 ]
 

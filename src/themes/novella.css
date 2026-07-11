@@ -1,0 +1,42 @@
+/* Novella — fiction manuscript. Serene serif, first-line indents, zero clutter. */
+:root {
+  --mds-bg: #fffdf9;
+  --mds-fg: #2e2a26;
+  --mds-font-body: 'Palatino Linotype', Palatino, Georgia, serif;
+  --mds-font-heading: 'Palatino Linotype', Palatino, Georgia, serif;
+  --mds-muted: #837a70;
+  --mds-rule: #e6ded1;
+  --mds-code-bg: #f5f0e6;
+}
+
+body { line-height: 1.8; }
+p + p { text-indent: 1.6em; margin-top: -0.6em; }
+
+h1 { font-size: 1.9em; font-weight: 400; text-align: center; letter-spacing: 0.02em; margin-bottom: 2em; }
+h2 { font-size: 1.3em; font-weight: 400; text-align: center; margin-top: 3em; letter-spacing: 0.05em; }
+h2::before { content: '❦' / ''; display: block; color: var(--mds-accent); font-size: 0.85em; padding-bottom: 0.6em; }
+h3 { font-size: 1.05em; font-weight: 600; margin-top: 2em; font-style: italic; }
+h4, h5, h6 { font-size: 1em; font-style: italic; font-weight: 400; color: var(--mds-muted); }
+
+a { color: var(--mds-accent); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+
+blockquote { margin: 1.8em 2em; padding: 0; border: 0; font-style: italic; color: var(--mds-muted); }
+
+hr { border: 0; text-align: center; margin: 2.6em 0; }
+hr::after { content: '· · ·' / ''; color: var(--mds-muted); letter-spacing: 0.6em; }
+
+code { font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace; font-size: 0.85em; background: var(--mds-code-bg); padding: 0.1em 0.35em; border-radius: 3px; }
+pre { padding: 14px 18px; font-size: 0.85em; border-radius: 4px; }
+pre code { background: none; padding: 0; font-size: 1em; }
+pre.shiki { border: 1px solid var(--mds-rule); }
+
+table { margin: 1.6em 0; font-size: 0.93em; }
+th { text-align: left; border-bottom: 1px solid var(--mds-fg); padding: 7px 12px; font-style: italic; font-weight: 600; }
+td { border-bottom: 1px solid var(--mds-rule); padding: 7px 12px; }
+
+ul, ol { padding-left: 1.7em; }
+li { margin: 0.3em 0; }
+
+.footnotes { font-size: 0.85em; color: var(--mds-muted); border-top: 1px solid var(--mds-rule); margin-top: 3em; }
+
+@media print { :root { --mds-bg: #ffffff; } body { font-size: 11.5pt; } }
