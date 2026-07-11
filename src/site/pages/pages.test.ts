@@ -3,10 +3,11 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { renderBody } from '../../pipeline/render'
-import { themes } from '../../themes/registry'
+import { CATEGORY_LABELS, themes, type Category } from '../../themes/registry'
 import { convertPages, themeCopy, useCases } from './copy'
 import { buildConvertPage } from './convert-pages'
 import { ALL_ROUTES, GENERATED_ROUTES } from './routes'
+import { escapeHtml } from './shell'
 import { buildSitemap } from './sitemap'
 import { buildThemePage, buildThemesHub } from './theme-pages'
 import { buildUseCasePage } from './use-case-pages'
@@ -79,7 +80,7 @@ describe('generated page invariants', () => {
     }
   })
 
-  it('the hub previews all eight themes inline and links each theme page', async () => {
+  it('the hub previews every theme inline and links each theme page', async () => {
     const pages = await pagesPromise
     const hub = pages.get('/themes')!
     for (const t of themes) {
@@ -87,6 +88,11 @@ describe('generated page invariants', () => {
       expect(hub, t.id).toContain(`mds-theme-${t.id}`)
     }
     expect(hub).not.toContain('<iframe')
+    for (const category of Object.keys(CATEGORY_LABELS)) {
+      expect(hub).toContain(`id="${category}"`)
+      // labels go through escapeHtml before landing in the page (e.g. "Business & Reports" -> "&amp;")
+      expect(hub).toContain(escapeHtml(CATEGORY_LABELS[category as Category]))
+    }
   })
 
   it('use-case pages show the markdown source AND the rendered result', async () => {
@@ -122,6 +128,13 @@ describe('buildSitemap', () => {
     const urls = [...xml.matchAll(/<loc>(.*?)<\/loc>/g)].map(m => m[1])
     expect(urls).toEqual(ALL_ROUTES.map(r => (r === '/' ? 'https://markdown.style/' : `https://markdown.style${r}`)))
     expect(xml).not.toContain('/samples/')
-    expect(urls.length).toBeLessThanOrEqual(25) // spec §6 launch ceiling
+    expect(urls.length).toBeLessThanOrEqual(50) // re-ruled 2026-07-11 (theme expansion spec §1.3)
+    expect(urls.length).toBe(4 + GENERATED_ROUTES.length) // '/', '/editor', '/privacy', '/terms' + generated
+  })
+})
+
+describe('themeCopy', () => {
+  it('themeCopy is 1:1 with the registry', () => {
+    expect(themeCopy.map(c => c.id).sort()).toEqual([...themes.map(t => t.id)].sort())
   })
 })

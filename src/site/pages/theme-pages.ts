@@ -1,4 +1,4 @@
-import { getTheme, themes } from '../../themes/registry'
+import { CATEGORY_LABELS, getTheme, themes, type Category } from '../../themes/registry'
 import type { ThemeCopy } from './copy'
 import { themeCopy } from './copy'
 import { scopedSampleCss } from './scope-css'
@@ -46,7 +46,8 @@ ${sampleEmbed(copy.id, sampleBody, `Sample document rendered in the ${theme.name
   <ul>
 ${related}
   </ul>
-  <p><a class="btn-ghost" href="/themes">Browse all eight themes →</a></p>
+  <p class="answer">Part of the ${escapeHtml(CATEGORY_LABELS[theme.category])} collection: <a href="/themes#${theme.category}">see the rest of the category</a>.</p>
+  <p><a class="btn-ghost" href="/themes">Browse all themes →</a></p>
 </section>`
   return pageShell({
     title: copy.title,
@@ -58,9 +59,7 @@ ${related}
 }
 
 export function buildThemesHub(samples: ReadonlyMap<string, string>): string {
-  const cards = themes
-    .map(t => {
-      return `<li>
+  const card = (t: (typeof themes)[number]): string => `<li>
 <a class="theme-card-link" href="/themes/${t.id}">
   <div class="mini-preview" aria-hidden="true">
     <div class="mds-theme-${t.id}"><div class="mds-content">
@@ -70,26 +69,33 @@ ${samples.get(t.id) ?? ''}
   <span class="theme-card-meta"><strong>${escapeHtml(t.name)}</strong><span class="desc">${escapeHtml(t.description)}</span></span>
 </a>
 </li>`
+  const sections = (Object.keys(CATEGORY_LABELS) as Category[])
+    .map(category => {
+      const group = themes.filter(t => t.category === category)
+      if (group.length === 0) return ''
+      return `<section aria-label="${escapeHtml(CATEGORY_LABELS[category])}" id="${category}">
+  <h2>${escapeHtml(CATEGORY_LABELS[category])} (${group.length})</h2>
+  <ul class="theme-grid">
+${group.map(card).join('\n')}
+  </ul>
+</section>`
     })
-    .join('\n')
+    .filter(Boolean)
+    .join('\n\n')
   const main = `<section class="hero" aria-label="Introduction" style="border-top:0">
   <h1>What do the markdown.style themes look like?</h1>
-  <p class="lede">Eight designed looks, each previewed below on the same real report — a warm book serif, a clean product-doc sans, a dark technical theme that prints light, and more. Click any theme for the full sample and a one-click way to apply it to your own markdown.</p>
+  <p class="lede">${themes.length} designed looks in six categories, each previewed below on the same real report. Click any theme for the full sample and a one-click way to apply it to your own markdown.</p>
 </section>
 
-<section aria-label="Theme gallery">
-  <ul class="theme-grid">
-${cards}
-  </ul>
-</section>
+${sections}
 
 <section aria-label="Next steps">
   <h2>How do I use one of these on my own document?</h2>
-  <p class="answer">Open any theme page and click “Use this theme”, or go straight to the <a href="/editor">editor</a> and paste your markdown — the theme picker previews all eight live. See a worked example: <a href="/use-cases/chatgpt-report">a ChatGPT research answer styled into a report</a>, or the two-step paths to <a href="/convert/markdown-to-pdf">PDF</a> and <a href="/convert/markdown-to-html">a single HTML file</a>.</p>
+  <p class="answer">Open any theme page and click “Use this theme”, or go straight to the <a href="/editor">editor</a> and paste your markdown — the theme picker previews every theme live. See a worked example: <a href="/use-cases/chatgpt-report">a ChatGPT research answer styled into a report</a>, or the two-step paths to <a href="/convert/markdown-to-pdf">PDF</a> and <a href="/convert/markdown-to-html">a single HTML file</a>.</p>
 </section>`
   return pageShell({
-    title: 'Themes — eight designed looks for LLM markdown — markdown.style',
-    description: 'Compare all eight markdown.style themes on the same real report: book serif, product-doc sans, dark technical, minimal Swiss, academic, and more.',
+    title: 'Themes — designed looks for LLM markdown, by category — markdown.style',
+    description: 'Compare all markdown.style themes on the same real report, organized by use case: business reports, technical docs, academic papers, editorial longform, minimal, and bold.',
     path: '/themes',
     main,
     extraCss: themes.map(t => scopedSampleCss(t)).join('\n'),
