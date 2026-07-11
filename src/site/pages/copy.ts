@@ -147,6 +147,33 @@ export const themeCopy: readonly ThemeCopy[] = [
     whoItSuits: 'Quarterly reviews, investor updates, and year-in-review documents — reporting that doubles as a keepsake.',
     pairWith: ['boardroom', 'editorial'],
   },
+  {
+    id: 'terminal',
+    title: 'Terminal theme — amber CRT styling for markdown — markdown.style',
+    description: 'See a full report rendered in Terminal: amber-on-black monospace styling that flips to a light palette when printed. Free, in your browser.',
+    h1: 'Terminal — amber phosphor for documents that live in the shell',
+    intro: 'Terminal renders your markdown like a well-kept CRT: amber monospace on near-black, prompt-prefixed headings, and a print stylesheet that lands on paper in ink-friendly light. Below is a complete sample rendered in it.',
+    whoItSuits: 'Runbooks, CLI documentation, and incident notes — documents whose readers already have a terminal open. Printing flips it light automatically.',
+    pairWith: ['carbon', 'manual'],
+  },
+  {
+    id: 'blueprint',
+    title: 'Blueprint theme — engineering-drawing styling for markdown — markdown.style',
+    description: 'See a full report rendered in Blueprint: drafting blues, boxed title, and uppercase annotations for specs and technical plans. Free, in your browser.',
+    h1: 'Blueprint — drafting-table discipline for specs and plans',
+    intro: 'Blueprint borrows the visual language of an engineering drawing: a boxed title block, uppercase mono annotations, and drafting blues on cool paper. Below is a complete sample rendered in it.',
+    whoItSuits: 'Specs, architecture documents, and implementation plans — writing that describes something to be built and benefits from looking like it.',
+    pairWith: ['slate', 'manual'],
+  },
+  {
+    id: 'manual',
+    title: 'Manual theme — reference-manual styling for markdown — markdown.style',
+    description: 'See a full report rendered in Manual: man-page bones, bold sans headings, and code blocks that lead the page. Free, in your browser.',
+    h1: 'Manual — reference styling with man-page bones',
+    intro: 'Manual sets your markdown like documentation that has shipped with software for decades: uppercase section heads, a serif reading measure, and code that stands proud of the prose. Below is a complete sample rendered in it.',
+    whoItSuits: 'API references, how-to guides, and README-grade documentation — anything a reader consults rather than reads cover to cover.',
+    pairWith: ['slate', 'terminal'],
+  },
 ]
 
 export const useCases: readonly UseCaseCopy[] = [

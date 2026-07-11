@@ -1,0 +1,51 @@
+/* Terminal — amber phosphor CRT. Monospace everything on near-black. Prints light. */
+:root {
+  --mds-bg: #171208;
+  --mds-fg: #ecc372;
+  --mds-font-body: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --mds-font-heading: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --mds-muted: #a68a4d;
+  --mds-rule: #40331a;
+  --mds-code-bg: #211a0c;
+}
+
+body { line-height: 1.6; }
+
+h1 { font-size: 1.7em; text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid var(--mds-rule); padding-bottom: 0.4em; }
+h1::before { content: '> ' / ''; color: var(--mds-accent); }
+h2 { font-size: 1.3em; margin-top: 2.1em; }
+h2::before { content: '>> ' / ''; color: var(--mds-accent); }
+h3 { font-size: 1.1em; margin-top: 1.6em; }
+h3::before { content: '>>> ' / ''; color: var(--mds-accent); }
+h4, h5, h6 { font-size: 1em; color: var(--mds-muted); }
+
+a { color: var(--mds-accent); }
+
+blockquote { margin: 1.4em 0; padding: 0.6em 1em; border: 1px solid var(--mds-rule); color: var(--mds-muted); background: var(--mds-code-bg); }
+
+hr { border: 0; border-top: 1px dashed var(--mds-rule); margin: 2em 0; }
+
+code { font-size: 0.95em; background: var(--mds-code-bg); border: 1px solid var(--mds-rule); padding: 0.1em 0.35em; border-radius: 3px; }
+pre { border-radius: 4px; padding: 14px 16px; font-size: 0.9em; }
+pre code { background: none; border: 0; padding: 0; font-size: 1em; }
+pre.shiki { border: 1px solid var(--mds-rule); }
+
+table { margin: 1.4em 0; font-size: 0.92em; }
+th { text-align: left; border-top: 1px solid var(--mds-fg); border-bottom: 1px solid var(--mds-fg); padding: 7px 10px; }
+td { border-bottom: 1px solid var(--mds-rule); padding: 7px 10px; }
+
+ul, ol { padding-left: 1.8em; }
+li { margin: 0.25em 0; }
+li::marker { color: var(--mds-accent); }
+
+.mds-error { background: #2b1408; border-color: #d9930d; color: #ecc372; }
+
+.footnotes { font-size: 0.88em; color: var(--mds-muted); border-top: 1px solid var(--mds-rule); margin-top: 3em; }
+
+@media print {
+  /* CRT on screen, paper in hand */
+  :root { --mds-bg: #ffffff; --mds-fg: #3a2f14; --mds-muted: #7a6a3e; --mds-rule: #ddd2b4; --mds-code-bg: #f7f3e6; }
+  blockquote { background: #f7f3e6; }
+  .mds-error { background: #fef2f2; border-color: #b91c1c; color: #7f1d1d; }
+  body { font-size: 10pt; }
+}

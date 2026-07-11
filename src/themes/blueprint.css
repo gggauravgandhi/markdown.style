@@ -1,0 +1,40 @@
+/* Blueprint — engineering drawing. Drafting blues, uppercase mono annotations. */
+:root {
+  --mds-bg: #f5f8fc;
+  --mds-fg: #23324a;
+  --mds-font-body: Verdana, Geneva, 'DejaVu Sans', system-ui, sans-serif;
+  --mds-font-heading: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --mds-muted: #5e7191;
+  --mds-rule: #c6d4e8;
+  --mds-code-bg: #e9eff8;
+}
+
+body { font-size: calc(15px * var(--mds-font-scale)); }
+
+h1 { font-size: 1.8em; text-transform: uppercase; letter-spacing: 0.05em; color: var(--mds-accent); border: 2px solid var(--mds-accent); padding: 0.4em 0.6em; display: inline-block; }
+h2 { font-size: 1.25em; margin-top: 2.2em; text-transform: uppercase; letter-spacing: 0.06em; color: var(--mds-accent); border-bottom: 1px solid var(--mds-rule); padding-bottom: 0.3em; }
+h3 { font-size: 1.05em; margin-top: 1.7em; text-transform: uppercase; letter-spacing: 0.04em; }
+h4, h5, h6 { font-size: 0.9em; color: var(--mds-muted); text-transform: uppercase; }
+
+a { color: var(--mds-accent); }
+
+blockquote { margin: 1.5em 0; padding: 0.7em 1.1em; border: 1px dashed var(--mds-accent); color: var(--mds-muted); background: #ffffff; }
+
+hr { border: 0; border-top: 1px solid var(--mds-rule); margin: 2.5em 0; }
+
+code { font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace; font-size: 0.88em; background: var(--mds-code-bg); padding: 0.15em 0.4em; border-radius: 3px; }
+pre { border-radius: 4px; padding: 14px 18px; font-size: 0.88em; }
+pre code { background: none; padding: 0; font-size: 1em; }
+pre.shiki { border: 1px solid var(--mds-rule); }
+
+table { margin: 1.5em 0; font-size: 0.9em; background: #ffffff; }
+th { text-align: left; border-top: 2px solid var(--mds-accent); border-bottom: 1px solid var(--mds-accent); padding: 7px 11px; text-transform: uppercase; font-size: 0.85em; letter-spacing: 0.05em; }
+td { border-bottom: 1px solid var(--mds-rule); padding: 7px 11px; }
+
+ul, ol { padding-left: 1.6em; }
+li { margin: 0.3em 0; }
+li::marker { color: var(--mds-accent); }
+
+.footnotes { font-size: 0.85em; color: var(--mds-muted); border-top: 1px solid var(--mds-rule); margin-top: 3em; }
+
+@media print { :root { --mds-bg: #ffffff; } body { font-size: 10pt; } }

@@ -1,11 +1,13 @@
 import type { MermaidTheme } from '../pipeline/types'
 import baseCssRaw from './_base.css?raw'
+import blueprintCss from './blueprint.css?raw'
 import boardroomCss from './boardroom.css?raw'
 import briefingCss from './briefing.css?raw'
 import carbonCss from './carbon.css?raw'
 import contrastCss from './contrast.css?raw'
 import editorialCss from './editorial.css?raw'
 import ledgerCss from './ledger.css?raw'
+import manualCss from './manual.css?raw'
 import memoCss from './memo.css?raw'
 import paperCss from './paper.css?raw'
 import popCss from './pop.css?raw'
@@ -13,6 +15,7 @@ import quarterlyCss from './quarterly.css?raw'
 import scholarCss from './scholar.css?raw'
 import slateCss from './slate.css?raw'
 import swissCss from './swiss.css?raw'
+import terminalCss from './terminal.css?raw'
 
 export type Category = 'business' | 'technical' | 'academic' | 'editorial' | 'minimal' | 'bold'
 
@@ -176,6 +179,36 @@ export const themes: readonly Theme[] = [
     shikiTheme: 'rose-pine-dawn',
     mermaidTheme: 'neutral',
     css: quarterlyCss,
+  },
+  {
+    id: 'terminal',
+    name: 'Terminal',
+    description: 'Amber phosphor terminal: monospace everything on near-black.',
+    category: 'technical',
+    defaultAccent: '#d9930d',
+    shikiTheme: 'vesper',
+    mermaidTheme: 'dark',
+    css: terminalCss,
+  },
+  {
+    id: 'blueprint',
+    name: 'Blueprint',
+    description: 'Engineering drawing: drafting blues, uppercase mono annotations.',
+    category: 'technical',
+    defaultAccent: '#1e4f91',
+    shikiTheme: 'github-light',
+    mermaidTheme: 'neutral',
+    css: blueprintCss,
+  },
+  {
+    id: 'manual',
+    name: 'Manual',
+    description: 'Reference manual: man-page structure, no-nonsense hierarchy.',
+    category: 'technical',
+    defaultAccent: '#8a1f11',
+    shikiTheme: 'github-light',
+    mermaidTheme: 'neutral',
+    css: manualCss,
   },
 ]
 
