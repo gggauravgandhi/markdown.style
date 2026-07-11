@@ -1,10 +1,15 @@
 import type { MermaidTheme } from '../pipeline/types'
 import baseCssRaw from './_base.css?raw'
+import boardroomCss from './boardroom.css?raw'
+import briefingCss from './briefing.css?raw'
 import carbonCss from './carbon.css?raw'
 import contrastCss from './contrast.css?raw'
 import editorialCss from './editorial.css?raw'
+import ledgerCss from './ledger.css?raw'
+import memoCss from './memo.css?raw'
 import paperCss from './paper.css?raw'
 import popCss from './pop.css?raw'
+import quarterlyCss from './quarterly.css?raw'
 import scholarCss from './scholar.css?raw'
 import slateCss from './slate.css?raw'
 import swissCss from './swiss.css?raw'
@@ -120,6 +125,57 @@ export const themes: readonly Theme[] = [
     shikiTheme: 'catppuccin-latte',
     mermaidTheme: 'forest',
     css: popCss,
+  },
+  {
+    id: 'boardroom',
+    name: 'Boardroom',
+    description: 'Confident corporate report: navy authority, disciplined ruled tables.',
+    category: 'business',
+    featured: true,
+    defaultAccent: '#1f3a5f',
+    shikiTheme: 'github-light',
+    mermaidTheme: 'neutral',
+    css: boardroomCss,
+  },
+  {
+    id: 'ledger',
+    name: 'Ledger',
+    description: 'Financial-statement style: tabular numerals, hairline table rules.',
+    category: 'business',
+    defaultAccent: '#1a5c3a',
+    shikiTheme: 'everforest-light',
+    mermaidTheme: 'forest',
+    css: ledgerCss,
+  },
+  {
+    id: 'briefing',
+    name: 'Briefing',
+    description: 'Consulting brief: numbered sections, decisive charcoal and signal red.',
+    category: 'business',
+    defaultAccent: '#b3261e',
+    shikiTheme: 'min-light',
+    mermaidTheme: 'neutral',
+    css: briefingCss,
+  },
+  {
+    id: 'memo',
+    name: 'Memo',
+    description: 'Interoffice memo: small-caps headings, typewriter code, warm paper.',
+    category: 'business',
+    defaultAccent: '#4a4238',
+    shikiTheme: 'solarized-light',
+    mermaidTheme: 'neutral',
+    css: memoCss,
+  },
+  {
+    id: 'quarterly',
+    name: 'Quarterly',
+    description: 'Annual-report editorial: generous margins, burgundy headlines.',
+    category: 'business',
+    defaultAccent: '#7c2138',
+    shikiTheme: 'rose-pine-dawn',
+    mermaidTheme: 'neutral',
+    css: quarterlyCss,
   },
 ]
 

@@ -72,10 +72,15 @@ describe('categories', () => {
     for (const t of themes) expect(Object.keys(CATEGORY_LABELS), t.id).toContain(t.category)
   })
 
-  it('featured themes are unique per category', () => {
+  it('exactly six featured themes, one per category', () => {
     const featured = themes.filter(t => t.featured)
-    expect(new Set(featured.map(t => t.category)).size).toBe(featured.length)
-    expect(featured.length).toBeGreaterThanOrEqual(5)
+    expect(featured.map(t => t.id).sort()).toEqual(['boardroom', 'paper', 'pop', 'scholar', 'slate', 'swiss'])
+    expect(new Set(featured.map(t => t.category)).size).toBe(6)
+  })
+
+  it('category population matches the shipped roadmap', () => {
+    const count = (c: string) => themes.filter(t => t.category === c).length
+    expect(count('business')).toBe(5)
   })
 
   it('descriptions carry no em dashes (UI copy rule)', () => {

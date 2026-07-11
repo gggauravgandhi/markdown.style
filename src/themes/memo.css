@@ -1,0 +1,36 @@
+/* Memo — interoffice memo. Small-caps headings, typewriter code, warm paper. */
+:root {
+  --mds-bg: #faf8f4;
+  --mds-fg: #33302b;
+  --mds-font-body: Georgia, 'Times New Roman', serif;
+  --mds-font-heading: Georgia, 'Times New Roman', serif;
+  --mds-muted: #7d766c;
+  --mds-rule: #ddd6ca;
+  --mds-code-bg: #f1ede4;
+}
+
+h1 { font-size: 1.7em; text-transform: uppercase; letter-spacing: 0.12em; text-align: center; border-top: 2px solid var(--mds-fg); border-bottom: 2px solid var(--mds-fg); padding: 0.5em 0; }
+h2 { font-size: 1.25em; margin-top: 2.2em; font-variant-caps: small-caps; letter-spacing: 0.04em; }
+h3 { font-size: 1.05em; margin-top: 1.7em; font-variant-caps: small-caps; }
+h4, h5, h6 { font-size: 0.95em; color: var(--mds-muted); font-style: italic; }
+
+a { color: var(--mds-accent); }
+
+blockquote { margin: 1.5em 0; padding: 0.8em 1.1em; border: 1px solid var(--mds-rule); color: var(--mds-muted); }
+
+hr { border: 0; border-top: 1px solid var(--mds-fg); margin: 2.5em 0; }
+
+code { font-family: 'Courier New', Courier, monospace; font-size: 0.92em; background: var(--mds-code-bg); padding: 0.1em 0.35em; }
+pre { padding: 14px 18px; font-size: 0.92em; border: 1px solid var(--mds-rule); }
+pre code { background: none; padding: 0; font-size: 1em; }
+
+table { margin: 1.5em 0; font-size: 0.94em; }
+th { text-align: left; border-bottom: 1px solid var(--mds-fg); padding: 7px 12px; font-variant-caps: small-caps; }
+td { border-bottom: 1px dotted var(--mds-rule); padding: 7px 12px; }
+
+ul, ol { padding-left: 1.7em; }
+li { margin: 0.3em 0; }
+
+.footnotes { font-size: 0.85em; color: var(--mds-muted); border-top: 1px solid var(--mds-rule); margin-top: 3em; }
+
+@media print { :root { --mds-bg: #ffffff; } body { font-size: 11pt; } }
