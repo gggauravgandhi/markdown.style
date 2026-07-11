@@ -4,6 +4,13 @@ import type { AppState } from './store'
 
 export const RENDER_DEBOUNCE_MS = 200
 
+/** Keeps the proof canvas from going blank when the document is empty. */
+const EMPTY_PREVIEW_HTML = `<!doctype html>
+<html><head><meta charset="utf-8"><style>
+html, body { height: 100%; margin: 0; }
+body { display: grid; place-items: center; background: #ffffff; color: #5c6470; font: 15px/1.5 system-ui, sans-serif; text-align: center; padding: 24px; }
+</style></head><body><p>Paste or type markdown to see your styled document</p></body></html>`
+
 export function createPreview(
   iframe: HTMLIFrameElement,
   onErrors: (errors: RenderError[]) => void,
@@ -14,6 +21,11 @@ export function createPreview(
   async function renderNow(state: AppState): Promise<void> {
     clearTimeout(timer) // a direct render supersedes any pending debounced one
     const ticket = ++seq
+    if (!state.markdown.trim()) {
+      // ticket already claimed above, so an in-flight older render still drops
+      iframe.srcdoc = EMPTY_PREVIEW_HTML
+      return
+    }
     let result: Awaited<ReturnType<typeof render>>
     try {
       result = await render(state.markdown, state.themeId, state.knobs)
@@ -21,7 +33,7 @@ export function createPreview(
       if (ticket !== seq) return // a newer render already succeeded — stay silent
       // render() is contracted never to throw, but a broken lazy dep must
       // surface as a visible notice, never a silently blank preview
-      onErrors([{ source: 'pipeline', message: 'Preview failed to render — try reloading' }])
+      onErrors([{ source: 'pipeline', message: 'Preview failed to render. Try reloading.' }])
       return
     }
     if (ticket !== seq) return // superseded by a newer render — drop

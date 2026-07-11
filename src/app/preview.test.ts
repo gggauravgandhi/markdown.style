@@ -62,6 +62,14 @@ describe('preview', () => {
     expect(iframe.srcdoc).not.toContain('ZZZQueued')
   })
 
+  it('shows the empty-state placeholder instead of rendering a blank document', async () => {
+    const preview = createPreview(makeIframe(), () => {})
+    const iframe = document.querySelector('iframe')!
+    await preview.renderNow({ ...STATE, markdown: '   \n ' })
+    expect(iframe.srcdoc).toContain('Paste or type markdown')
+    expect(iframe.srcdoc).not.toContain('mds-content') // pipeline never runs for empty docs
+  })
+
   it('applyKnobs mutates iframe css variables without touching srcdoc', () => {
     const preview = createPreview(makeIframe(), () => {})
     const iframe = document.querySelector('iframe')!

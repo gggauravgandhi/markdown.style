@@ -15,20 +15,36 @@ body { background: var(--app-bg); color: var(--app-fg); font: 14px/1.5 system-ui
 .app { display: grid; grid-template-rows: auto 1fr; height: 100%; }
 
 .toolbar {
-  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-  padding: 8px 12px; background: var(--app-surface); border-bottom: 1px solid var(--app-border);
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  padding: 10px 16px; background: var(--app-surface); border-bottom: 1px solid var(--app-border);
 }
-.brand { font-weight: 700; margin-right: 8px; }
+.tb-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.brand { font-weight: 700; color: var(--app-fg); text-decoration: none; }
+.brand:hover { color: var(--app-accent); }
+.brand:focus-visible { outline: 2px solid var(--app-accent); outline-offset: 2px; border-radius: 2px; }
 .spacer { flex: 1; }
 .btn {
   background: none; border: 1px solid var(--app-border); color: var(--app-fg);
-  border-radius: 6px; padding: 6px 12px; font: inherit; cursor: pointer;
+  border-radius: 6px; padding: 6px 12px; min-height: 34px; font: inherit; cursor: pointer;
+  transition: background-color 150ms ease-out, border-color 150ms ease-out, color 150ms ease-out;
 }
-.btn:hover { border-color: var(--app-accent); }
+.btn:hover { background: rgba(255, 255, 255, 0.07); border-color: #3a3a46; }
+.btn:active { background: rgba(255, 255, 255, 0.12); }
 .btn:focus-visible { outline: 2px solid var(--app-accent); outline-offset: 2px; }
-.btn-primary { background: var(--app-accent); border-color: var(--app-accent); color: #fff; }
-.knob { width: 90px; accent-color: var(--app-accent); }
-.knob-accent { width: 36px; height: 30px; padding: 2px; border: 1px solid var(--app-border); border-radius: 6px; background: none; }
+/* dark text on the periwinkle accent: white-on-#6d8dff is ~3.2:1 (AA fail) */
+.btn-primary { background: var(--app-accent); border-color: var(--app-accent); color: #10131f; font-weight: 600; }
+.btn-primary:hover { background: #859fff; border-color: #859fff; }
+.btn-primary:active { background: #5c7df2; border-color: #5c7df2; }
+.btn-secondary { border-color: rgba(109, 141, 255, 0.45); color: var(--app-accent); }
+.btn-secondary:hover { background: rgba(109, 141, 255, 0.12); border-color: var(--app-accent); }
+.btn-ghost { border-color: transparent; color: var(--app-muted); }
+.btn-ghost:hover { color: var(--app-fg); border-color: transparent; }
+.btn-theme::after { content: ' ▾' / ''; opacity: 0.6; }
+.knob-group { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+.knob-label { font-size: 12px; color: var(--app-muted); }
+.knob { width: 110px; margin: 0; accent-color: var(--app-accent); cursor: pointer; }
+.knob-accent { width: 36px; height: 34px; padding: 3px; border: 1px solid var(--app-border); border-radius: 6px; background: none; cursor: pointer; }
+@media (prefers-reduced-motion: reduce) { .btn { transition: none; } }
 
 .panes { display: grid; grid-template-columns: 1fr 1fr; min-height: 0; }
 .pane { min-width: 0; min-height: 0; overflow: auto; }
@@ -48,16 +64,21 @@ body { background: var(--app-bg); color: var(--app-fg); font: 14px/1.5 system-ui
 
 .theme-dialog {
   border: 1px solid var(--app-border); border-radius: 12px; background: var(--app-surface); color: var(--app-fg);
-  display: none; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; padding: 16px; max-width: 760px; width: 90vw;
+  display: none; padding: 16px; max-width: 760px; width: 90vw;
 }
-.theme-dialog[open] { display: grid; }
+.theme-dialog[open] { display: block; }
 .theme-dialog::backdrop { background: rgba(0, 0, 0, 0.55); }
+.dialog-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.dialog-head h2 { margin: 0; font-size: 16px; }
+.theme-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
 .theme-card {
   display: grid; gap: 6px; text-align: left; background: var(--app-bg); color: var(--app-fg);
   border: 1px solid var(--app-border); border-radius: 8px; padding: 8px; cursor: pointer; font: inherit;
   overflow: hidden;
 }
 .theme-card:hover, .theme-card:focus-visible { border-color: var(--app-accent); }
+.theme-card[aria-current='true'] { border-color: var(--app-accent); }
+.theme-card[aria-current='true'] .theme-name::after { content: ' · current'; color: var(--app-muted); font-weight: 400; }
 /* render at double width and scale down so the sample isn't clipped mid-word;
    transforms are paint-only, so the negative margin returns the layout box
    (grid row) to the 140px the scaled content actually paints */
@@ -68,7 +89,18 @@ body { background: var(--app-bg); color: var(--app-fg); font: 14px/1.5 system-ui
 .notices { position: fixed; bottom: 16px; right: 16px; display: grid; gap: 8px; z-index: 10; }
 .notice {
   margin: 0; background: var(--app-surface); border: 1px solid var(--app-border);
-  border-left: 3px solid var(--app-accent); border-radius: 6px; padding: 10px 14px; max-width: 340px;
+  border-radius: 6px; padding: 10px 14px; max-width: 340px;
+}
+
+/* file drag affordance: shown via .app[data-dragging] while a drag is over the app */
+.drop-hint {
+  position: fixed; inset: 0; z-index: 20; display: none; place-items: center;
+  background: rgba(16, 16, 20, 0.65); pointer-events: none;
+}
+.app[data-dragging='true'] .drop-hint { display: grid; }
+.drop-hint span {
+  border: 1px solid var(--app-accent); border-radius: 8px;
+  background: var(--app-surface); padding: 14px 22px;
 }
 
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }

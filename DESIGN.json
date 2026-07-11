@@ -1,0 +1,145 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-07-11",
+  "title": "Design System: markdown.style",
+  "extensions": {
+    "colorMeta": {
+      "press-indigo": {
+        "role": "primary",
+        "displayName": "Press Indigo",
+        "canonical": "#4338ca",
+        "tonalRamp": ["#0d0b2a", "#1a1650", "#282277", "#36309f", "#4338ca", "#6f6ad8", "#9d99e6", "#cecdf4"]
+      },
+      "proofing-blue": {
+        "role": "primary",
+        "displayName": "Proofing Blue",
+        "canonical": "#6d8dff",
+        "tonalRamp": ["#111a3d", "#1f2f6b", "#2e4699", "#3f5fc7", "#5273e8", "#6d8dff", "#93abff", "#c1cfff"]
+      },
+      "night-slab": {
+        "role": "neutral",
+        "displayName": "Night Slab",
+        "canonical": "#101014",
+        "tonalRamp": ["#0a0a0d", "#101014", "#1a1a21", "#2a2a33", "#4a4a58", "#71717f", "#9a9aa8", "#e8e8ee"]
+      },
+      "headline-ink": {
+        "role": "neutral",
+        "displayName": "Headline Ink",
+        "canonical": "#0e0f2e",
+        "tonalRamp": ["#0e0f2e", "#17181c", "#2e3038", "#474a54", "#5c6470", "#8a919c", "#c3c8cf", "#e5e8ec"]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Marketing hero headline only." },
+      "headline": { "displayName": "Headline", "purpose": "Marketing section headings in Headline Ink." },
+      "body": { "displayName": "Body", "purpose": "Marketing prose at a 42em measure." },
+      "body-app": { "displayName": "App Body", "purpose": "All editor chrome text and controls." },
+      "label": { "displayName": "Label", "purpose": "Toolbar micro-labels and card descriptions." }
+    },
+    "shadows": [
+      {
+        "name": "modal-scrim",
+        "value": "rgba(0, 0, 0, 0.55)",
+        "purpose": "Backdrop dim behind the theme dialog. The only depth effect in the system; there are no box-shadows."
+      }
+    ],
+    "motion": [
+      { "name": "ease-standard", "value": "150ms ease-out", "purpose": "All chrome state transitions (background, border, color). Disabled under prefers-reduced-motion." }
+    ],
+    "breakpoints": [
+      { "name": "site-sm", "value": "640px" },
+      { "name": "app-split", "value": "768px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Marketing CTA",
+      "kind": "button",
+      "refersTo": "button-cta",
+      "description": "The one filled action per marketing page.",
+      "html": "<a class=\"ds-btn-cta\" href=\"#\">Open the editor</a>",
+      "css": ".ds-btn-cta { background: #4338ca; color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; display: inline-block; font-family: system-ui, sans-serif; font-size: 17px; } .ds-btn-cta:hover { background: #0e0f2e; } .ds-btn-cta:focus-visible { outline: 3px solid #4338ca; outline-offset: 2px; }"
+    },
+    {
+      "name": "App Primary Button",
+      "kind": "button",
+      "refersTo": "app-button-primary",
+      "description": "The single primary action in the editor toolbar (Print or save as PDF).",
+      "html": "<button class=\"ds-btn-primary\">Print or save as PDF</button>",
+      "css": ".ds-btn-primary { background: #6d8dff; border: 1px solid #6d8dff; color: #10131f; font-weight: 600; border-radius: 6px; padding: 6px 12px; min-height: 34px; font-family: system-ui, sans-serif; font-size: 14px; cursor: pointer; transition: background-color 150ms ease-out, border-color 150ms ease-out; } .ds-btn-primary:hover { background: #859fff; border-color: #859fff; } .ds-btn-primary:active { background: #5c7df2; } .ds-btn-primary:focus-visible { outline: 2px solid #6d8dff; outline-offset: 2px; }"
+    },
+    {
+      "name": "App Secondary Button",
+      "kind": "button",
+      "refersTo": "app-button-secondary",
+      "description": "Accent-outlined sibling export action (Download HTML).",
+      "html": "<button class=\"ds-btn-secondary\">Download HTML</button>",
+      "css": ".ds-btn-secondary { background: none; border: 1px solid rgba(109, 141, 255, 0.45); color: #6d8dff; border-radius: 6px; padding: 6px 12px; min-height: 34px; font-family: system-ui, sans-serif; font-size: 14px; cursor: pointer; transition: background-color 150ms ease-out, border-color 150ms ease-out; } .ds-btn-secondary:hover { background: rgba(109, 141, 255, 0.12); border-color: #6d8dff; } .ds-btn-secondary:focus-visible { outline: 2px solid #6d8dff; outline-offset: 2px; }"
+    },
+    {
+      "name": "App Default Button",
+      "kind": "button",
+      "refersTo": "app-button",
+      "description": "Workhorse toolbar button: quiet border, subtle fill on hover.",
+      "html": "<button class=\"ds-btn\">Open file</button>",
+      "css": ".ds-btn { background: none; border: 1px solid #2a2a33; color: #e8e8ee; border-radius: 6px; padding: 6px 12px; min-height: 34px; font-family: system-ui, sans-serif; font-size: 14px; cursor: pointer; transition: background-color 150ms ease-out, border-color 150ms ease-out; } .ds-btn:hover { background: rgba(255, 255, 255, 0.07); border-color: #3a3a46; } .ds-btn:active { background: rgba(255, 255, 255, 0.12); } .ds-btn:focus-visible { outline: 2px solid #6d8dff; outline-offset: 2px; }"
+    },
+    {
+      "name": "App Ghost Button",
+      "kind": "button",
+      "refersTo": "app-button-ghost",
+      "description": "Borderless tertiary or semi-destructive action (Reset to sample).",
+      "html": "<button class=\"ds-btn-ghost\">Reset to sample</button>",
+      "css": ".ds-btn-ghost { background: none; border: 1px solid transparent; color: #9a9aa8; border-radius: 6px; padding: 6px 12px; min-height: 34px; font-family: system-ui, sans-serif; font-size: 14px; cursor: pointer; transition: background-color 150ms ease-out, color 150ms ease-out; } .ds-btn-ghost:hover { color: #e8e8ee; background: rgba(255, 255, 255, 0.07); } .ds-btn-ghost:focus-visible { outline: 2px solid #6d8dff; outline-offset: 2px; }"
+    },
+    {
+      "name": "Notice Toast",
+      "kind": "custom",
+      "refersTo": "notice",
+      "description": "Bottom-right status toast. Full 1px border plus surface fill; side-stripe accents are banned.",
+      "html": "<p class=\"ds-notice\">HTML copied to clipboard</p>",
+      "css": ".ds-notice { margin: 0; background: #1a1a21; border: 1px solid #2a2a33; color: #e8e8ee; border-radius: 6px; padding: 10px 14px; max-width: 340px; font-family: system-ui, sans-serif; font-size: 14px; line-height: 1.5; }"
+    },
+    {
+      "name": "Toolbar Knob",
+      "kind": "input",
+      "description": "Labeled native control group: 12px micro-label plus accent-themed slider.",
+      "html": "<label class=\"ds-knob-group\"><span class=\"ds-knob-label\">Width</span><input class=\"ds-knob\" type=\"range\" min=\"480\" max=\"1400\" value=\"760\"></label>",
+      "css": ".ds-knob-group { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-family: system-ui, sans-serif; } .ds-knob-label { font-size: 12px; color: #9a9aa8; } .ds-knob { width: 110px; margin: 0; accent-color: #6d8dff; cursor: pointer; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Galley Proof",
+    "overview": "The moment raw copy becomes a page. Everything in markdown.style is staged around that transformation: plain monospace text on the left, the designed sheet on the right, and the instant where one becomes the other. The interface is the production room, not the publication; it stays dim, exact, and out of the way so the proof itself carries all the light. Two chrome surfaces serve one voice: the editor is a dark workbench, the marketing pages are a bright specimen sheet.",
+    "keyCharacteristics": [
+      "The document is the hero; chrome recedes on both surfaces.",
+      "Flat, border-defined construction; zero decorative shadows.",
+      "System type everywhere in the chrome; the eight document themes carry the expressive typography.",
+      "One accent per surface, spent on actions and state, never on decoration.",
+      "Refined and restrained components: quiet until touched, subtle fills on interaction, no lifts or glows."
+    ],
+    "rules": [
+      { "name": "The One Accent Rule", "body": "Each surface gets exactly one accent, spent on primary actions, current state, and focus. If an element is not interactive or stateful, it does not get accent color.", "section": "colors" },
+      { "name": "The Dark Text on Accent Rule", "body": "Proofing Blue fills always carry Ink-on-Accent text. White-on-periwinkle is prohibited; it fails WCAG AA.", "section": "colors" },
+      { "name": "The Stage Crew Rule", "body": "No display or decorative fonts in chrome, ever. Expressive typography lives exclusively inside the rendered document themes.", "section": "typography" },
+      { "name": "The Flat Galley Rule", "body": "Surfaces are flat at rest and flat on hover. Interaction feedback is a fill change, never a lift, glow, or shadow.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do spend accent color only on actions, selection, and focus (The One Accent Rule).",
+      "Do set Ink-on-Accent (#10131f) text on every Proofing Blue fill.",
+      "Do keep every interactive element at 4.5:1 contrast or better, with a visible 2px focus outline.",
+      "Do use 1px borders and surface steps for depth (The Flat Galley Rule).",
+      "Do give every control a visible label; aria-only labeling is a last resort, not a default.",
+      "Do respect prefers-reduced-motion on every transition, and keep transitions between 150 and 250ms."
+    ],
+    "donts": [
+      "Don't look like a plain converter utility: no identity-free white pages with a lone form and button.",
+      "Don't look like generic AI-startup SaaS: no gradient heroes, no glassmorphism cards, no purple-on-black, no hero metrics.",
+      "Don't look like a corporate enterprise tool: no heavy nav, feature matrices, or stock-photo trust sections.",
+      "Don't use side-stripe borders: border-left wider than 1px as a colored accent on toasts, callouts, or cards is prohibited.",
+      "Don't use gradient text, box-shadows, or decorative blur anywhere in chrome.",
+      "Don't put display fonts, em dashes, or marketing voice inside the editor chrome.",
+      "Don't use pure #000 anywhere; the darkest chrome value is Night Slab (#101014)."
+    ]
+  }
+}

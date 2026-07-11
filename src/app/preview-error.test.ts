@@ -17,7 +17,7 @@ describe('preview error path', () => {
 
     await preview.renderNow({ markdown: '# x', themeId: 'paper', knobs: {} })
 
-    expect(errs).toEqual([{ source: 'pipeline', message: 'Preview failed to render — try reloading' }])
+    expect(errs).toEqual([{ source: 'pipeline', message: 'Preview failed to render. Try reloading.' }])
     expect(iframe.srcdoc).toBe('')
     document.body.innerHTML = ''
   })

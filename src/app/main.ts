@@ -4,6 +4,7 @@ import { render } from '../pipeline/render'
 import type { RenderError } from '../pipeline/types'
 import { themes } from '../themes/registry'
 import './app.css'
+import { editorTheme } from './editor-theme'
 import { copyHtml, downloadHtml, printDocument } from './exports'
 import { isMarkdownFile, loadMarkdownFile } from './file-input'
 import { createPreview } from './preview'
@@ -23,6 +24,18 @@ function el<K extends keyof HTMLElementTagNameMap>(
   return node
 }
 
+function group(...children: Element[]): HTMLDivElement {
+  const node = el('div', { class: 'tb-group' })
+  node.append(...children)
+  return node
+}
+
+function knob(label: string, input: HTMLInputElement): HTMLLabelElement {
+  const node = el('label', { class: 'knob-group' })
+  node.append(el('span', { class: 'knob-label' }, label), input)
+  return node
+}
+
 export async function mount(root: HTMLElement): Promise<void> {
   const initial: AppState = { markdown: SAMPLE_MARKDOWN, themeId: themes[0]!.id, knobs: {} }
   const store = createStore(initial)
@@ -39,19 +52,26 @@ export async function mount(root: HTMLElement): Promise<void> {
   root.innerHTML = ''
   const app = el('div', { class: 'app', 'data-view': 'split' })
   const toolbar = el('header', { class: 'toolbar' })
-  const brand = el('span', { class: 'brand' }, 'markdown.style')
-  const themeBtn = el('button', { class: 'btn', 'aria-haspopup': 'dialog' }, 'Theme')
+  const brand = el('a', { class: 'brand', href: '/' }, 'markdown.style')
+  const themeBtn = el('button', { class: 'btn btn-theme', 'aria-haspopup': 'dialog' }, 'Theme')
   const accentInput = el('input', { type: 'color', 'aria-label': 'Accent color', class: 'knob-accent' })
   const fontRange = el('input', { type: 'range', min: '0.7', max: '1.5', step: '0.05', 'aria-label': 'Font size', class: 'knob' })
   const widthRange = el('input', { type: 'range', min: '480', max: '1400', step: '20', 'aria-label': 'Page width', class: 'knob' })
   const spacer = el('span', { class: 'spacer' })
   const openBtn = el('button', { class: 'btn' }, 'Open file')
-  const resetBtn = el('button', { class: 'btn' }, 'Reset to sample')
+  const resetBtn = el('button', { class: 'btn btn-ghost' }, 'Reset to sample')
   const copyBtn = el('button', { class: 'btn' }, 'Copy HTML')
-  const downloadBtn = el('button', { class: 'btn btn-primary' }, 'Download HTML')
+  const downloadBtn = el('button', { class: 'btn btn-secondary' }, 'Download HTML')
   const printBtn = el('button', { class: 'btn btn-primary' }, 'Print or save as PDF')
   const viewToggle = el('button', { class: 'btn view-toggle', 'aria-label': 'Toggle editor and preview' }, 'Preview')
-  toolbar.append(brand, themeBtn, accentInput, fontRange, widthRange, spacer, openBtn, resetBtn, copyBtn, downloadBtn, printBtn, viewToggle)
+  toolbar.append(
+    brand,
+    group(themeBtn, knob('Accent', accentInput), knob('Text', fontRange), knob('Width', widthRange)),
+    spacer,
+    group(openBtn, resetBtn),
+    group(copyBtn, downloadBtn, printBtn),
+    viewToggle,
+  )
 
   const panes = el('main', { class: 'panes' })
   const editorPane = el('section', { class: 'pane pane-editor', 'aria-label': 'Markdown editor' })
@@ -64,8 +84,15 @@ export async function mount(root: HTMLElement): Promise<void> {
 
   const notices = el('div', { class: 'notices', role: 'status', 'aria-live': 'polite' })
   const fileInput = el('input', { type: 'file', accept: '.md,.markdown,.txt', class: 'visually-hidden', 'aria-label': 'Open markdown file' })
-  const dialog = el('dialog', { class: 'theme-dialog', 'aria-label': 'Choose a theme' })
-  app.append(toolbar, panes, notices, dialog, fileInput)
+  const dialog = el('dialog', { class: 'theme-dialog', 'aria-labelledby': 'theme-dialog-title' })
+  const dialogHead = el('div', { class: 'dialog-head' })
+  const dialogClose = el('button', { class: 'btn btn-ghost' }, 'Close')
+  dialogHead.append(el('h2', { id: 'theme-dialog-title' }, 'Choose a theme'), dialogClose)
+  const themeCards = el('div', { class: 'theme-cards' })
+  dialog.append(dialogHead, themeCards)
+  const dropHint = el('div', { class: 'drop-hint', 'aria-hidden': 'true' })
+  dropHint.append(el('span', {}, 'Drop your markdown file'))
+  app.append(toolbar, panes, notices, dropHint, dialog, fileInput)
   root.append(app)
 
   function notice(message: string): void {
@@ -93,6 +120,7 @@ export async function mount(root: HTMLElement): Promise<void> {
       basicSetup,
       markdown(),
       EditorView.lineWrapping,
+      ...editorTheme,
       EditorView.updateListener.of(update => {
         if (update.docChanged) {
           store.set({ markdown: update.state.doc.toString() })
@@ -106,7 +134,7 @@ export async function mount(root: HTMLElement): Promise<void> {
     view.dispatch({ changes: { from: 0, to: view.state.doc.length, insert: text } })
   }
 
-  store.onQuotaWarning(() => notice('Autosave unavailable (storage full) — your work stays in this tab only'))
+  store.onQuotaWarning(() => notice('Autosave unavailable (storage full). Your work stays in this tab only.'))
 
   // --- knobs --------------------------------------------------------------------
   function currentKnobs(): AppState['knobs'] {
@@ -116,17 +144,25 @@ export async function mount(root: HTMLElement): Promise<void> {
       pageWidth: Number(widthRange.value),
     }
   }
+  function syncKnobTitles(): void {
+    fontRange.title = `Font size ×${Number(fontRange.value).toFixed(2)}`
+    widthRange.title = `Page width ${widthRange.value}px`
+  }
   function initKnobControls(): void {
     const { knobs, themeId } = store.get()
-    accentInput.value = knobs.accent ?? themes.find(t => t.id === themeId)?.defaultAccent ?? '#0f62fe'
+    const theme = themes.find(t => t.id === themeId)
+    themeBtn.textContent = `Theme: ${theme?.name ?? themeId}`
+    accentInput.value = knobs.accent ?? theme?.defaultAccent ?? '#0f62fe'
     fontRange.value = String(knobs.fontScale ?? 1)
     widthRange.value = String(knobs.pageWidth ?? 760)
+    syncKnobTitles()
   }
   for (const input of [accentInput, fontRange, widthRange]) {
     input.addEventListener('input', () => {
       const knobs = currentKnobs()
       store.set({ knobs })
       preview.applyKnobs(knobs)
+      syncKnobTitles()
     })
   }
 
@@ -141,7 +177,7 @@ export async function mount(root: HTMLElement): Promise<void> {
       const name = el('span', { class: 'theme-name' }, theme.name)
       const desc = el('span', { class: 'theme-desc' }, theme.description)
       card.append(thumb, name, desc)
-      dialog.append(card)
+      themeCards.append(card)
       const { html } = await render(THUMB_MARKDOWN, theme.id)
       ;(thumb as HTMLIFrameElement).srcdoc = html
       card.addEventListener('click', () => {
@@ -152,16 +188,24 @@ export async function mount(root: HTMLElement): Promise<void> {
       })
     }
   }
+  function markActiveCard(): void {
+    const { themeId } = store.get()
+    for (const card of themeCards.querySelectorAll('.theme-card')) {
+      if (card.getAttribute('data-theme') === themeId) card.setAttribute('aria-current', 'true')
+      else card.removeAttribute('aria-current')
+    }
+  }
   themeBtn.addEventListener('click', () => {
-    void buildThumbs()
+    void buildThumbs().then(markActiveCard)
     dialog.showModal()
   })
+  dialogClose.addEventListener('click', () => dialog.close())
 
   // --- exports ------------------------------------------------------------------------
   async function withDocument(action: (html: string, title: string) => void | Promise<void>): Promise<void> {
     const state = store.get()
     if (!state.markdown.trim()) {
-      notice('Nothing to export — the document is empty')
+      notice('Nothing to export. The document is empty.')
       return
     }
     const { html, title } = await render(state.markdown, state.themeId, state.knobs)
@@ -170,19 +214,19 @@ export async function mount(root: HTMLElement): Promise<void> {
   downloadBtn.addEventListener('click', () => void withDocument((html, title) => downloadHtml(html, title)))
   printBtn.addEventListener('click', () =>
     void withDocument(html => {
-      if (!printDocument(html)) notice('Popup blocked — allow popups for this site to print')
+      if (!printDocument(html)) notice('Popup blocked. Allow popups for this site to print.')
     }),
   )
   copyBtn.addEventListener('click', () =>
     void withDocument(async html => {
-      notice((await copyHtml(html)) ? 'HTML copied to clipboard' : 'Copy failed — clipboard unavailable')
+      notice((await copyHtml(html)) ? 'HTML copied to clipboard' : 'Copy failed. Clipboard is unavailable.')
     }),
   )
 
   // --- file open / drag-drop -------------------------------------------------------------
   async function acceptFile(file: File): Promise<void> {
     if (!isMarkdownFile(file.name)) {
-      notice('Unsupported file — use .md, .markdown, or .txt')
+      notice('Unsupported file. Use .md, .markdown, or .txt.')
       return
     }
     try {
@@ -190,7 +234,7 @@ export async function mount(root: HTMLElement): Promise<void> {
       if (warning) notice(warning)
       setEditorText(text)
     } catch {
-      notice('Could not read the file — try again') // spec §7: read failures toast
+      notice('Could not read the file. Try again.') // spec §7: read failures toast
     }
   }
   openBtn.addEventListener('click', () => fileInput.click())
@@ -198,10 +242,26 @@ export async function mount(root: HTMLElement): Promise<void> {
     const file = fileInput.files?.[0]
     if (file) void acceptFile(file)
   })
+  // dragleave fires on every child boundary, so a bare toggle would flicker;
+  // count enters/leaves and only hide when the drag truly exits the app
+  let dragDepth = 0
+  const endDrag = (): void => {
+    dragDepth = 0
+    delete app.dataset.dragging
+  }
+  app.addEventListener('dragenter', e => {
+    e.preventDefault()
+    dragDepth++
+    app.dataset.dragging = 'true'
+  })
+  app.addEventListener('dragleave', () => {
+    if (--dragDepth <= 0) endDrag()
+  })
   for (const evt of ['dragover', 'drop'] as const) {
     app.addEventListener(evt, e => {
       e.preventDefault()
       if (evt === 'drop') {
+        endDrag()
         const file = (e as DragEvent).dataTransfer?.files?.[0]
         if (file) void acceptFile(file)
       }

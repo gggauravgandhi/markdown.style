@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { themes } from '../themes/registry'
 import { mount } from './main'
 
 // CodeMirror needs a couple of layout APIs jsdom lacks.
@@ -8,6 +9,9 @@ beforeEach(() => {
   document.body.innerHTML = '<div id="app"></div>'
   Range.prototype.getClientRects ??= () => ({ length: 0, item: () => null, [Symbol.iterator]: Array.prototype[Symbol.iterator] }) as unknown as DOMRectList
   Range.prototype.getBoundingClientRect ??= () => new DOMRect()
+  // jsdom has no <dialog> modal support
+  HTMLDialogElement.prototype.showModal ??= function (this: HTMLDialogElement) { this.open = true }
+  HTMLDialogElement.prototype.close ??= function (this: HTMLDialogElement) { this.open = false }
 })
 
 describe('editor app shell', () => {
@@ -18,9 +22,11 @@ describe('editor app shell', () => {
     expect(iframe.title).toBe('Document preview')
     expect(document.querySelector('.cm-editor')).toBeTruthy()
     const buttons = [...document.querySelectorAll('button')].map(b => b.textContent?.trim())
-    for (const label of ['Theme', 'Download HTML', 'Print or save as PDF', 'Copy HTML', 'Open file', 'Reset to sample']) {
+    for (const label of ['Download HTML', 'Print or save as PDF', 'Copy HTML', 'Open file', 'Reset to sample']) {
       expect(buttons, label).toContain(label)
     }
+    // theme button shows the active theme, not a bare "Theme"
+    expect(buttons).toContain('Theme: Paper')
     for (const aria of ['Accent color', 'Font size', 'Page width']) {
       expect(document.querySelector(`[aria-label="${aria}"]`), aria).toBeTruthy()
     }
@@ -38,6 +44,37 @@ describe('editor app shell', () => {
   })
 })
 
+describe('theme dialog', () => {
+  it('opens labelled, marks the active theme, and closes from its header', async () => {
+    await mount(document.getElementById('app')!)
+    const themeBtn = [...document.querySelectorAll('button')].find(b => b.textContent?.startsWith('Theme:'))!
+    themeBtn.click()
+    const dialog = document.querySelector('dialog')!
+    expect(dialog.open).toBe(true)
+    expect(dialog.getAttribute('aria-labelledby')).toBe('theme-dialog-title')
+    expect(dialog.querySelector('h2#theme-dialog-title')?.textContent).toBe('Choose a theme')
+    await vi.waitFor(() => expect(dialog.querySelectorAll('.theme-card')).toHaveLength(themes.length))
+    // the active theme is visibly marked, not just remembered
+    await vi.waitFor(() =>
+      expect(dialog.querySelector('[aria-current="true"]')?.getAttribute('data-theme')).toBe(themes[0]!.id),
+    )
+    dialog.querySelector<HTMLButtonElement>('.dialog-head button')!.click()
+    expect(dialog.open).toBe(false)
+  })
+})
+
+describe('drag and drop affordance', () => {
+  it('shows the drop hint only while dragging over the app', async () => {
+    await mount(document.getElementById('app')!)
+    const app = document.querySelector<HTMLElement>('.app')!
+    expect(app.dataset.dragging).toBeUndefined()
+    app.dispatchEvent(new Event('dragenter', { bubbles: true }))
+    expect(app.dataset.dragging).toBe('true')
+    app.dispatchEvent(new Event('dragleave', { bubbles: true }))
+    expect(app.dataset.dragging).toBeUndefined()
+  })
+})
+
 describe('?theme= deep link', () => {
   it('applies a valid theme param over restored state and strips it from the URL', async () => {
     localStorage.setItem('mds-state-v1', JSON.stringify({ markdown: '# Keep me', themeId: 'paper', knobs: { accent: '#123456' } }))
@@ -46,6 +83,8 @@ describe('?theme= deep link', () => {
     // observable via the accent knob: initKnobControls falls back to the active theme's default
     const accent = document.querySelector<HTMLInputElement>('[aria-label="Accent color"]')!
     expect(accent.value).toBe('#d81b7a') // pop's defaultAccent; knobs were reset
+    const buttons = [...document.querySelectorAll('button')].map(b => b.textContent?.trim())
+    expect(buttons).toContain('Theme: Pop')
     expect(location.search).toBe('') // param stripped
   })
 
