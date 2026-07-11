@@ -2,7 +2,7 @@ import { markdown } from '@codemirror/lang-markdown'
 import { basicSetup, EditorView } from 'codemirror'
 import { render } from '../pipeline/render'
 import type { RenderError } from '../pipeline/types'
-import { themes } from '../themes/registry'
+import { CATEGORY_LABELS, themes, type Category } from '../themes/registry'
 import './app.css'
 import { editorTheme } from './editor-theme'
 import { copyHtml, downloadHtml, printDocument } from './exports'
@@ -168,25 +168,51 @@ export async function mount(root: HTMLElement): Promise<void> {
 
   // --- theme picker ----------------------------------------------------------------
   let thumbsBuilt = false
+  async function fillThumb(card: Element): Promise<void> {
+    const thumb = card.querySelector<HTMLIFrameElement>('.theme-thumb')
+    const id = card.getAttribute('data-theme')
+    if (!thumb || !id || thumb.srcdoc) return
+    const { html } = await render(THUMB_MARKDOWN, id)
+    thumb.srcdoc = html
+  }
   async function buildThumbs(): Promise<void> {
     if (thumbsBuilt) return
     thumbsBuilt = true
-    for (const theme of themes) {
-      const card = el('button', { class: 'theme-card', 'data-theme': theme.id })
-      const thumb = el('iframe', { sandbox: '', class: 'theme-thumb', title: `${theme.name} preview`, loading: 'lazy' })
-      const name = el('span', { class: 'theme-name' }, theme.name)
-      const desc = el('span', { class: 'theme-desc' }, theme.description)
-      card.append(thumb, name, desc)
-      themeCards.append(card)
-      const { html } = await render(THUMB_MARKDOWN, theme.id)
-      ;(thumb as HTMLIFrameElement).srcdoc = html
-      card.addEventListener('click', () => {
-        store.set({ themeId: theme.id, knobs: {} })
-        initKnobControls()
-        void preview.renderNow(store.get())
-        dialog.close()
-      })
+    const cards: HTMLButtonElement[] = []
+    for (const category of Object.keys(CATEGORY_LABELS) as Category[]) {
+      const group = themes.filter(t => t.category === category)
+      if (group.length === 0) continue
+      themeCards.append(el('h3', { class: 'theme-cat' }, CATEGORY_LABELS[category]))
+      for (const theme of group) {
+        const card = el('button', { class: 'theme-card', 'data-theme': theme.id })
+        const thumb = el('iframe', { sandbox: '', class: 'theme-thumb', title: `${theme.name} preview`, loading: 'lazy' })
+        card.append(thumb, el('span', { class: 'theme-name' }, theme.name), el('span', { class: 'theme-desc' }, theme.description))
+        themeCards.append(card)
+        cards.push(card)
+        card.addEventListener('click', () => {
+          store.set({ themeId: theme.id, knobs: {} })
+          initKnobControls()
+          void preview.renderNow(store.get())
+          dialog.close()
+        })
+      }
     }
+    // jsdom and older engines: no IntersectionObserver, render everything now
+    if (typeof IntersectionObserver === 'undefined') {
+      await Promise.all(cards.map(fillThumb))
+      return
+    }
+    const io = new IntersectionObserver(
+      entries => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue
+          io.unobserve(entry.target)
+          void fillThumb(entry.target)
+        }
+      },
+      { root: dialog, rootMargin: '200px' },
+    )
+    for (const card of cards) io.observe(card)
   }
   function markActiveCard(): void {
     const { themeId } = store.get()

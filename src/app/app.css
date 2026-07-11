@@ -64,13 +64,21 @@ body { background: var(--app-bg); color: var(--app-fg); font: 14px/1.5 system-ui
 
 .theme-dialog {
   border: 1px solid var(--app-border); border-radius: 12px; background: var(--app-surface); color: var(--app-fg);
-  display: none; padding: 16px; max-width: 760px; width: 90vw;
+  display: none; padding: 16px; max-width: 760px; width: 90vw; max-height: 80vh; overflow-y: auto;
 }
 .theme-dialog[open] { display: block; }
 .theme-dialog::backdrop { background: rgba(0, 0, 0, 0.55); }
-.dialog-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.dialog-head {
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: -16px; z-index: 1; background: var(--app-surface);
+  padding: 16px 0 8px; margin: -16px 0 8px;
+}
 .dialog-head h2 { margin: 0; font-size: 16px; }
 .theme-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+.theme-cards .theme-cat {
+  grid-column: 1 / -1; margin: 10px 0 0; font-size: 13px;
+  text-transform: uppercase; letter-spacing: 0.08em; color: var(--app-muted); font-weight: 600;
+}
 .theme-card {
   display: grid; gap: 6px; text-align: left; background: var(--app-bg); color: var(--app-fg);
   border: 1px solid var(--app-border); border-radius: 8px; padding: 8px; cursor: pointer; font: inherit;

@@ -54,13 +54,21 @@ describe('theme dialog', () => {
     expect(dialog.getAttribute('aria-labelledby')).toBe('theme-dialog-title')
     expect(dialog.querySelector('h2#theme-dialog-title')?.textContent).toBe('Choose a theme')
     await vi.waitFor(() => expect(dialog.querySelectorAll('.theme-card')).toHaveLength(themes.length))
+    // one heading per populated category, cards grouped beneath
+    expect(dialog.querySelectorAll('.theme-cat')).toHaveLength(new Set(themes.map(t => t.category)).size)
+    // jsdom has no IntersectionObserver, so the eager fallback must fill every thumbnail
+    await vi.waitFor(() => {
+      for (const thumb of dialog.querySelectorAll<HTMLIFrameElement>('.theme-thumb')) {
+        expect(thumb.srcdoc).toContain('<!doctype html>')
+      }
+    })
     // the active theme is visibly marked, not just remembered
     await vi.waitFor(() =>
       expect(dialog.querySelector('[aria-current="true"]')?.getAttribute('data-theme')).toBe(themes[0]!.id),
     )
     dialog.querySelector<HTMLButtonElement>('.dialog-head button')!.click()
     expect(dialog.open).toBe(false)
-  })
+  }, 20_000)
 })
 
 describe('drag and drop affordance', () => {
