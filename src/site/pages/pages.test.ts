@@ -130,6 +130,7 @@ describe('buildSitemap', () => {
     expect(xml).not.toContain('/samples/')
     expect(urls.length).toBeLessThanOrEqual(50) // re-ruled 2026-07-11 (theme expansion spec §1.3)
     expect(urls.length).toBe(4 + GENERATED_ROUTES.length) // '/', '/editor', '/privacy', '/terms' + generated
+    expect(urls.length).toBe(40) // 4 static + 36 generated (spec 2026-07-11 §6)
   })
 })
 

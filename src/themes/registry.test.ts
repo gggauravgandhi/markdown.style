@@ -14,9 +14,15 @@ describe('theme registry', () => {
     expect(getTheme('paper').id).toBe('paper')
   })
 
-  it('keeps the original eight first, paper leading', () => {
-    expect(themes.slice(0, 8).map(t => t.id)).toEqual([
+  it('ships the expanded lineup in category batches, paper first', () => {
+    expect(themes.map(t => t.id)).toEqual([
       'paper', 'slate', 'carbon', 'swiss', 'contrast', 'editorial', 'scholar', 'pop',
+      'boardroom', 'ledger', 'briefing', 'memo', 'quarterly',
+      'terminal', 'blueprint', 'manual',
+      'thesis', 'preprint', 'notebook', 'lecture',
+      'gazette', 'novella', 'columnist',
+      'mist', 'mono', 'airy',
+      'neon', 'poster', 'riso', 'retro',
     ])
   })
 
@@ -80,12 +86,9 @@ describe('categories', () => {
 
   it('category population matches the shipped roadmap', () => {
     const count = (c: string) => themes.filter(t => t.category === c).length
-    expect(count('business')).toBe(5)
-    expect(count('technical')).toBe(5)
-    expect(count('academic')).toBe(5)
-    expect(count('editorial')).toBe(5)
-    expect(count('minimal')).toBe(5)
-    expect(count('bold')).toBe(5)
+    for (const category of Object.keys(CATEGORY_LABELS)) {
+      expect(count(category), category).toBe(5)
+    }
   })
 
   it('descriptions carry no em dashes (UI copy rule)', () => {
