@@ -92,12 +92,9 @@ async function renderThemesHub(): Promise<string> {
 
 async function renderThemePage(copy: ThemeCopy): Promise<string> {
   const showcase = readFileSync(join(samplesDir, 'showcase.md'), 'utf8')
-  const specimen = readFileSync(join(samplesDir, 'specimen.md'), 'utf8')
   const sample = await renderBody(showcase, copy.id)
   if (sample.errors.length > 0) throw new Error(`sample render failed for ${copy.id}: ${sample.errors[0]!.message}`)
-  const specimen_ = await renderBody(specimen, copy.id)
-  if (specimen_.errors.length > 0) throw new Error(`specimen render failed for ${copy.id}: ${specimen_.errors[0]!.message}`)
-  return buildThemePage(copy, sample.body, specimen_.body, specimen)
+  return buildThemePage(copy, sample.body)
 }
 
 async function renderUseCasePage(copy: UseCaseCopy): Promise<string> {

@@ -5,11 +5,7 @@ import type { ThemeCopy } from './copy'
 import { themeCopy } from './copy'
 import { scopedSampleCss } from './scope-css'
 import { escapeHtml, pageShell } from './shell'
-
-// Rendered inline (not through content/samples/*.md) so the sample-hygiene
-// test's math ban stays intact; this is the only math example on a theme page.
-const MATH_SPECIMEN_MD =
-  'Inline math renders too: the quadratic formula is $x = \\dfrac{-b \\pm \\sqrt{b^2-4ac}}{2a}$.\n\nAnd block math: $$E = mc^2$$'
+import { SPECIMENS, type Specimen } from './specimens'
 
 function sampleEmbed(themeId: string, sampleBody: string, label: string): string {
   // the matching scoped css travels via pageShell's extraCss (style-in-body is non-conforming)
@@ -20,26 +16,58 @@ ${sampleBody}
 </figure>`
 }
 
-/** markdown-it-footnote emits identical ids (id="fn1", id="fnref1") on every
-    render. Theme pages already embed one footnote via the sample document, so
-    a second embed needs its footnote ids namespaced to avoid duplicate DOM ids
-    breaking footnote navigation.
-    Ceiling: this is a blind regex over the rendered body, not markdown-aware;
-    if specimen.md ever demonstrates a literal id="fn or href="#fn inside a
-    code example, this would corrupt it. Revisit then. */
-function namespaceFootnotes(body: string): string {
-  return body.replace(/id="fn/g, 'id="specimen-fn').replace(/href="#fn/g, 'href="#specimen-fn')
+// distinct class from sample-embed: sample-embed marks a *full document*
+// (exactly one h1 of its own, asserted by pages.test.ts); a specimen is a
+// single-component snippet, so it gets its own class instead of overloading that count
+function specimenEmbed(themeId: string, body: string, label: string): string {
+  return `<figure class="specimen-embed" role="group" aria-label="${escapeHtml(label)}">
+<div class="mds-theme-${themeId}"><div class="mds-content">
+${body}
+</div></div>
+</figure>`
 }
 
-export async function buildThemePage(
-  copy: ThemeCopy,
-  sampleBody: string,
-  specimenBody: string,
-  specimenMarkdown: string,
-): Promise<string> {
+/** markdown-it-footnote emits identical ids (id="fn1", id="fnref1") on every
+    render. Theme pages already embed one footnote via the sample document, so
+    any other embed containing a footnote needs its ids namespaced (by
+    specimen id, so two footnote-bearing specimens can never collide either)
+    to avoid duplicate DOM ids breaking footnote navigation.
+    Ceiling: this is a blind regex over the rendered body, not markdown-aware;
+    if a specimen ever demonstrates a literal id="fn or href="#fn inside a
+    code example, this would corrupt it. Revisit then. */
+function namespaceFootnotes(body: string, specimenId: string): string {
+  return body.replace(/id="fn/g, `id="specimen-${specimenId}-fn`).replace(/href="#fn/g, `href="#specimen-${specimenId}-fn`)
+}
+
+/** Mermaid diagrams need a browser to lay out (verified: renderMermaidFences
+    degrades to an error block under plain bun); theme pages build under plain
+    bun, so this specimen is never rendered here, only its source is shown. */
+async function renderSpecimen(spec: Specimen, themeId: string): Promise<string | null> {
+  if (spec.id === 'mermaid') return null
+  const { body, errors } = await renderBody(spec.markdown, themeId)
+  if (errors.length > 0) throw new Error(`specimen "${spec.id}" render failed for ${themeId}: ${errors[0]!.message}`)
+  return namespaceFootnotes(body, spec.id)
+}
+
+function specimenPair(themeId: string, themeName: string, spec: Specimen, renderedBody: string | null): string {
+  const render =
+    renderedBody === null
+      ? `<div class="specimen-note">Mermaid diagrams need a live browser to lay out, so this static gallery can't render one; try it in <a href="/editor?theme=${themeId}">the editor</a>.</div>`
+      : specimenEmbed(themeId, renderedBody, `${spec.name} rendered in the ${themeName} theme`)
+  return `<div class="specimen-pair">
+  <div class="specimen-source">
+    <h3>${escapeHtml(spec.name)}</h3>
+    <pre>${escapeHtml(spec.markdown)}</pre>
+  </div>
+  ${render}
+</div>`
+}
+
+export async function buildThemePage(copy: ThemeCopy, sampleBody: string): Promise<string> {
   const theme = getTheme(copy.id)
-  const math = await renderBody(MATH_SPECIMEN_MD, copy.id)
-  if (math.errors.length > 0) throw new Error(`math specimen render failed for ${copy.id}: ${math.errors[0]!.message}`)
+  const specimenPairs = (
+    await Promise.all(SPECIMENS.map(async spec => specimenPair(copy.id, theme.name, spec, await renderSpecimen(spec, copy.id))))
+  ).join('\n')
   const mathCssStr = await mathCss()
   const related = copy.pairWith
     .map(id => {
@@ -64,12 +92,8 @@ ${sampleEmbed(copy.id, sampleBody, `Sample document rendered in the ${theme.name
 
 <section aria-label="Component specimens">
   <h2>What does every element look like in ${escapeHtml(theme.name)}?</h2>
-  <p class="answer">The same markdown building blocks, one by one: headings, tables, code, quotes, lists, footnotes, and math, exactly as ${escapeHtml(theme.name)} styles them.</p>
-  <details class="md-source">
-    <summary>See the markdown source</summary>
-    <pre>${escapeHtml(specimenMarkdown)}</pre>
-  </details>
-${sampleEmbed(copy.id, namespaceFootnotes(specimenBody) + math.body, `Component specimens rendered in the ${theme.name} theme`)}
+  <p class="answer">Every markdown building block, one at a time: the raw markdown on the left, that exact snippet rendered in ${escapeHtml(theme.name)} on the right.</p>
+${specimenPairs}
 </section>
 
 <section aria-label="Who it suits">

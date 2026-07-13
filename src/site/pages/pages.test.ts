@@ -10,24 +10,22 @@ import { buildConvertPage } from './convert-pages'
 import { ALL_ROUTES, GENERATED_ROUTES } from './routes'
 import { escapeHtml } from './shell'
 import { buildSitemap } from './sitemap'
+import { SPECIMENS } from './specimens'
 import { buildThemePage, buildThemesHub } from './theme-pages'
 import { buildUseCasePage } from './use-case-pages'
 
 const samplesDir = join(import.meta.dirname, '..', '..', '..', 'content', 'samples')
 const showcase = readFileSync(join(samplesDir, 'showcase.md'), 'utf8')
-const specimen = readFileSync(join(samplesDir, 'specimen.md'), 'utf8')
 
 // build everything once; individual tests assert invariants across the set
 async function buildAll(): Promise<Map<string, string>> {
   const pages = new Map<string, string>()
   const sampleBodies = new Map<string, string>()
-  const specimenBodies = new Map<string, string>()
   for (const t of themes) {
     sampleBodies.set(t.id, (await renderBody(showcase, t.id)).body)
-    specimenBodies.set(t.id, (await renderBody(specimen, t.id)).body)
   }
   pages.set('/themes', buildThemesHub(sampleBodies))
-  for (const c of themeCopy) pages.set(`/themes/${c.id}`, await buildThemePage(c, sampleBodies.get(c.id)!, specimenBodies.get(c.id)!, specimen))
+  for (const c of themeCopy) pages.set(`/themes/${c.id}`, await buildThemePage(c, sampleBodies.get(c.id)!))
   for (const u of useCases) {
     const md = readFileSync(join(samplesDir, `${u.slug}.md`), 'utf8')
     const { body } = await renderBody(md, u.themeId)
@@ -57,13 +55,18 @@ describe('generated page invariants', () => {
     }
   })
 
-  it('h1 structure: the hero h1 leads, and the only other h1s are inside sample embeds', async () => {
+  it('h1 structure: the hero h1 leads, and the only other h1s are inside embeds', async () => {
     const pages = await pagesPromise
+    // full-document embeds (sample-embed, mini-preview) each carry exactly one
+    // h1 of their own; theme pages additionally embed one specimen per
+    // component, and only the "headings" specimen's markdown contains a
+    // top-level heading, so it contributes exactly one more h1
+    const specimenH1s = SPECIMENS.filter(s => /^#\s/m.test(s.markdown)).length
     for (const [route, html] of pages) {
-      const embeds = (html.match(/class="mds-theme-/g) ?? []).length
+      const fullDocEmbeds = (html.match(/class="(?:sample-embed|mini-preview)"/g) ?? []).length
       const h1s = (html.match(/<h1[\s>]/g) ?? []).length
-      // each embedded sample document carries exactly one h1 of its own
-      expect(h1s, route).toBe(1 + embeds)
+      const expected = 1 + fullDocEmbeds + (route.startsWith('/themes/') ? specimenH1s : 0)
+      expect(h1s, route).toBe(expected)
       const firstH1 = html.indexOf('<h1')
       const firstEmbed = html.indexOf('class="mds-theme-')
       expect(firstH1, route).toBeGreaterThan(-1)
@@ -84,42 +87,36 @@ describe('generated page invariants', () => {
     }
   })
 
-  it('theme pages carry a namespaced component specimen section with no id clash', async () => {
+  it('theme pages carry a namespaced component specimen for every SPECIMENS entry, with no id clash', async () => {
     const pages = await pagesPromise
     for (const t of themes) {
       const html = pages.get(`/themes/${t.id}`)!
       expect(html, t.id).toContain('What does every element look like in')
-      expect(html, t.id).toContain('specimen-fn')
+      expect(html, t.id).toContain('id="specimen-footnote-fn')
       const fn1Count = (html.match(/id="fn1"/g) ?? []).length
       expect(fn1Count, t.id).toBeLessThanOrEqual(1)
+      for (const s of SPECIMENS) expect(html, `${t.id}: ${s.id}`).toContain(`class="specimen-pair"`)
     }
   })
 
-  it('theme pages render every specimen component', async () => {
+  it('theme pages show every specimen source, side by side with its render', async () => {
     const pages = await pagesPromise
     for (const t of themes) {
       const html = pages.get(`/themes/${t.id}`)!
+      for (const s of SPECIMENS) {
+        // raw markdown source, escaped, visible (not hidden behind a click)
+        expect(html, `${t.id}: ${s.id} source`).toContain(escapeHtml(s.markdown))
+      }
+      // representative rendered markup for a sample of non-mermaid specimens
       expect(html, t.id).toContain('<table')
-      expect(html, t.id).toContain('<pre')
       expect(html, t.id).toContain('<blockquote')
       expect(html, t.id).toContain('type="checkbox"')
-      expect(html, t.id).toContain('specimen-fn')
-      // byte strings unique to specimen.md (absent from showcase.md, the other
-      // embed on this page); catches the specimen body being dropped or
-      // swapped for the sample, which the assertions above cannot
-      expect(html, t.id).toContain('A quoted aside, set apart from the body copy.')
-      expect(html, t.id).toContain('GFM pipe syntax')
-      expect(html, t.id).toContain('The citation backing that claim.')
-    }
-  })
-
-  it('theme pages show the specimen markdown source and a math example', async () => {
-    const pages = await pagesPromise
-    for (const t of themes) {
-      const html = pages.get(`/themes/${t.id}`)!
-      expect(html, t.id).toContain('<details class="md-source">') // escaped source, zero-JS disclosure
-      expect(html, t.id).toContain('| Component | Kind') // raw specimen markdown, escaped
       expect(html, t.id).toContain('class="katex"') // math specimen rendered
+      // mermaid never gets build-time-rendered (no DOM); source shown, no error block shipped
+      // (theme stylesheets legitimately define a ".mds-error {" CSS rule; only the rendered markup is banned)
+      expect(html, t.id).not.toContain('class="mds-error"')
+      expect(html, t.id).not.toContain('requires a browser')
+      expect(html, t.id).toContain('class="specimen-note"')
     }
   })
 

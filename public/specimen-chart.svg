@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 120" role="img" aria-label="Bar chart of quarterly revenue by region">
+  <rect width="320" height="120" fill="#f4f5f7"/>
+  <rect x="24" y="52" width="40" height="44" fill="#94a3b8"/>
+  <rect x="88" y="34" width="40" height="62" fill="#94a3b8"/>
+  <rect x="152" y="22" width="40" height="74" fill="#64748b"/>
+  <rect x="216" y="44" width="40" height="52" fill="#94a3b8"/>
+  <line x1="16" y1="96" x2="304" y2="96" stroke="#334155" stroke-width="2"/>
+  <g fill="#475569" font-family="Georgia, serif" font-size="11" text-anchor="middle">
+    <text x="44" y="112">Q1</text>
+    <text x="108" y="112">Q2</text>
+    <text x="172" y="112">Q3</text>
+    <text x="236" y="112">Q4</text>
+  </g>
+</svg>

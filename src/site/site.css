@@ -86,3 +86,12 @@ section h2 { font-size: 1.5em; letter-spacing: -0.01em; color: var(--site-ink); 
 .md-source { margin: 20px 0; }
 .md-source summary { cursor: pointer; font-weight: 600; }
 .md-source pre { overflow-x: auto; background: var(--site-accent-soft); padding: 16px; border-radius: 8px; font-size: 0.85em; }
+
+.specimen-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; margin: 24px 0; }
+.specimen-pair h3 { margin: 0 0 8px; font-size: 1em; color: var(--site-ink); }
+.specimen-embed { margin: 0; border: 1px solid var(--site-rule); border-radius: 10px; overflow: hidden; }
+.specimen-source pre { overflow-x: auto; background: var(--site-accent-soft); padding: 16px; border-radius: 8px; font-size: 0.85em; margin: 0; }
+.specimen-note { margin: 0; padding: 16px; border: 1px dashed var(--site-rule); border-radius: 10px; color: var(--site-muted); font-size: 0.9em; }
+@media (max-width: 640px) {
+  .specimen-pair { grid-template-columns: 1fr; }
+}
