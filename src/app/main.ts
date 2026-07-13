@@ -125,9 +125,7 @@ export async function mount(root: HTMLElement): Promise<void> {
   const accentInput = el('input', { type: 'color', 'aria-label': 'Accent color', class: 'knob-accent' })
   const fontRange = el('input', { type: 'range', min: '0.7', max: '1.5', step: '0.05', 'aria-label': 'Font size', class: 'knob' })
   const widthRange = el('input', { type: 'range', min: '480', max: '1400', step: '20', 'aria-label': 'Page width', class: 'knob' })
-  const fullscreenBtn = el('button', { class: 'btn', 'aria-pressed': 'false' }, 'Full screen')
   const spacer = el('span', { class: 'spacer' })
-  const previewBarSpacer = el('span', { class: 'spacer' })
   const viewToggle = el('button', { class: 'btn view-toggle', 'aria-label': 'Toggle editor and preview' }, 'Preview')
 
   const notices = el('div', { class: 'notices', role: 'status', 'aria-live': 'polite' })
@@ -169,25 +167,26 @@ export async function mount(root: HTMLElement): Promise<void> {
     ],
     'menu-export',
   )
-  toolbar.append(brand, fileMenu, spacer, viewToggle, exportMenu)
-
-  const panes = el('main', { class: 'panes' })
-  const editorPane = el('section', { class: 'pane pane-editor', 'aria-label': 'Markdown editor' })
-  const previewPane = el('section', { class: 'pane pane-preview', 'aria-label': 'Preview' })
-  const previewBar = el('div', { class: 'preview-bar' })
-  previewBar.append(
+  toolbar.append(
+    brand,
+    fileMenu,
     themeBtn,
     randomBtn,
     knob('Accent', accentInput),
     knob('Text', fontRange),
     knob('Width', widthRange),
-    previewBarSpacer,
-    fullscreenBtn,
+    spacer,
+    viewToggle,
+    exportMenu,
   )
+
+  const panes = el('main', { class: 'panes' })
+  const editorPane = el('section', { class: 'pane pane-editor', 'aria-label': 'Markdown editor' })
+  const previewPane = el('section', { class: 'pane pane-preview', 'aria-label': 'Preview' })
   // security invariant (spec §2): script-free content + no allow-scripts;
   // allow-same-origin is required for the knob fast-path into contentDocument
   const iframe = el('iframe', { sandbox: 'allow-same-origin', title: 'Document preview' })
-  previewPane.append(previewBar, iframe)
+  previewPane.append(iframe)
   panes.append(editorPane, previewPane)
 
   app.append(toolbar, panes, notices, dropHint, dialog, fileInput)
@@ -402,30 +401,12 @@ export async function mount(root: HTMLElement): Promise<void> {
     viewToggle.textContent = next === 'preview' ? 'Editor' : 'Preview'
   })
 
-  // --- fullscreen -------------------------------------------------------------------------
-  function setFullscreen(active: boolean): void {
-    if (active) app.dataset.fullscreen = 'true'
-    else delete app.dataset.fullscreen
-    fullscreenBtn.textContent = active ? 'Exit full screen' : 'Full screen'
-    fullscreenBtn.setAttribute('aria-pressed', String(active))
-    // fullscreen covers the toolbar and editor pane visually; inert keeps them
-    // out of tab order and off-limits to assistive tech while hidden
-    toolbar.toggleAttribute('inert', active)
-    editorPane.toggleAttribute('inert', active)
-  }
-  fullscreenBtn.addEventListener('click', () => setFullscreen(app.dataset.fullscreen !== 'true'))
   // Escape priority: the native <dialog> owns Escape while open (return immediately
-  // so we don't also close a menu or exit fullscreen on the same keystroke); then an
-  // open menu; only then fullscreen exit
+  // so we don't also close a menu on the same keystroke); otherwise close an open menu
   document.addEventListener('keydown', e => {
     if (e.key !== 'Escape') return
     if (dialog.open) return
-    const openMenu = menuHandles.find(m => m.wrapper.dataset.open)
-    if (openMenu) {
-      openMenu.dismiss(true)
-      return
-    }
-    if (app.dataset.fullscreen === 'true') setFullscreen(false)
+    menuHandles.find(m => m.wrapper.dataset.open)?.dismiss(true)
   })
 
   initKnobControls()

@@ -37,6 +37,10 @@ export function printDocument(html: string): boolean {
   win.document.write(html)
   win.document.close()
   const doPrint = (): void => {
+    // close the tab once the dialog is dismissed (printed or canceled); the
+    // handler lives on the window object, never inside the document, so the
+    // printed artifact stays script-free
+    win.addEventListener('afterprint', () => win.close())
     win.focus()
     win.print()
   }

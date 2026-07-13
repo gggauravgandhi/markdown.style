@@ -45,13 +45,18 @@ describe('printDocument', () => {
     expect(printDocument('<html></html>')).toBe(false)
   })
 
-  it('writes the document and prints after fonts are ready', async () => {
+  it('writes the document, prints after fonts are ready, and closes the tab after printing', async () => {
     const doPrint = vi.fn()
+    const close = vi.fn()
+    const listeners: Record<string, () => void> = {}
     const written: string[] = []
     const fakeWin = {
       focus: vi.fn(),
       print: doPrint,
-      addEventListener: vi.fn(),
+      close,
+      addEventListener: vi.fn((event: string, handler: () => void) => {
+        listeners[event] = handler
+      }),
       document: {
         open: vi.fn(),
         write: (s: string) => written.push(s),
@@ -66,5 +71,9 @@ describe('printDocument', () => {
     await Promise.resolve() // let fonts.ready continuation run
     await Promise.resolve()
     expect(doPrint).toHaveBeenCalledTimes(1)
+    // the tab closes itself once the print dialog is dismissed
+    expect(listeners['afterprint'], 'afterprint handler registered').toBeTruthy()
+    listeners['afterprint']!()
+    expect(close).toHaveBeenCalledTimes(1)
   })
 })

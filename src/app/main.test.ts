@@ -149,20 +149,15 @@ describe('file menu', () => {
   })
 })
 
-describe('fullscreen toggle', () => {
-  it('toggles app fullscreen state and aria-pressed; Escape clears both', async () => {
+describe('toolbar layout', () => {
+  it('theme controls live in the top toolbar; no preview bar or fullscreen button', async () => {
     await mount(document.getElementById('app')!)
-    const app = document.querySelector<HTMLElement>('.app')!
     const toolbar = document.querySelector<HTMLElement>('.toolbar')!
-    const fsBtn = [...document.querySelectorAll('button')].find(b => b.textContent === 'Full screen') as HTMLButtonElement
-    fsBtn.click()
-    expect(app.dataset.fullscreen).toBe('true')
-    expect(fsBtn.getAttribute('aria-pressed')).toBe('true')
-    expect(toolbar.hasAttribute('inert')).toBe(true) // covered chrome is inert while fullscreen
-    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
-    expect(app.dataset.fullscreen).toBeUndefined()
-    expect(fsBtn.getAttribute('aria-pressed')).toBe('false')
-    expect(toolbar.hasAttribute('inert')).toBe(false) // inert lifted on exit
+    // theme controls returned to the main navigation bar (owner ruling 2026-07-13)
+    expect(toolbar.querySelector('.btn-theme')).toBeTruthy()
+    expect(toolbar.querySelector('[aria-label="Accent color"]')).toBeTruthy()
+    expect(document.querySelector('.preview-bar')).toBeNull()
+    expect([...document.querySelectorAll('button')].some(b => b.textContent?.includes('Full screen'))).toBe(false)
   })
 })
 
