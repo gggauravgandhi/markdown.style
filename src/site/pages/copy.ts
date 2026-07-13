@@ -357,6 +357,78 @@ export const useCases: readonly UseCaseCopy[] = [
       },
     ],
   },
+  {
+    slug: 'architecture-document',
+    themeId: 'blueprint',
+    title: 'Style a software architecture document for your team — markdown.style',
+    description: 'Turn an architecture decision record into a designed document: decision tables, config blocks, and footnotes rendered in Blueprint. Free, no upload.',
+    h1: 'Turn an architecture document into something your team will actually read',
+    intro: 'Architecture decisions live in markdown: headings, a comparison table, a config block, a footnote justifying the call. Paste that into markdown.style and it becomes a document worth attaching to the RFC. Below is a real example, decision record in, styled document out.',
+    sections: [
+      {
+        q: 'Does it handle comparison tables and config blocks?',
+        a: 'Yes, GitHub-flavored tables render with full formatting, and fenced code blocks (YAML, JSON, or any language) get syntax highlighting from the same highlighter VS Code uses, in both the exported HTML and the print/PDF version.',
+      },
+      {
+        q: 'Can I show the reasoning, not just the decision?',
+        a: 'Footnotes and blockquotes both render properly, so the tradeoffs and caveats an AI writes alongside a decision stay visible instead of getting stripped out.',
+      },
+    ],
+  },
+  {
+    slug: 'product-requirements',
+    themeId: 'briefing',
+    title: 'Style an AI-drafted PRD into a document worth reviewing — markdown.style',
+    description: 'Turn a product requirements draft into a document: a requirements table, acceptance criteria, and user stories, rendered in Briefing. Free, no upload.',
+    h1: 'Turn a PRD draft into a document your team will actually review',
+    intro: 'Ask an AI for a PRD and you get markdown: goals, user stories, a requirements table, acceptance criteria as checkboxes. Paste it here and it becomes a document worth putting in front of stakeholders. Below is a real example, draft in, styled document out.',
+    sections: [
+      {
+        q: 'Do acceptance criteria checkboxes render as real checkboxes?',
+        a: 'Yes, GitHub-style task lists render as checked and unchecked boxes in every theme, exactly as written in the source markdown.',
+      },
+      {
+        q: 'What if my PRD has more than one table?',
+        a: 'Every table renders independently, so a requirements table, a metrics table, and a comparison table can all sit in the same document without any extra markup.',
+      },
+    ],
+  },
+  {
+    slug: 'research-paper',
+    themeId: 'scholar',
+    title: 'Style an AI-drafted research paper with proper footnotes — markdown.style',
+    description: 'Turn a research write-up into a designed paper: structured headings, a data table, and footnotes that read like citations, rendered in Scholar. Free, no upload.',
+    h1: 'Turn a research write-up into a paper that reads like one',
+    intro: 'Research answers come back in markdown: an abstract, structured sections, a results table, and footnotes an AI uses as citations. Paste it here and Scholar gives it the academic register that format deserves. Below is a real example, draft in, styled paper out.',
+    sections: [
+      {
+        q: 'Do footnotes work as citations?',
+        a: 'Yes, footnotes render as numbered references with jump-to-source links, about as close as markdown gets to a citation format, and Scholar styles them to look intentional rather than bolted on.',
+      },
+      {
+        q: 'Does it support math and diagrams for papers that need them?',
+        a: 'Yes, KaTeX math and Mermaid diagrams both render live once you paste content that uses them into the editor. This particular example sticks to tables and footnotes.',
+      },
+    ],
+  },
+  {
+    slug: 'business-report',
+    themeId: 'boardroom',
+    title: 'Style an AI-drafted business report for the executive team — markdown.style',
+    description: 'Turn a business or retention review into a designed report: a metrics table, findings, and footnoted recommendations, rendered in Boardroom. Free, no upload.',
+    h1: 'Turn a business review into a report that belongs in front of leadership',
+    intro: 'Ask an AI to write up a quarterly review and it comes back as markdown: an executive summary, a metrics table, numbered findings, footnoted caveats. Paste it here and Boardroom gives it the polish the audience expects. Below is a real example, review in, styled report out.',
+    sections: [
+      {
+        q: 'Will a dense metrics table stay readable?',
+        a: 'Yes, GFM tables render with proper column alignment and header styling, and Boardroom’s print rules keep tables from splitting awkwardly across a page.',
+      },
+      {
+        q: 'How do I get this in front of the exec team as a PDF?',
+        a: 'Open it in the editor, keep Boardroom selected, and use “Print or save as PDF”. Your browser’s print dialog handles the conversion, nothing uploaded.',
+      },
+    ],
+  },
 ]
 
 export const convertPages: readonly ConvertCopy[] = [

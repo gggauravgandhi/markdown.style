@@ -1,9 +1,9 @@
-export function filenameFor(title: string): string {
+export function filenameFor(title: string, ext = 'html'): string {
   const slug = title
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')
-  return `${slug || 'document'}.html`
+  return `${slug || 'document'}.${ext}`
 }
 
 export function downloadHtml(html: string, title: string): void {
@@ -12,6 +12,16 @@ export function downloadHtml(html: string, title: string): void {
   const a = document.createElement('a')
   a.href = url
   a.download = filenameFor(title)
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
+export function downloadMarkdown(markdown: string, title: string): void {
+  const blob = new Blob([markdown], { type: 'text/markdown' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = filenameFor(title, 'md')
   a.click()
   URL.revokeObjectURL(url)
 }

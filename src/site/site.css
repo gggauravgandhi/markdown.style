@@ -14,9 +14,9 @@ body { background: var(--site-bg); color: var(--site-fg); font: 17px/1.65 system
 .wrap { max-width: 880px; margin: 0 auto; padding: 0 24px; }
 
 .site-header { border-bottom: 1px solid var(--site-rule); }
-.site-header .wrap { display: flex; align-items: center; gap: 24px; padding-top: 16px; padding-bottom: 16px; }
+.site-header .wrap { display: flex; align-items: center; gap: 24px; padding-top: 16px; padding-bottom: 16px; flex-wrap: wrap; }
 .brand { font-weight: 750; color: var(--site-fg); text-decoration: none; font-size: 1.05em; }
-.site-nav { margin-left: auto; display: flex; gap: 20px; align-items: center; }
+.site-nav { margin-left: auto; display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
 /* :not(.btn-cta) so the nav's muted color never overrides a CTA button's
    white text — otherwise .site-nav a out-specifies .btn-cta (gray on purple). */
 .site-nav a:not(.btn-cta) { color: var(--site-muted); text-decoration: none; }
@@ -28,7 +28,12 @@ body { background: var(--site-bg); color: var(--site-fg); font: 17px/1.65 system
 }
 .btn-cta:hover { background: var(--site-ink); }
 .btn-ghost { color: var(--site-accent); text-decoration: none; font-weight: 600; padding: 10px 4px; display: inline-block; }
-a:focus-visible, .btn-cta:focus-visible { outline: 3px solid var(--site-accent); outline-offset: 2px; }
+/* .btn-cta/.btn-ghost are also used on <button> (gateway actions) — reset UA button chrome. */
+.btn-cta, .btn-ghost { font: inherit; }
+button.btn-cta, button.btn-ghost { appearance: none; border: none; cursor: pointer; }
+button.btn-ghost { background: none; }
+.btn-cta:disabled { opacity: 0.5; cursor: not-allowed; }
+a:focus-visible, .btn-cta:focus-visible, .gateway textarea:focus-visible, .gateway button:focus-visible { outline: 3px solid var(--site-accent); outline-offset: 2px; }
 
 .hero { padding: 72px 0 56px; }
 .hero h1 { font-size: 2.7em; line-height: 1.12; letter-spacing: -0.02em; margin: 0 0 0.4em; color: var(--site-ink); }
@@ -49,6 +54,10 @@ section h2 { font-size: 1.5em; letter-spacing: -0.01em; color: var(--site-ink); 
   background: var(--site-accent-soft); color: var(--site-accent);
   font-weight: 700; text-align: center; line-height: 1.5em; font-size: 0.9em;
 }
+
+/* Homepage-only rules (.gateway/.compare-grid/.faq) live in an inline
+   <style> in index.html, not here — shell.ts inlines this whole file into
+   every generated page, and none of them render that markup. */
 
 .theme-strip { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px; padding: 0; list-style: none; }
 .theme-strip li { border: 1px solid var(--site-rule); border-radius: 10px; padding: 14px; }

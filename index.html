@@ -3,16 +3,47 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Turn ChatGPT or Claude output into a designed report — markdown.style</title>
-<meta name="description" content="Paste the markdown an AI gave you, pick a theme, and download a styled HTML document or save it as a PDF. Free, no upload — everything happens in your browser.">
+<title>AI Markdown to PDF &amp; Styled Documents — markdown.style</title>
+<meta name="description" content="Paste Markdown from ChatGPT, Claude, Gemini, or any AI assistant. Choose a document style and download a polished PDF. Free, local, and no signup.">
 <link rel="canonical" href="https://markdown.style/">
-<meta property="og:title" content="Turn ChatGPT or Claude output into a designed report">
-<meta property="og:description" content="Paste AI markdown, pick a theme, get a styled document or PDF. Free, private, in your browser.">
+<meta property="og:title" content="Turn AI-generated Markdown into a polished document">
+<meta property="og:description" content="Paste AI Markdown, pick a document style, and download a polished PDF or self-contained HTML file. Free, local, no signup.">
 <meta property="og:url" content="https://markdown.style/">
 <meta property="og:type" content="website">
 <meta property="og:image" content="https://markdown.style/og.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="/src/site/site.css">
+<style>
+/* Homepage-only rules: gateway, compare-grid, and FAQ markup exist only on
+   this page, so they live here instead of site.css (which shell.ts inlines
+   into every generated page — those rules would be dead weight there). */
+.gateway-label { display: block; font-size: 0.85em; font-weight: 600; color: var(--site-muted); margin-bottom: 6px; }
+.gateway { border: 1px solid var(--site-rule); border-radius: 10px; padding: 20px; margin: 24px 0; }
+.gateway textarea { width: 100%; min-height: 160px; resize: vertical; border: 1px solid var(--site-rule); border-radius: 6px; padding: 12px; font: inherit; color: inherit; background: transparent; }
+.gateway .cta-row { margin-top: 12px; }
+.gateway #md-error { min-height: 1.2em; margin: 12px 0 0; font-size: 0.9em; color: var(--site-muted); }
+/* drag-over and error states are conveyed via #md-error's text (set in home.ts), not color alone */
+.gateway[data-dragover="true"] { border-style: dashed; background: var(--site-accent-soft); }
+.gateway[data-error="true"] #md-error { font-weight: 600; }
+.gateway[data-error="true"] #md-error::before { content: '⚠ '; }
+.compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 20px; }
+.compare-grid .compare-after { padding: 16px 20px; }
+.compare-grid table { border-collapse: collapse; width: 100%; font-size: 0.9em; }
+.compare-grid th, .compare-grid td { border: 1px solid var(--site-rule); padding: 6px 10px; text-align: left; }
+@media (max-width: 640px) { .compare-grid { grid-template-columns: 1fr; } }
+.faq details { border-top: 1px solid var(--site-rule); padding: 14px 0; }
+.faq summary { cursor: pointer; font-weight: 600; }
+</style>
+<!--
+  USER-AUTHORIZED DEVIATION (2026-07): this page loads one module script, the
+  homepage paste-gateway (src/site/home.ts). It is progressive enhancement
+  only — every word of marketing copy below is static HTML a crawler reads
+  without executing anything; the script just wires up the textarea/drop-zone
+  buttons that were already visible and usable as plain HTML. Generated pages
+  and privacy/terms stay 100% script-free, so the AEO "nothing to execute"
+  guarantee holds everywhere except this one enhanced entry point.
+-->
+<script type="module" src="/src/site/home.ts"></script>
 <script type="application/ld+json">
 [
   {
@@ -20,7 +51,7 @@
     "@type": "WebApplication",
     "name": "markdown.style",
     "url": "https://markdown.style/editor",
-    "description": "Free browser tool that turns LLM markdown output into a designed document: themed HTML download or print-ready PDF. 100% client-side.",
+    "description": "Free browser tool that turns AI-generated Markdown into a polished document: a downloadable PDF, self-contained HTML, or copied HTML. 100% client-side.",
     "applicationCategory": "DeveloperApplication",
     "operatingSystem": "Any",
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
@@ -45,9 +76,10 @@
   <div class="wrap">
     <a class="brand" href="/">markdown.style</a>
     <nav class="site-nav" aria-label="Site">
+      <a href="#examples">Examples</a>
       <a href="/themes">Themes</a>
-      <a href="#how">How it works</a>
-      <a class="btn-cta" href="/editor">Open the editor</a>
+      <a href="https://github.com/gggauravgandhi/markdown.style" rel="noopener">GitHub</a>
+      <a class="btn-cta" href="/editor">Open editor</a>
     </nav>
   </div>
 </header>
@@ -55,53 +87,189 @@
 <main>
   <div class="wrap">
     <section class="hero" aria-label="Introduction" style="border-top:0">
-      <h1>Turn your ChatGPT or Claude output into a designed report</h1>
-      <p class="lede">AI writes great markdown — and then it dies in a plain white PDF. Paste that markdown here, pick a theme, and download a styled document instead. No prompt tokens wasted asking the model for HTML.</p>
-      <div class="cta-row">
-        <a class="btn-cta" href="/editor">Style my markdown</a>
-        <a class="btn-ghost" href="#themes">See the themes</a>
+      <h1>Turn AI-generated Markdown into a polished document.</h1>
+      <p class="lede">Paste output from ChatGPT, Claude, Gemini, Copilot, or any AI assistant. Choose a document style and download a polished PDF — without asking the AI to regenerate your content.</p>
+      <p class="lede">Generate the content once. Style and export it as many times as you need, with no additional AI tokens.</p>
+
+      <div class="gateway" id="md-drop">
+        <label for="md-input" class="gateway-label">Your Markdown</label>
+        <textarea id="md-input" class="gateway-input" rows="7" aria-describedby="md-error" placeholder="Paste your Markdown here…"></textarea>
+        <input type="file" id="md-file" accept=".md,.markdown,.txt" hidden>
+        <div class="cta-row">
+          <button type="button" id="md-go" class="btn-cta" disabled>Style this Markdown</button>
+          <button type="button" id="md-open" class="btn-ghost">Open a file</button>
+          <button type="button" id="md-example" class="btn-ghost">Try an example</button>
+        </div>
+        <p class="trust">Drop a Markdown file anywhere in this box, or open one from your device.</p>
+        <p id="md-error" role="status" aria-live="polite"></p>
       </div>
-      <p class="trust">100% in your browser · no upload · free · no sign-up</p>
+
+      <p class="trust">Free · No signup · No limits · Everything stays on your device</p>
+    </section>
+
+    <section id="proof" aria-label="Transformation proof">
+      <h2>From useful AI output to a document worth sharing.</h2>
+      <p class="answer">AI is good at producing structured Markdown. markdown.style gives that structure typography, hierarchy, tables, code styling, and export-ready layout.</p>
+      <div class="compare-grid">
+        <div>
+          <p class="trust">Plain Markdown</p>
+          <div class="md-source"><pre>## Q3 Revenue Summary
+
+Revenue grew **12%** quarter over
+quarter after the March launch.
+
+| Region | Growth |
+| --- | --- |
+| APAC | 18% |
+| EMEA | 9% |
+
+`npm run report --quarter=3`</pre></div>
+        </div>
+        <div>
+          <p class="trust">Styled result</p>
+          <div class="sample-embed compare-after">
+            <h3>Q3 Revenue Summary</h3>
+            <p>Revenue grew <strong>12%</strong> quarter over quarter after the March launch.</p>
+            <table>
+              <thead><tr><th>Region</th><th>Growth</th></tr></thead>
+              <tbody><tr><td>APAC</td><td>18%</td></tr><tr><td>EMEA</td><td>9%</td></tr></tbody>
+            </table>
+            <p><code>npm run report --quarter=3</code></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="examples" aria-label="Examples">
+      <h2>Made for more than one kind of document.</h2>
+      <p class="answer">Technical specifications, PRDs, research papers, and business reports should not all look the same.</p>
+      <ul class="theme-grid">
+        <li><a class="theme-card-link" href="/use-cases/architecture-document">
+          <span class="theme-card-meta"><strong>Architecture document</strong><span class="desc">Decision tables, config blocks, and footnotes for the tradeoffs — styled in Blueprint.</span></span>
+        </a></li>
+        <li><a class="theme-card-link" href="/use-cases/product-requirements">
+          <span class="theme-card-meta"><strong>Product requirements</strong><span class="desc">A requirements table, user stories, and acceptance-criteria checkboxes — styled in Briefing.</span></span>
+        </a></li>
+        <li><a class="theme-card-link" href="/use-cases/research-paper">
+          <span class="theme-card-meta"><strong>Research paper</strong><span class="desc">An abstract, a data table, and footnotes that read like citations — styled in Scholar.</span></span>
+        </a></li>
+        <li><a class="theme-card-link" href="/use-cases/business-report">
+          <span class="theme-card-meta"><strong>Business report</strong><span class="desc">A metrics table, findings, and footnoted recommendations — styled in Boardroom.</span></span>
+        </a></li>
+      </ul>
     </section>
 
     <section id="how" aria-label="How it works">
-      <h2>How do I turn an AI answer into a PDF?</h2>
-      <p class="answer">Paste the markdown into the editor, pick one of thirty themes, and hit Print — your browser's "Save as PDF" does the rest. Or download it as a single styled HTML file that looks identical anywhere.</p>
+      <h2>Markdown in. Polished document out.</h2>
       <ol class="steps">
-        <li><strong>Paste or drop</strong> the markdown ChatGPT, Claude, or any LLM gave you. The live preview styles it instantly — tables, code, math, and diagrams included.</li>
-        <li><strong>Pick a theme</strong> and tune the accent color, font size, and page width. The structure never changes; only the design does.</li>
-        <li><strong>Export</strong> — Download HTML for a self-contained file, or Print for a clean, page-break-aware PDF.</li>
+        <li><strong>Paste or open</strong><br>Paste AI-generated Markdown, drop a file, or open one from your device.</li>
+        <li><strong>Style and refine</strong><br>Preview it live, choose a document style, edit the Markdown, and tune the accent color or font size.</li>
+        <li><strong>Export</strong><br>Download a PDF (Print or save as PDF), export self-contained HTML, copy the HTML, or save your edited Markdown.</li>
       </ol>
     </section>
 
-    <section aria-label="Why markdown converts badly">
-      <h2>Why does markdown look so plain as a PDF?</h2>
-      <p class="answer">Most converters apply no design at all: default fonts, blue links, tables that overflow, code blocks split across pages. markdown.style applies a real theme — typography, tables, syntax-highlighted code, KaTeX math, Mermaid diagrams — and print styles that keep tables and code intact across page breaks.</p>
+    <section aria-label="Why not just ask the AI">
+      <h2>Generate the content once. <em>Style it as many times as you need.</em></h2>
+      <p class="answer">Asking AI to rebuild HTML or a PDF works, until you change a heading, dislike the design, or need another version. Keep the Markdown editable and handle every visual revision locally, without another prompt.</p>
+      <div class="compare-grid">
+        <div>
+          <h3>Asking AI to build the document</h3>
+          <ul>
+            <li>Prompt for HTML or PDF formatting</li>
+            <li>Spend more context and output tokens</li>
+            <li>Prompt again for design changes</li>
+            <li>Regenerate after small edits</li>
+            <li>Usually one generic visual treatment</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Using markdown.style</h3>
+          <ul>
+            <li>Generate the Markdown once</li>
+            <li>Edit the source directly</li>
+            <li>Switch document styles instantly</li>
+            <li>Export repeatedly</li>
+            <li>No additional AI tokens for formatting changes</li>
+          </ul>
+        </div>
+      </div>
     </section>
 
-    <section id="themes" aria-label="Themes">
-      <h2>What do the themes look like?</h2>
-      <p class="answer">Thirty designed looks, from a warm book-serif to dark technical to bold poster. Every theme styles the whole document — headings, tables, code, quotes, footnotes — and every theme prints cleanly.</p>
+    <section aria-label="Markdown support">
+      <h2>Built for the Markdown AI answers are full of.</h2>
+      <p class="answer">Tables, syntax-highlighted code, Mermaid diagrams, math, task lists, footnotes, images, links, blockquotes, and nested lists render in the preview and carry through to export.</p>
+      <ul class="answer">
+        <li>GitHub-flavored tables and task lists</li>
+        <li>Syntax-highlighted code blocks</li>
+        <li>Mermaid diagrams</li>
+        <li>KaTeX math</li>
+        <li>Footnotes</li>
+        <li>Images, links, blockquotes, and nested lists</li>
+      </ul>
+      <p class="trust">Your Markdown is processed locally. Remote images or links it references may still be fetched by your browser.</p>
+    </section>
+
+    <section id="styles" aria-label="Document styles">
+      <h2>A style for the document you are making.</h2>
+      <p class="answer">A technical specification should not look like an academic paper. An executive report should not look like a terminal. Choose a complete document style designed for the content and the people reading it.</p>
       <ul class="theme-strip">
         <li><strong><span class="swatch" style="background:#8b3a2f"></span><a href="/themes/paper">Paper</a></strong><span class="desc">Warm, book-like serif: reads like a well-set hardcover.</span></li>
         <li><strong><span class="swatch" style="background:#0969da"></span><a href="/themes/slate">Slate</a></strong><span class="desc">Modern product-doc sans: clean, neutral, engineered.</span></li>
-        <li><strong><span class="swatch" style="background:#1f3a5f"></span><a href="/themes/boardroom">Boardroom</a></strong><span class="desc">Confident corporate report: navy authority, disciplined ruled tables.</span></li>
         <li><strong><span class="swatch" style="background:#e30613"></span><a href="/themes/swiss">Swiss</a></strong><span class="desc">Minimal typographic: whitespace, uppercase labels, one red line.</span></li>
         <li><strong><span class="swatch" style="background:#1f3a93"></span><a href="/themes/scholar">Scholar</a></strong><span class="desc">Academic restraint: justified text, centered title, footnotes at home.</span></li>
         <li><strong><span class="swatch" style="background:#d81b7a"></span><a href="/themes/pop">Pop</a></strong><span class="desc">Colorful and friendly: rounded corners, warm tint, wavy links.</span></li>
+        <li><strong><span class="swatch" style="background:#1f3a5f"></span><a href="/themes/boardroom">Boardroom</a></strong><span class="desc">Confident corporate report: navy authority, disciplined ruled tables.</span></li>
       </ul>
       <p><a class="btn-ghost" href="/themes">Browse all 30 themes →</a></p>
     </section>
 
-    <section aria-label="Privacy">
-      <h2>Is my document uploaded anywhere?</h2>
-      <p class="answer">No. The entire pipeline — parsing, theming, exporting — runs in your browser. Nothing you paste ever reaches a server, and there's no account, tracking, or analytics. <a href="/privacy">Read the two-minute privacy page</a>.</p>
+    <section aria-label="Privacy and open source">
+      <h2>Your document stays on your device.</h2>
+      <p class="answer">Parsing, previewing, editing, and exporting happen in your browser. Your Markdown is not uploaded to markdown.style, there is no account, and there are no usage limits. If your Markdown references remote images or links, your browser will still fetch those.</p>
+      <p class="answer"><a href="/privacy">Read the privacy page</a>, or <a href="https://github.com/gggauravgandhi/markdown.style" rel="noopener">read the source on GitHub</a>.</p>
     </section>
 
-    <section aria-label="Feature support">
-      <h2>Does it handle tables, code, math, and diagrams?</h2>
-      <p class="answer">Yes — GitHub-flavored markdown tables and task lists, syntax-highlighted code in any common language, KaTeX math, and Mermaid diagrams all render and export. Exactly the things LLM answers are full of.</p>
-      <p><a class="btn-cta" href="/editor">Try it with your last AI answer</a></p>
+    <section aria-label="Frequently asked questions">
+      <h2>Common questions</h2>
+      <div class="faq">
+        <details>
+          <summary>How do I convert ChatGPT Markdown to PDF?</summary>
+          <p class="answer">Paste the Markdown into the box above or the editor, pick a document style, and use Print or save as PDF. Your browser's print dialog handles the PDF conversion.</p>
+        </details>
+        <details>
+          <summary>Can I turn Claude or Gemini output into a styled PDF?</summary>
+          <p class="answer">Yes — the paste gateway and editor work with Markdown from any AI assistant, not just one brand.</p>
+        </details>
+        <details>
+          <summary>Does markdown.style upload my document?</summary>
+          <p class="answer">No. Parsing, styling, and exporting all run in your browser. Nothing you paste is sent to a server.</p>
+        </details>
+        <details>
+          <summary>Does it support tables, code, Mermaid diagrams, and math?</summary>
+          <p class="answer">Yes — GitHub-flavored tables and task lists, syntax-highlighted code, Mermaid diagrams, and KaTeX math all render live and carry through to export.</p>
+        </details>
+        <details>
+          <summary>Can I export Markdown as HTML?</summary>
+          <p class="answer">Yes — download a self-contained HTML file, or copy the rendered HTML directly.</p>
+        </details>
+        <details>
+          <summary>Do I need an account?</summary>
+          <p class="answer">No signup, no login, and no usage limits.</p>
+        </details>
+        <details>
+          <summary>Is markdown.style free and open source?</summary>
+          <p class="answer">Yes to both. <a href="https://github.com/gggauravgandhi/markdown.style" rel="noopener">The source is on GitHub</a>.</p>
+        </details>
+      </div>
+    </section>
+
+    <section aria-label="Final call to action">
+      <h2>Your last AI answer is already enough.</h2>
+      <p class="answer">Paste the Markdown, choose how it should look, and download the document.</p>
+      <div class="cta-row">
+        <a class="btn-cta" href="/editor">Style my Markdown</a>
+        <a class="btn-ghost" href="/themes">Browse document styles</a>
+      </div>
     </section>
   </div>
 </main>
@@ -112,6 +280,7 @@
     <a href="/privacy">Privacy</a>
     <a href="/terms">Terms</a>
     <a href="/editor">Editor</a>
+    <a href="https://github.com/gggauravgandhi/markdown.style" rel="noopener">GitHub</a>
   </div>
 </footer>
 </body>

@@ -146,6 +146,20 @@ describe('generated page invariants', () => {
     }
   })
 
+  it('the four new use-case samples render their signature rich elements', async () => {
+    const pages = await pagesPromise
+    const signature: Record<string, string[]> = {
+      'architecture-document': ['<table', 'class="shiki', '<blockquote', 'class="footnote-ref"'],
+      'product-requirements': ['<table', 'type="checkbox"'],
+      'research-paper': ['<table', 'class="footnote-ref"'],
+      'business-report': ['<table', '<blockquote', 'class="footnote-ref"'],
+    }
+    for (const [slug, needles] of Object.entries(signature)) {
+      const html = pages.get(`/use-cases/${slug}`)!
+      for (const needle of needles) expect(html, `${slug}: ${needle}`).toContain(needle)
+    }
+  })
+
   it('no generated route is an orphan: every one is linked from another generated page', async () => {
     const pages = await pagesPromise
     const allHtml = [...pages.entries()]
@@ -189,7 +203,7 @@ describe('buildSitemap', () => {
     expect(xml).not.toContain('/samples/')
     expect(urls.length).toBeLessThanOrEqual(50) // re-ruled 2026-07-11 (theme expansion spec §1.3)
     expect(urls.length).toBe(4 + GENERATED_ROUTES.length) // '/', '/editor', '/privacy', '/terms' + generated
-    expect(urls.length).toBe(40) // 4 static + 36 generated (spec 2026-07-11 §6)
+    expect(urls.length).toBe(44) // 4 static + 40 generated (spec 2026-07-11 §6)
   })
 })
 

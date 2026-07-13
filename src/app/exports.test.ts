@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { copyHtml, downloadHtml, filenameFor, printDocument } from './exports'
+import { copyHtml, downloadHtml, downloadMarkdown, filenameFor, printDocument } from './exports'
 
 afterEach(() => vi.restoreAllMocks())
 
@@ -9,6 +9,9 @@ describe('filenameFor', () => {
   })
   it('falls back for empty/symbol-only titles', () => {
     expect(filenameFor('***')).toBe('document.html')
+  })
+  it('supports a custom extension', () => {
+    expect(filenameFor('My Doc', 'md')).toBe('my-doc.md')
   })
 })
 
@@ -23,6 +26,22 @@ describe('downloadHtml', () => {
     downloadHtml('<!doctype html><html></html>', 'My Doc')
     expect(clicked).toHaveLength(1)
     expect(clicked[0]!.download).toBe('my-doc.html')
+    expect(clicked[0]!.href).toContain('blob:fake')
+    expect(revoke).toHaveBeenCalledWith('blob:fake')
+  })
+})
+
+describe('downloadMarkdown', () => {
+  it('clicks an anchor with a blob url and a .md slug filename', () => {
+    const clicked: HTMLAnchorElement[] = []
+    vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(function (this: HTMLAnchorElement) {
+      clicked.push(this)
+    })
+    vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:fake')
+    const revoke = vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {})
+    downloadMarkdown('# My Doc', 'My Doc')
+    expect(clicked).toHaveLength(1)
+    expect(clicked[0]!.download).toBe('my-doc.md')
     expect(clicked[0]!.href).toContain('blob:fake')
     expect(revoke).toHaveBeenCalledWith('blob:fake')
   })

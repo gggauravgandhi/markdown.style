@@ -1,12 +1,14 @@
 import { markdown } from '@codemirror/lang-markdown'
 import { basicSetup, EditorView } from 'codemirror'
+import { extractTitle } from '../pipeline/assemble'
 import { render } from '../pipeline/render'
 import type { RenderError } from '../pipeline/types'
 import { CATEGORY_LABELS, themes, type Category } from '../themes/registry'
 import './app.css'
 import { editorTheme } from './editor-theme'
-import { copyHtml, downloadHtml, printDocument } from './exports'
+import { copyHtml, downloadHtml, downloadMarkdown, printDocument } from './exports'
 import { isMarkdownFile, loadMarkdownFile } from './file-input'
+import { takeHandoff } from './handoff'
 import { createPreview } from './preview'
 import { SAMPLE_MARKDOWN, THUMB_MARKDOWN } from './sample'
 import { createStore, type AppState } from './store'
@@ -38,6 +40,12 @@ interface MenuItem {
 export async function mount(root: HTMLElement): Promise<void> {
   const initial: AppState = { markdown: SAMPLE_MARKDOWN, themeId: themes[0]!.id, knobs: {} }
   const store = createStore(initial)
+
+  // landing-page paste gateway: a pasted document waiting in the handoff key
+  // takes precedence over the restored autosave doc, but a missing handoff
+  // must never touch the saved document (spec §8)
+  const handoff = takeHandoff()
+  if (handoff !== null) store.set({ markdown: handoff })
 
   // --- menus ------------------------------------------------------------------
   // dismiss fns for every menu built by this mount; enforces "only one open at a
@@ -143,6 +151,18 @@ export async function mount(root: HTMLElement): Promise<void> {
     { label: 'New', action: () => setEditorText('') },
     { label: 'Open…', action: () => fileInput.click() },
     { label: 'Reset to sample', action: () => resetToSample() },
+    {
+      label: 'Download Markdown',
+      action: () => {
+        const { markdown } = store.get()
+        if (!markdown.trim()) {
+          notice('Nothing to export. The document is empty.')
+          return
+        }
+        // no render() round-trip needed: the file is the raw source
+        downloadMarkdown(markdown, extractTitle(markdown))
+      },
+    },
   ])
   const exportMenu = buildMenu(
     'export-menu-trigger',

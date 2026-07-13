@@ -1,6 +1,9 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { themes } from '../themes/registry'
+import { HANDOFF_KEY, putHandoff } from './handoff'
 import { mount } from './main'
+
+afterEach(() => vi.restoreAllMocks())
 
 // CodeMirror needs a couple of layout APIs jsdom lacks.
 beforeEach(() => {
@@ -22,7 +25,7 @@ describe('editor app shell', () => {
     expect(iframe.title).toBe('Document preview')
     expect(document.querySelector('.cm-editor')).toBeTruthy()
     const buttons = [...document.querySelectorAll('button')].map(b => b.textContent?.trim())
-    for (const label of ['Download HTML', 'Print or save as PDF', 'Copy HTML', 'Open…', 'Reset to sample', 'New']) {
+    for (const label of ['Download HTML', 'Download Markdown', 'Print or save as PDF', 'Copy HTML', 'Open…', 'Reset to sample', 'New']) {
       expect(buttons, label).toContain(label)
     }
     // theme button shows the active theme, not a bare "Theme"
@@ -146,6 +149,46 @@ describe('file menu', () => {
     const newItem = [...document.querySelectorAll('.menu-item')].find(b => b.textContent === 'New')!
     newItem.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     await vi.waitFor(() => expect(document.querySelector('.cm-content')!.textContent).toBe(''))
+  })
+
+  it('Download Markdown downloads a .md file of the current document', async () => {
+    await mount(document.getElementById('app')!)
+    const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {})
+    vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:fake')
+    vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {})
+    const trigger = document.getElementById('file-menu-trigger') as HTMLButtonElement
+    trigger.click()
+    const item = [...document.querySelectorAll('.menu-item')].find(b => b.textContent === 'Download Markdown')!
+    item.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    expect(click).toHaveBeenCalledTimes(1)
+  })
+
+  it('Download Markdown shows a notice instead of downloading when the document is empty', async () => {
+    localStorage.setItem('mds-state-v1', JSON.stringify({ markdown: '   ', themeId: 'paper', knobs: {} }))
+    await mount(document.getElementById('app')!)
+    const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {})
+    const trigger = document.getElementById('file-menu-trigger') as HTMLButtonElement
+    trigger.click()
+    const item = [...document.querySelectorAll('.menu-item')].find(b => b.textContent === 'Download Markdown')!
+    item.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    await vi.waitFor(() => expect(document.querySelector('[role="status"]')!.textContent).toMatch(/empty/i))
+    expect(click).not.toHaveBeenCalled()
+  })
+})
+
+describe('landing-page handoff', () => {
+  it('opens the editor on handed-off content, taking precedence over the saved document', async () => {
+    localStorage.setItem('mds-state-v1', JSON.stringify({ markdown: '# Saved', themeId: 'paper', knobs: {} }))
+    putHandoff('# From landing')
+    await mount(document.getElementById('app')!)
+    expect(document.querySelector('.cm-content')!.textContent).toBe('# From landing')
+    expect(localStorage.getItem(HANDOFF_KEY)).toBeNull()
+  })
+
+  it('leaves the saved document untouched when no handoff is waiting', async () => {
+    localStorage.setItem('mds-state-v1', JSON.stringify({ markdown: '# Saved', themeId: 'paper', knobs: {} }))
+    await mount(document.getElementById('app')!)
+    expect(document.querySelector('.cm-content')!.textContent).toBe('# Saved')
   })
 })
 
