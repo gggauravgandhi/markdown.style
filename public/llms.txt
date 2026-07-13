@@ -1,6 +1,6 @@
 # markdown.style
 
-> Free browser tool that turns LLM markdown output (ChatGPT, Claude, etc.) into a designed document: pick a theme, download self-contained styled HTML, or print to PDF. 100% client-side — documents never leave the browser.
+> Free browser tool that turns LLM markdown output (ChatGPT, Claude, etc.) into a designed document: pick a theme, download self-contained styled HTML, or print to PDF. 100% client-side: documents never leave the browser.
 
 ## Key pages
 

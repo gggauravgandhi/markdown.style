@@ -3,7 +3,7 @@ import { baseCss, type Theme } from '../../themes/registry'
 /**
  * Rewrites document-level selectors to `&` and wraps the sheet in a scope
  * class, using native CSS nesting. Only used for samples embedded inline in
- * static marketing pages — standalone exports keep the unscoped sheet.
+ * static marketing pages; standalone exports keep the unscoped sheet.
  * Relies on the theme-CSS convention (enforced by scope-css.test.ts) that
  * `:root`, `body`, and `html, body` selectors start their line.
  */

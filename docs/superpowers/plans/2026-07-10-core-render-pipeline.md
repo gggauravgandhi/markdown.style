@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Build `render(markdown, themeId, knobs) → self-contained HTML string` — the pure function the whole product hangs off — plus the base theme layer and first theme, fully tested.
+**Goal:** Build `render(markdown, themeId, knobs) → self-contained HTML string`, the pure function the whole product hangs off, plus the base theme layer and first theme, fully tested.
 
 **Architecture:** markdown-it (GFM, `html:false`) renders sync and emits slot elements for code/mermaid fences; DOMPurify sanitizes the user-authored body; then trusted static renderers (Shiki, Mermaid) fill the slots; KaTeX renders inline during the markdown pass (lazy-loaded only when math is detected). `assembleDocument()` wraps body + theme CSS + validated knob variables into one script-free HTML document. Heavy libs are dynamic imports inside their stage modules.
 
@@ -12,17 +12,17 @@
 
 ## Global Constraints
 
-- Use `bun` for everything (`bun add`, `bun run`, `bunx`) — never npm/npx/yarn/node.
+- Use `bun` for everything (`bun add`, `bun run`, `bunx`), never npm/npx/yarn/node.
 - markdown-it raw HTML passthrough DISABLED: `html: false`. Never enable it.
-- The rendered document string must contain **zero `<script>` tags and zero runtime JS** — script-free by construction.
+- The rendered document string must contain **zero `<script>` tags and zero runtime JS**, script-free by construction.
 - Self-containment: final document has no external stylesheet/font URLs; only user-authored image URLs (and `data:` URIs) may be remote.
 - Rendered content DOM = plain flowing block elements. **No flex/grid wrappers around content blocks** (Paged.js v2 constraint).
 - All theme tunables route through `--mds-*` CSS custom properties; knobs are `--mds-accent`, `--mds-font-scale`, `--mds-page-width`.
-- `--mds-page-width` affects screen/HTML content max-width only — never printed paper size (that's `@page` + browser).
+- `--mds-page-width` affects screen/HTML content max-width only, never printed paper size (that's `@page` + browser).
 - Heavy libs (shiki, mermaid, katex + its CSS) load via dynamic `import()` inside stage functions, never statically from `render.ts`'s import graph.
 - Errors never throw to the caller: `render()` returns `RenderResult` with per-block error annotations; failed blocks render as visible error elements (no blank holes).
 - Knob values are validated/clamped before entering CSS (CSS-injection boundary).
-- TypeScript strict mode; vanilla TS — no UI framework.
+- TypeScript strict mode; vanilla TS, no UI framework.
 - Commit after every green test cycle. Conventional commits (`feat:`, `test:`, `chore:`). No Co-Authored-By lines.
 
 ## File Structure
@@ -110,7 +110,7 @@ Note: `dompurify` ≥3.2 ships its own types. If `bun add @vscode/markdown-it-ka
 import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
-  // css: true is REQUIRED — without it, `?raw` imports of .css files resolve
+  // css: true is REQUIRED, without it, `?raw` imports of .css files resolve
   // to empty strings under vitest and Tasks 7/8/10 fail with baffling output.
   test: { environment: 'jsdom', css: true },
 })
@@ -142,7 +142,7 @@ declare module 'markdown-it-footnote' {
 }
 ```
 
-Do NOT add a shim for `@vscode/markdown-it-katex` — it ships its own types; a shim would shadow them.
+Do NOT add a shim for `@vscode/markdown-it-katex`; it ships its own types, a shim would shadow them.
 
 - [ ] **Step 5: Write smoke test and verify harness**
 
@@ -201,7 +201,7 @@ export interface RenderError {
   message: string
 }
 
-/** Shared literal union — mermaid.initialize rejects a bare `string` theme. */
+/** Shared literal union, mermaid.initialize rejects a bare `string` theme. */
 export type MermaidTheme = 'default' | 'dark' | 'neutral' | 'forest'
 
 export interface RenderResult {
@@ -261,7 +261,7 @@ describe('hasMath', () => {
 - [ ] **Step 3: Run tests to verify they fail**
 
 Run: `bunx vitest run src/pipeline/markdown.test.ts`
-Expected: FAIL — `markdown.ts` does not exist / exports missing.
+Expected: FAIL: `markdown.ts` does not exist / exports missing.
 
 - [ ] **Step 4: Implement in markdown.ts**
 
@@ -273,7 +273,7 @@ export function stripFrontmatter(src: string): string {
 
 /**
  * Cheap gate for lazy-loading KaTeX. False positives only cost an unneeded
- * plugin load, so this is intentionally permissive — but a lone $amount must
+ * plugin load, so this is intentionally permissive, but a lone $amount must
  * not trigger (inline math requires both $ on one line).
  */
 export function hasMath(src: string): boolean {
@@ -295,7 +295,7 @@ git commit -m "feat: pipeline types, frontmatter strip, math detection"
 
 ---
 
-### Task 3: Markdown pass — GFM rendering with fence slots
+### Task 3: Markdown pass: GFM rendering with fence slots
 
 **Files:**
 - Modify: `src/pipeline/markdown.ts`
@@ -303,7 +303,7 @@ git commit -m "feat: pipeline types, frontmatter strip, math detection"
 
 **Interfaces:**
 - Consumes: `Fence`, `MarkdownPass` from `./types`
-- Produces: `markdownToHtml(src: string): Promise<MarkdownPass>` — body HTML in which every ```lang fence is replaced by `<pre data-mds-slot="code:N"></pre>` and every ```mermaid fence by `<div data-mds-slot="mermaid:N"></div>`; fences collected with raw code text. KaTeX plugin applied only when `hasMath(src)`. Slot elements (not HTML comments) are used **because DOMPurify strips comments but keeps elements with data attributes** — sanitize runs before slot fill.
+- Produces: `markdownToHtml(src: string): Promise<MarkdownPass>`, body HTML in which every ```lang fence is replaced by `<pre data-mds-slot="code:N"></pre>` and every ```mermaid fence by `<div data-mds-slot="mermaid:N"></div>`; fences collected with raw code text. KaTeX plugin applied only when `hasMath(src)`. Slot elements (not HTML comments) are used **because DOMPurify strips comments but keeps elements with data attributes**, sanitize runs before slot fill.
 
 - [ ] **Step 1: Write failing tests**
 
@@ -381,7 +381,7 @@ describe('markdownToHtml', () => {
 - [ ] **Step 2: Run tests to verify the new ones fail**
 
 Run: `bunx vitest run src/pipeline/markdown.test.ts`
-Expected: FAIL — `markdownToHtml` not exported.
+Expected: FAIL: `markdownToHtml` not exported.
 
 - [ ] **Step 3: Implement markdownToHtml**
 
@@ -394,7 +394,7 @@ import type { Fence, MarkdownPass } from './types'
 
 export async function markdownToHtml(src: string): Promise<MarkdownPass> {
   const md = new MarkdownIt({
-    html: false, // security boundary — never enable (spec §2)
+    html: false, // security boundary, never enable (spec §2)
     linkify: true,
     typographer: true,
   })
@@ -427,7 +427,7 @@ export async function markdownToHtml(src: string): Promise<MarkdownPass> {
 }
 ```
 
-Note: if `md.use(katexPlugin, ...)` type-errors or the options are ignored, open `node_modules/@vscode/markdown-it-katex/README.md` and use the documented option names — the requirement is `throwOnError: false` semantics (KaTeX errors render inline in an error color; they must never throw).
+Note: if `md.use(katexPlugin, ...)` type-errors or the options are ignored, open `node_modules/@vscode/markdown-it-katex/README.md` and use the documented option names, the requirement is `throwOnError: false` semantics (KaTeX errors render inline in an error color; they must never throw).
 
 - [ ] **Step 4: Run tests to verify they pass**
 
@@ -451,7 +451,7 @@ git commit -m "feat: markdown pass with GFM, footnotes, katex, fence slots"
 
 **Interfaces:**
 - Consumes: nothing (pure string → string)
-- Produces: `sanitizeBody(body: string): string` — DOMPurify pass over the user-authored body. Runs **after** `markdownToHtml` and **before** slot filling (slot elements survive; Shiki/Mermaid output is library-generated from escaped text and is inserted afterwards).
+- Produces: `sanitizeBody(body: string): string`, DOMPurify pass over the user-authored body. Runs **after** `markdownToHtml` and **before** slot filling (slot elements survive; Shiki/Mermaid output is library-generated from escaped text and is inserted afterwards).
 
 - [ ] **Step 1: Write failing tests**
 
@@ -501,7 +501,7 @@ describe('sanitizeBody', () => {
 - [ ] **Step 2: Run tests to verify they fail**
 
 Run: `bunx vitest run src/pipeline/sanitize.test.ts`
-Expected: FAIL — module missing.
+Expected: FAIL: module missing.
 
 - [ ] **Step 3: Implement sanitize.ts**
 
@@ -543,7 +543,7 @@ git commit -m "feat: DOMPurify sanitization stage"
 
 **Interfaces:**
 - Consumes: `Fence` from `./types`
-- Produces: `highlightFences(body: string, fences: Fence[], shikiTheme: string): Promise<string>` — replaces each `<pre data-mds-slot="code:N"></pre>` with Shiki's static HTML. Unknown languages fall back to plain text. Shiki is dynamically imported.
+- Produces: `highlightFences(body: string, fences: Fence[], shikiTheme: string): Promise<string>`, replaces each `<pre data-mds-slot="code:N"></pre>` with Shiki's static HTML. Unknown languages fall back to plain text. Shiki is dynamically imported.
 
 - [ ] **Step 1: Write failing tests**
 
@@ -581,7 +581,7 @@ describe('highlightFences', () => {
 - [ ] **Step 2: Run tests to verify they fail**
 
 Run: `bunx vitest run src/pipeline/highlight.test.ts`
-Expected: FAIL — module missing.
+Expected: FAIL: module missing.
 
 - [ ] **Step 3: Implement highlight.ts**
 
@@ -598,7 +598,7 @@ export async function highlightFences(body: string, fences: Fence[], shikiTheme:
     try {
       html = await codeToHtml(fence.code, { lang, theme: shikiTheme })
     } catch {
-      // unknown language or grammar load failure — plain text, never a blank hole
+      // unknown language or grammar load failure, plain text, never a blank hole
       html = await codeToHtml(fence.code, { lang: 'text', theme: shikiTheme })
     }
     // function replacer: a string replacement would interpret $$, $&, $`, $'
@@ -612,7 +612,7 @@ export async function highlightFences(body: string, fences: Fence[], shikiTheme:
 - [ ] **Step 4: Run tests to verify they pass**
 
 Run: `bunx vitest run src/pipeline/highlight.test.ts`
-Expected: PASS (3 tests). First run loads grammars — may take a few seconds.
+Expected: PASS (3 tests). First run loads grammars, may take a few seconds.
 
 - [ ] **Step 5: Commit**
 
@@ -631,8 +631,8 @@ git commit -m "feat: shiki highlighting stage with plain-text fallback"
 
 **Interfaces:**
 - Consumes: `Fence`, `RenderError` from `./types`
-- Produces: `renderMermaidFences(body: string, fences: Fence[], mermaidTheme: MermaidTheme): Promise<{ body: string; errors: RenderError[] }>` — fills `<div data-mds-slot="mermaid:N"></div>` with inline SVG, or with a visible `.mds-error` block on any failure. Never throws. Browser-only rendering: without a usable DOM it always produces error blocks (build-time sample docs must avoid mermaid — spec §6).
-- **Documented security decision:** Mermaid SVG is inserted *after* the DOMPurify pass and is not re-sanitized — re-sanitizing SVG has its own mXSS/`foreignObject` caveats. The sole control is `securityLevel: 'strict'` at initialize. Plan 2 browser QA MUST include a hostile diagram (event-handler in a label, `click` directive) to verify strict mode holds.
+- Produces: `renderMermaidFences(body: string, fences: Fence[], mermaidTheme: MermaidTheme): Promise<{ body: string; errors: RenderError[] }>`, fills `<div data-mds-slot="mermaid:N"></div>` with inline SVG, or with a visible `.mds-error` block on any failure. Never throws. Browser-only rendering: without a usable DOM it always produces error blocks (build-time sample docs must avoid mermaid, spec §6).
+- **Documented security decision:** Mermaid SVG is inserted *after* the DOMPurify pass and is not re-sanitized, re-sanitizing SVG has its own mXSS/`foreignObject` caveats. The sole control is `securityLevel: 'strict'` at initialize. Plan 2 browser QA MUST include a hostile diagram (event-handler in a label, `click` directive) to verify strict mode holds.
 
 - [ ] **Step 1: Write failing tests**
 
@@ -679,7 +679,7 @@ describe('renderMermaidFences', () => {
 - [ ] **Step 2: Run tests to verify they fail**
 
 Run: `bunx vitest run src/pipeline/mermaid.test.ts`
-Expected: FAIL — module missing.
+Expected: FAIL: module missing.
 
 - [ ] **Step 3: Implement mermaid.ts**
 
@@ -696,7 +696,7 @@ function errorBlock(fence: Fence, message: string): string {
 
 /**
  * Fill mermaid slots with inline SVG; any failure becomes a visible error block.
- * Security: output bypasses DOMPurify by design (see Interfaces note) —
+ * Security: output bypasses DOMPurify by design (see Interfaces note), 
  * securityLevel 'strict' is the control; never weaken it.
  */
 export async function renderMermaidFences(
@@ -733,7 +733,7 @@ export async function renderMermaidFences(
     if (html.includes('mds-error')) {
       errors.push({ source: 'mermaid', message: `diagram ${fence.index + 1} failed to render` })
     }
-    // mermaid.render can leave an error element behind in the live DOM — remove it.
+    // mermaid.render can leave an error element behind in the live DOM, remove it.
     // Guarded with typeof: a bare `document?.` still ReferenceErrors when undeclared.
     if (typeof document !== 'undefined') {
       document.getElementById(`dmds-mermaid-${fence.index}`)?.remove()
@@ -745,7 +745,7 @@ export async function renderMermaidFences(
 }
 ```
 
-Note: the `d`-prefixed element id (`dmds-mermaid-N`) is mermaid's convention for its temp container; verify the exact id in devtools during Plan 2 browser QA — in jsdom the cleanup line is a harmless no-op either way.
+Note: the `d`-prefixed element id (`dmds-mermaid-N`) is mermaid's convention for its temp container; verify the exact id in devtools during Plan 2 browser QA, in jsdom the cleanup line is a harmless no-op either way.
 
 - [ ] **Step 4: Run tests to verify they pass**
 
@@ -770,7 +770,7 @@ git commit -m "feat: mermaid stage with visible error blocks, never throws"
 
 **Interfaces:**
 - Consumes: `node_modules/katex/dist/katex.min.css` + `fonts/*.woff2`
-- Produces: `mathCss(): Promise<string>` — KaTeX CSS with every font as a base64 `data:` URI (woff2 only; woff/ttf fallbacks dropped). Included in the document only when `usedMath` (spec §4: zero font weight for math-free docs).
+- Produces: `mathCss(): Promise<string>`, KaTeX CSS with every font as a base64 `data:` URI (woff2 only; woff/ttf fallbacks dropped). Included in the document only when `usedMath` (spec §4: zero font weight for math-free docs).
 
 - [ ] **Step 1: Write the generator script**
 
@@ -803,7 +803,7 @@ console.log('wrote src/pipeline/katex-inline.css')
 
 - [ ] **Step 2: Pin katex and run the generator**
 
-`@vscode/markdown-it-katex` nests its own `katex@^0.16.x` (which produces the markup), while this generator reads the TOP-LEVEL katex's CSS. Keep them in sync — check with `bun pm ls katex`; if the top-level copy is a different major/minor, pin it: `bun add katex@^0.16.4`.
+`@vscode/markdown-it-katex` nests its own `katex@^0.16.x` (which produces the markup), while this generator reads the TOP-LEVEL katex's CSS. Keep them in sync, check with `bun pm ls katex`; if the top-level copy is a different major/minor, pin it: `bun add katex@^0.16.4`.
 
 Run: `bun run prepare:katex`
 Expected: `wrote src/pipeline/katex-inline.css`; file exists, roughly 0.7–1.5 MB.
@@ -828,7 +828,7 @@ describe('mathCss', () => {
 - [ ] **Step 4: Run test to verify it fails**
 
 Run: `bunx vitest run src/pipeline/katex-css.test.ts`
-Expected: FAIL — `katex-css.ts` missing.
+Expected: FAIL: `katex-css.ts` missing.
 
 - [ ] **Step 5: Implement katex-css.ts**
 
@@ -902,7 +902,7 @@ describe('theme registry', () => {
     expect(baseCss).toContain('break-inside: avoid')
   })
 
-  it('content layout is flowing blocks — no flex/grid on content wrapper (Paged.js constraint)', () => {
+  it('content layout is flowing blocks, no flex/grid on content wrapper (Paged.js constraint)', () => {
     const contentRule = baseCss.slice(baseCss.indexOf('.mds-content'))
     expect(contentRule.slice(0, contentRule.indexOf('}'))).not.toMatch(/display:\s*(flex|grid)/)
   })
@@ -912,14 +912,14 @@ describe('theme registry', () => {
 - [ ] **Step 2: Run tests to verify they fail**
 
 Run: `bunx vitest run src/themes/registry.test.ts`
-Expected: FAIL — module missing.
+Expected: FAIL: module missing.
 
 - [ ] **Step 3: Create _base.css**
 
 `src/themes/_base.css`:
 ```css
 /* Base layer shared by all themes: reset, structure, knob defaults, print scaffolding.
-   Content is plain flowing blocks — no flex/grid wrappers (Paged.js v2 constraint). */
+   Content is plain flowing blocks, no flex/grid wrappers (Paged.js v2 constraint). */
 :root {
   --mds-accent: #0f62fe;
   --mds-font-scale: 1;
@@ -988,7 +988,7 @@ input[type='checkbox'] { accent-color: var(--mds-accent); }
 
 `src/themes/paper.css`:
 ```css
-/* Paper — warm, book-like reading theme. */
+/* Paper, warm, book-like reading theme. */
 :root {
   --mds-bg: #faf6ef;
   --mds-fg: #2b2622;
@@ -1076,7 +1076,7 @@ export const themes: readonly Theme[] = [
   {
     id: 'paper',
     name: 'Paper',
-    description: 'Warm, book-like serif — reads like a well-set hardcover.',
+    description: 'Warm, book-like serif, reads like a well-set hardcover.',
     defaultAccent: '#8b3a2f',
     shikiTheme: 'vitesse-light',
     mermaidTheme: 'neutral',
@@ -1112,8 +1112,8 @@ git commit -m "feat: base css, paper theme, theme registry with hygiene tests"
 **Interfaces:**
 - Consumes: `Knobs` from `./types`; `baseCss` from `../themes/registry`
 - Produces:
-  - `extractTitle(src: string): string` — first `# ` heading text, inline markdown markers stripped; fallback `'Document'`.
-  - `assembleDocument(opts: { body: string; title: string; themeCss: string; knobs: Knobs; extraCss?: string }): string` — full `<!doctype html>` document; base CSS + theme CSS + validated knob overrides + optional extra CSS inlined in one `<style>`. Invalid knob values are dropped (theme defaults apply) — this is the CSS-injection boundary.
+  - `extractTitle(src: string): string`, first `# ` heading text, inline markdown markers stripped; fallback `'Document'`.
+  - `assembleDocument(opts: { body: string; title: string; themeCss: string; knobs: Knobs; extraCss?: string }): string`, full `<!doctype html>` document; base CSS + theme CSS + validated knob overrides + optional extra CSS inlined in one `<style>`. Invalid knob values are dropped (theme defaults apply); this is the CSS-injection boundary.
 
 - [ ] **Step 1: Write failing tests**
 
@@ -1164,7 +1164,7 @@ describe('assembleDocument', () => {
 
   // NOTE: baseCss (inlined in every document) legitimately declares default
   // --mds-* variables, so assert on the knob OVERRIDE block (`:root { --mds-…`,
-  // single-line format unique to knobsToCss) — never on bare variable names.
+  // single-line format unique to knobsToCss), never on bare variable names.
   it('drops CSS-injection attempts in accent', () => {
     const html = assembleDocument({ ...base, knobs: { accent: 'red;}body{background:url(javascript:alert(1))' } })
     expect(html).not.toContain('javascript:alert')
@@ -1187,7 +1187,7 @@ describe('assembleDocument', () => {
 - [ ] **Step 2: Run tests to verify they fail**
 
 Run: `bunx vitest run src/pipeline/assemble.test.ts`
-Expected: FAIL — module missing.
+Expected: FAIL: module missing.
 
 - [ ] **Step 3: Implement assemble.ts**
 
@@ -1270,8 +1270,8 @@ git commit -m "feat: document assembly with knob validation boundary"
 - Test: `src/pipeline/render.test.ts`
 
 **Interfaces:**
-- Consumes: everything above — `markdownToHtml`, `stripFrontmatter`, `sanitizeBody`, `highlightFences`, `renderMermaidFences`, `mathCss`, `extractTitle`, `assembleDocument`, `getTheme`
-- Produces: `render(markdown: string, themeId: string, knobs?: Knobs): Promise<RenderResult>` — THE public API. Plans 2 (editor app) and 4 (static site build) call exactly this signature.
+- Consumes: everything above, `markdownToHtml`, `stripFrontmatter`, `sanitizeBody`, `highlightFences`, `renderMermaidFences`, `mathCss`, `extractTitle`, `assembleDocument`, `getTheme`
+- Produces: `render(markdown: string, themeId: string, knobs?: Knobs): Promise<RenderResult>`, THE public API. Plans 2 (editor app) and 4 (static site build) call exactly this signature.
 
 - [ ] **Step 1: Write failing integration tests**
 
@@ -1319,7 +1319,7 @@ describe('render (integration)', () => {
     expect(html).toContain('katex')
     expect(html).toContain('shiki')
     expect(html).toContain('data:font/woff2;base64,') // math present → fonts inlined
-    // jsdom cannot render mermaid — it must degrade to a visible error block
+    // jsdom cannot render mermaid; it must degrade to a visible error block
     expect(html).toContain('mds-error')
     expect(errors.length).toBeGreaterThanOrEqual(1)
     expect(html).not.toContain('data-mds-slot')
@@ -1330,7 +1330,7 @@ describe('render (integration)', () => {
     expect(html).not.toMatch(/<script/i)
     expect(html).not.toMatch(/\son\w+=/i)
     expect(html).not.toContain('javascript:')
-    // no external url() refs in CSS — fonts/backgrounds must be data: or none
+    // no external url() refs in CSS, fonts/backgrounds must be data: or none
     const cssUrls = [...html.matchAll(/url\(\s*['"]?(?!data:)([^'")]+)/g)]
     expect(cssUrls).toEqual([])
   })
@@ -1351,7 +1351,7 @@ describe('render (integration)', () => {
     ].join('\n\n')
     const { html } = await render(hostile, 'paper')
     expect(html).not.toMatch(/<script/i)
-    // escaped text legitimately contains the substring "onerror" — only a
+    // escaped text legitimately contains the substring "onerror", only a
     // handler inside a LIVE tag is a failure, so anchor the match to a real tag
     expect(html).not.toMatch(/<\w+[^>]*\son\w+=/i)
     expect(html).not.toContain('<iframe')
@@ -1374,7 +1374,7 @@ describe('render (integration)', () => {
 - [ ] **Step 2: Run tests to verify they fail**
 
 Run: `bunx vitest run src/pipeline/render.test.ts`
-Expected: FAIL — `render.ts` missing.
+Expected: FAIL: `render.ts` missing.
 
 - [ ] **Step 3: Implement render.ts**
 
@@ -1433,16 +1433,16 @@ git commit -m "feat: render() orchestrator with integration + XSS + self-contain
 ## Execution deviations (source of truth = code, not the snippets below)
 
 - Task 5/6: slot replacement uses a function replacer `() => html` ($-pattern hazard; commits 747b4ff, snippet updated).
-- Task 6 (commit 72a790d): `renderOne` returns `{ html, ok }` and the loop pushes error annotations on `!ok` — the snippet's `html.includes('mds-error')` heuristic was replaced (false-positives on labels containing that string). No-DOM branch is covered by `src/pipeline/mermaid.node.test.ts` (`@vitest-environment node`); its message reads `'diagram requires a browser to render'`.
+- Task 6 (commit 72a790d): `renderOne` returns `{ html, ok }` and the loop pushes error annotations on `!ok`, the snippet's `html.includes('mds-error')` heuristic was replaced (false-positives on labels containing that string). No-DOM branch is covered by `src/pipeline/mermaid.node.test.ts` (`@vitest-environment node`); its message reads `'diagram requires a browser to render'`.
 
 ## Advisor-Verified Fixes (applied after a full scratch-directory execution of this plan)
 
-An advisor agent executed every task verbatim (real `bun add`, vitest, tsc). These fixes are already folded in above — listed so executors understand why they exist:
+An advisor agent executed every task verbatim (real `bun add`, vitest, tsc). These fixes are already folded in above, listed so executors understand why they exist:
 
 1. `vitest.config.ts` needs `css: true` or every `.css?raw` import is an empty string (Tasks 7/8/10 fail).
 2. Task 9 assertions must target the knob override block, not bare `--mds-*` names (baseCss always contains the defaults).
 3. `@types/node` + `@types/bun` required (`node:fs`, `import.meta.dir`); `MermaidTheme` literal union required (`mermaid.initialize` rejects `string`).
-4. XSS assertions must anchor to live tags — escaped text legitimately contains "onerror".
+4. XSS assertions must anchor to live tags, escaped text legitimately contains "onerror".
 5. Mermaid output bypasses DOMPurify by documented decision (securityLevel 'strict' is the control); hostile-diagram check is a Plan 2 browser QA requirement.
 6. No type shim for `@vscode/markdown-it-katex` (ships own types); pin top-level `katex` to the plugin's nested 0.16.x line.
 
@@ -1450,7 +1450,7 @@ An advisor agent executed every task verbatim (real `bun add`, vitest, tsc). The
 
 - Slot elements (`<pre data-mds-slot>`) instead of HTML comments: DOMPurify strips comments; data attributes survive (Task 3/4 rationale).
 - Mermaid happy path is untestable in jsdom (no `getBBox`); tests pin the error-degradation contract instead, and the plan says so explicitly. Browser verification lands in Plan 2 QA.
-- `@vscode/markdown-it-katex` option passthrough is flagged as verify-at-install (Task 3 note) — requirement is behavior (`throwOnError: false`), not the exact option spelling.
+- `@vscode/markdown-it-katex` option passthrough is flagged as verify-at-install (Task 3 note), requirement is behavior (`throwOnError: false`), not the exact option spelling.
 - Knob validation happens in exactly one place (assemble.ts) and is tested as a CSS-injection boundary.
 
 ## After this plan

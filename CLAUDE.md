@@ -8,7 +8,7 @@ markdown.style turns LLM-generated markdown into styled, self-contained document
 
 Three strictly separated layers:
 
-- **Render pipeline** (`src/pipeline/`): markdown-it (+ footnote, task-lists, KaTeX, mermaid, shiki) → DOMPurify sanitize → assemble a self-contained HTML document. `render()` output must stay script-free and dependency-free — it IS the product.
+- **Render pipeline** (`src/pipeline/`): markdown-it (+ footnote, task-lists, KaTeX, mermaid, shiki) → DOMPurify sanitize → assemble a self-contained HTML document. `render()` output must stay script-free and dependency-free: it IS the product.
 - **Editor app** (`src/app/`, mounted from `editor.html`): vanilla TS, CodeMirror 6, dark chrome. `app.css` styles chrome only; documents are styled exclusively by themes.
 - **Static site** (`index.html`, `src/site/`): marketing + SEO pages. `bun run build` = `vite build` **then** `bun scripts/build-pages.ts`, which renders per-theme samples/specimens and writes ~70 files into `dist/` (theme pages, hub, use-cases, convert hubs, sitemap).
 - **Themes** (`src/themes/`): `registry.ts` holds 30 themes across 6 categories (`category`, `featured` fields). Each theme is a standalone CSS file imported with `?raw`.
@@ -17,23 +17,24 @@ Design context lives in `PRODUCT.md` / `DESIGN.md` (root) and `docs/superpowers/
 
 ## Commands
 
-- `bun run test` — full vitest suite. **NEVER bare `bun test`**: that runs Bun's own runner and produces ~27 false failures.
-- `bun run test src/app/main.test.ts` — single file.
-- `bunx tsc --noEmit` — typecheck (run before every commit).
+- `bun run test`: full vitest suite. **NEVER bare `bun test`**: that runs Bun's own runner and produces ~27 false failures.
+- `bun run test src/app/main.test.ts`: single file.
+- `bunx tsc --noEmit`: typecheck (run before every commit).
 - `bun run build` / `bun run dev` / `bun run preview`.
 - bun for everything; never npm/npx/node/yarn.
 
 ## Hard Invariants (test-enforced; never weaken the tests)
 
-- Preview iframe sandbox is exactly `allow-same-origin` — never add `allow-scripts`. Theme-thumb iframes use `sandbox=""`.
-- Zero `<script>` (except JSON-LD) and zero external requests on marketing/generated pages — the AEO strategy. The privacy promise ("no analytics, no third-party requests") is load-bearing copy; analytics are Cloudflare edge-level only.
-- Registry: static `?raw` imports only — `scripts/build-pages.ts` runs under plain bun where Vite-isms (`import.meta.glob`) don't exist.
+- Preview iframe sandbox is exactly `allow-same-origin`: never add `allow-scripts`. Theme-thumb iframes use `sandbox=""`.
+- Zero `<script>` (except JSON-LD) and zero external requests on marketing/generated pages (the AEO strategy). The privacy promise ("no analytics, no third-party requests") is load-bearing copy; analytics are Cloudflare edge-level only.
+- Registry: static `?raw` imports only; `scripts/build-pages.ts` runs under plain bun where Vite-isms (`import.meta.glob`) don't exist.
 - Theme CSS contract: define `--mds-bg/--mds-fg/--mds-font-body/--mds-font-heading`, include `@media print`, no flex/grid on `.mds-content` (Paged.js), decorative `::before/::after` content uses alt-text syntax (`content: '# ' / ''`), web-safe fonts only. Dark themes (carbon, terminal, neon) flip light in print.
-- Sample docs (`content/samples/`): no mermaid fences, no math (hygiene test enforces).
-- No em dashes in registry descriptions or UI strings (tests enforce for descriptions and generated-page copy).
-- Theme pages embed two documents; specimen footnote ids are namespaced `specimen-fn*` — duplicate `id="fn1"` is a regression.
+- Sample docs (`content/samples/`): no mermaid fences (mermaid needs a DOM; build-time render degrades to an error block). Math IS fine: KaTeX renders via `renderToString`, verified working under plain bun.
+- NO EM DASHES ANYWHERE. Not in copy, UI strings, theme descriptions, samples, docs, commit messages, or code comments. Every file. Use a comma, a colon, parentheses, or two sentences. A test enforces this across the repo; write the character as the escape sequence `\u2014` inside that test so it does not flag itself.
+- `bun run dev` serves ONLY index/editor/privacy/terms unless the dev middleware renders the generated pages. Vite's fallback silently returns index.html with a 200 for `/themes`, `/themes/*`, `/use-cases/*`, so a "page shows the wrong content" bug locally is usually this, not the page.
+- Theme pages embed two documents; specimen footnote ids are namespaced `specimen-fn*`: duplicate `id="fn1"` is a regression.
 - Sitemap ≤ 50 URLs; landing strip = the six `featured` themes exactly.
-- Never nest rendered markdown (it contains links) inside an `<a>` — parsers split the outer link. Hub previews demote inner anchors via `inertLinks()`; reuse it for any new linked preview.
+- Never nest rendered markdown (it contains links) inside an `<a>`: parsers split the outer link. Hub previews demote inner anchors via `inertLinks()`; reuse it for any new linked preview.
 
 ## Code Style
 
@@ -50,6 +51,6 @@ Design context lives in `PRODUCT.md` / `DESIGN.md` (root) and `docs/superpowers/
 
 ## Behavioral Rules
 
-- Adding routes/pages: everything derives from the registry and `routes.ts` — never hardcode counts in copy or tests (use `themes.length`; the "eight themes" regression test exists because stale counts shipped twice).
+- Adding routes/pages: everything derives from the registry and `routes.ts`: never hardcode counts in copy or tests (use `themes.length`; the "eight themes" regression test exists because stale counts shipped twice).
 - Print/export behavior changes require checking both screen and `@media print` paths.
-- `git push` to `main` is a production deploy — suite + typecheck locally first.
+- `git push` to `main` is a production deploy: suite + typecheck locally first.

@@ -43,7 +43,7 @@ describe('theme registry', () => {
     expect(baseCss).toContain("li:has(> input[type='checkbox'])")
   })
 
-  it('content layout is flowing blocks — no flex/grid on content wrapper (Paged.js constraint)', () => {
+  it('content layout is flowing blocks, no flex/grid on content wrapper (Paged.js constraint)', () => {
     const contentRule = baseCss.slice(baseCss.indexOf('.mds-content'))
     expect(contentRule.slice(0, contentRule.indexOf('}'))).not.toMatch(/display:\s*(flex|grid)/)
   })
@@ -57,8 +57,8 @@ describe('theme polish (plan 4b pre-pass)', () => {
   })
 
   it('carbon heading prefixes carry empty alt text so screen readers skip them', () => {
-    // CSS alt-text syntax: content: '# ' / '' — unsupported browsers drop the
-    // declaration entirely (decorative # disappears; heading text unaffected).
+    // CSS alt-text syntax: content: '# ' / '' (unsupported browsers drop the
+    // declaration entirely; decorative # disappears, heading text unaffected).
     const carbon = getTheme('carbon').css
     expect(carbon).toContain("content: '# ' / ''")
     expect(carbon).toContain("content: '## ' / ''")
@@ -67,7 +67,7 @@ describe('theme polish (plan 4b pre-pass)', () => {
 
   it('base print block no longer carries the dead link rule', () => {
     // every theme defines an unconditional `a { color }` later in source order,
-    // so the base @media print `a { color: inherit }` could never win — dead code.
+    // so the base @media print `a { color: inherit }` could never win, making it dead code.
     const printBlock = baseCss.slice(baseCss.indexOf('@media print'))
     expect(printBlock).not.toMatch(/^\s*a\s*\{/m)
   })
@@ -92,6 +92,6 @@ describe('categories', () => {
   })
 
   it('descriptions carry no em dashes (UI copy rule)', () => {
-    for (const t of themes) expect(t.description, t.id).not.toContain('—')
+    for (const t of themes) expect(t.description, t.id).not.toContain('\u2014')
   })
 })

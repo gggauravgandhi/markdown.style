@@ -15,7 +15,7 @@ export function escapeHtml(s: string): string {
  * Shared skeleton for generated static pages. Mirrors index.html's head
  * invariants (canonical, og, description) but inlines site.css so the files
  * need no Vite processing and make zero requests beyond themselves.
- * Zero JS by design — AI crawlers do not execute it (spec §6).
+ * Zero JS by design: AI crawlers do not execute it (spec §6).
  */
 export function pageShell(opts: {
   title: string

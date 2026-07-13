@@ -2,23 +2,23 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Build the programmatic SEO surface — `/themes` gallery hub, 8 theme pages, 3 use-case pages, 2 convert hubs — generated at build time through the product's own `render()` pipeline, plus editor `?theme=` deep links, a generated sitemap, and a theme-polish pre-pass.
+**Goal:** Build the programmatic SEO surface, `/themes` gallery hub, 8 theme pages, 3 use-case pages, 2 convert hubs, generated at build time through the product's own `render()` pipeline, plus editor `?theme=` deep links, a generated sitemap, and a theme-polish pre-pass.
 
-**Architecture:** A plain bun script (`scripts/build-pages.ts`) runs after `vite build` and writes static pages straight into `dist/`. Bun natively resolves the project's Vite-style `?raw` CSS imports (verified empirically), so the generator imports the real pipeline directly — no Vite SSR machinery. Rendered sample documents are **inlined into each page's own HTML** with CSS scoped via native nesting (never iframes — AI crawlers don't execute JS and don't merge iframe content), and full standalone exports are also written to `/samples/*.html` (noindexed) as human-facing "view the exported file" demos.
+**Architecture:** A plain bun script (`scripts/build-pages.ts`) runs after `vite build` and writes static pages straight into `dist/`. Bun natively resolves the project's Vite-style `?raw` CSS imports (verified empirically), so the generator imports the real pipeline directly, no Vite SSR machinery. Rendered sample documents are **inlined into each page's own HTML** with CSS scoped via native nesting (never iframes, AI crawlers don't execute JS and don't merge iframe content), and full standalone exports are also written to `/samples/*.html` (noindexed) as human-facing "view the exported file" demos.
 
 **Tech Stack:** bun, TypeScript strict, existing pipeline (`markdown-it`, Shiki, DOMPurify via jsdom fallback in node), vitest (node env for generator tests, jsdom for editor tests). **No new dependencies.**
 
 ## Global Constraints
 
-Copied from the spec (`docs/superpowers/specs/2026-07-10-markdown-style-design.md` §6) and prior owner rulings — every task's requirements implicitly include these:
+Copied from the spec (`docs/superpowers/specs/2026-07-10-markdown-style-design.md` §6) and prior owner rulings, every task's requirements implicitly include these:
 
-- Every citable page is **static HTML generated at build time; zero JS** on citable pages (no `<script>` tags at all on generated pages — not even JSON-LD; the landing page keeps its existing JSON-LD).
+- Every citable page is **static HTML generated at build time; zero JS** on citable pages (no `<script>` tags at all on generated pages, not even JSON-LD; the landing page keeps its existing JSON-LD).
 - **≤25 pages** in the sitemap at launch; cross-linked, **zero orphans**.
 - Copy is **answer-first**: each page/section opens with a direct 1–2 sentence answer; H1s/titles/slugs use natural question language.
 - **No** FAQPage/HowTo/aggregateRating/SearchAction JSON-LD anywhere.
 - Trust badge "100% in your browser · no upload · free" appears on every page.
-- Canonicals are absolute `https://markdown.style/...`, extensionless, no trailing slash (matching `privacy.html` → `/privacy` host clean-URL convention; owner must verify Cloudflare Pages clean-URL handling before launch — not a repo concern).
-- Sample markdown for static pages contains **no mermaid fences** (build must not need a browser DOM) and **no math** (`$`/`$$` — KaTeX pulls a ~360KB inline-font stylesheet into every render that uses it; static pages must stay light for Core Web Vitals).
+- Canonicals are absolute `https://markdown.style/...`, extensionless, no trailing slash (matching `privacy.html` → `/privacy` host clean-URL convention; owner must verify Cloudflare Pages clean-URL handling before launch, not a repo concern).
+- Sample markdown for static pages contains **no mermaid fences** (build must not need a browser DOM) and **no math** (`$`/`$$`, KaTeX pulls a ~360KB inline-font stylesheet into every render that uses it; static pages must stay light for Core Web Vitals).
 - `render()` output stays script-free and self-contained; never weaken `src/pipeline/sanitize.ts` or the iframe sandbox.
 - bun for all commands (`bun test`, `bun run build`, `bunx tsc`); never npm/npx/node.
 - Don't lead any hero/H1 with "markdown to pdf" **except** the two `/convert/*` hubs, which exist precisely for those queries (spec routes table).
@@ -57,7 +57,7 @@ describe('theme polish (plan 4b pre-pass)', () => {
   })
 
   it('carbon heading prefixes carry empty alt text so screen readers skip them', () => {
-    // CSS alt-text syntax: content: '# ' / '' — unsupported browsers drop the
+    // CSS alt-text syntax: content: '# ' / '', unsupported browsers drop the
     // declaration entirely (decorative # disappears; heading text unaffected).
     const carbon = getTheme('carbon').css
     expect(carbon).toContain("content: '# ' / ''")
@@ -67,7 +67,7 @@ describe('theme polish (plan 4b pre-pass)', () => {
 
   it('base print block no longer carries the dead link rule', () => {
     // every theme defines an unconditional `a { color }` later in source order,
-    // so the base @media print `a { color: inherit }` could never win — dead code.
+    // so the base @media print `a { color: inherit }` could never win, dead code.
     const printBlock = baseCss.slice(baseCss.indexOf('@media print'))
     expect(printBlock).not.toMatch(/^\s*a\s*\{/m)
   })
@@ -120,27 +120,27 @@ In `src/app/app.css`, replace the `.theme-thumb` rule:
 .theme-thumb { width: 200%; height: 280px; transform: scale(0.5); transform-origin: top left; margin-bottom: -140px; border: 0; border-radius: 4px; background: #fff; pointer-events: none; }
 ```
 
-and add `overflow: hidden;` to the existing `.theme-card` rule at `src/app/app.css:55` (crops the scaled iframe's horizontal 200% overflow back to the card; the `margin-bottom: -140px` on `.theme-thumb` handles the vertical gap since CSS transforms are paint-only and don't shrink the layout box on their own). This is a visual-only app-chrome change; there is deliberately no unit test for it (matches the untested status of the rest of `app.css`) — it gets eyeballed in Task 8.
+and add `overflow: hidden;` to the existing `.theme-card` rule at `src/app/app.css:55` (crops the scaled iframe's horizontal 200% overflow back to the card; the `margin-bottom: -140px` on `.theme-thumb` handles the vertical gap since CSS transforms are paint-only and don't shrink the layout box on their own). This is a visual-only app-chrome change; there is deliberately no unit test for it (matches the untested status of the rest of `app.css`); it gets eyeballed in Task 8.
 
 - [ ] **Step 4: Run tests to verify they pass**
 
 Run: `bun test src/themes/registry.test.ts src/themes/themes-render.test.ts`
-Expected: PASS (including the pre-existing theme-contract tests — the print-block test in `themes-render.test.ts` must still pass after the `_base.css` edit).
+Expected: PASS (including the pre-existing theme-contract tests, the print-block test in `themes-render.test.ts` must still pass after the `_base.css` edit).
 
 - [ ] **Step 5: Run the full suite and commit**
 
-Run: `bun test` — expected: all pass (117 + 3 new).
+Run: `bun test`, expected: all pass (117 + 3 new).
 
 ```bash
 git add src/themes/_base.css src/themes/carbon.css src/themes/contrast.css src/themes/swiss.css src/app/app.css src/themes/registry.test.ts
-git commit -m "fix: theme polish pre-pass — error styling, a11y heading prefixes, dead print rule, thumbnail clipping"
+git commit -m "fix: theme polish pre-pass, error styling, a11y heading prefixes, dead print rule, thumbnail clipping"
 ```
 
 ---
 
 ### Task 2: Extract `renderBody()` from the pipeline
 
-The generator needs the sanitized+highlighted body *without* the full-document assembly (pages inline the body with scoped CSS). Extract the existing steps into an exported `renderBody()` and re-implement `render()` on top of it. **Zero behavior change to `render()`** — the existing render tests are the regression net.
+The generator needs the sanitized+highlighted body *without* the full-document assembly (pages inline the body with scoped CSS). Extract the existing steps into an exported `renderBody()` and re-implement `render()` on top of it. **Zero behavior change to `render()`**, the existing render tests are the regression net.
 
 **Files:**
 - Modify: `src/pipeline/render.ts`
@@ -148,7 +148,7 @@ The generator needs the sanitized+highlighted body *without* the full-document a
 
 **Interfaces:**
 - Consumes: existing pipeline internals (unchanged).
-- Produces: `renderBody(markdown: string, themeId: string): Promise<{ body: string; title: string; errors: RenderError[]; usedMath: boolean }>` — consumed by Task 6's `buildAllPages`.
+- Produces: `renderBody(markdown: string, themeId: string): Promise<{ body: string; title: string; errors: RenderError[]; usedMath: boolean }>`, consumed by Task 6's `buildAllPages`.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -163,7 +163,7 @@ describe('renderBody', () => {
     expect(usedMath).toBe(false)
     expect(body).toContain('shiki') // fences highlighted
     expect(body).not.toContain('<!doctype') // not assembled
-    expect(body).not.toContain('<style') // no css — caller owns styling
+    expect(body).not.toContain('<style') // no css, caller owns styling
   })
 })
 ```
@@ -173,7 +173,7 @@ Add `renderBody` to the existing import from `./render`.
 - [ ] **Step 2: Run test to verify it fails**
 
 Run: `bun test src/pipeline/render.test.ts`
-Expected: FAIL — `renderBody` is not exported.
+Expected: FAIL: `renderBody` is not exported.
 
 - [ ] **Step 3: Refactor render.ts**
 
@@ -188,7 +188,7 @@ import { renderMermaidFences } from './mermaid'
 import { sanitizeBody } from './sanitize'
 import type { Knobs, RenderError, RenderResult } from './types'
 
-/** The processed document body before assembly — used by the static-page generator. */
+/** The processed document body before assembly, used by the static-page generator. */
 export async function renderBody(
   markdown: string,
   themeId: string,
@@ -228,7 +228,7 @@ export async function render(markdown: string, themeId: string, knobs: Knobs = {
 - [ ] **Step 4: Run the pipeline tests**
 
 Run: `bun test src/pipeline`
-Expected: PASS — all existing render/assemble/markdown tests green plus the new one.
+Expected: PASS: all existing render/assemble/markdown tests green plus the new one.
 
 - [ ] **Step 5: Commit**
 
@@ -239,7 +239,7 @@ git commit -m "refactor: extract renderBody() for the static-page generator"
 
 ---
 
-### Task 3: Content — sample documents and page copy
+### Task 3: Content: sample documents and page copy
 
 All sample markdown and per-page SEO copy, plus a hygiene test enforcing the content constraints (no mermaid, no math, copy complete and unique).
 
@@ -264,12 +264,12 @@ All sample markdown and per-page SEO copy, plus a hygiene test enforcing the con
 
 - [ ] **Step 1: Write the sample documents**
 
-Create `content/samples/showcase.md` (the one document rendered in all 8 themes — exercises headings, table, task list, code, blockquote, footnote, hr, links, inline code; **no mermaid, no math**):
+Create `content/samples/showcase.md` (the one document rendered in all 8 themes, exercises headings, table, task list, code, blockquote, footnote, hr, links, inline code; **no mermaid, no math**):
 
 ````markdown
 # Quarterly Growth Report
 
-*Written by an LLM in seconds — styled by markdown.style.*
+*Written by an LLM in seconds, styled by markdown.style.*
 
 This is the markdown an AI assistant hands you: solid structure, zero design. The theme you are looking at is doing all of the visual work.
 
@@ -313,7 +313,7 @@ Create `content/samples/chatgpt-report.md`:
 
 ## Executive summary
 
-The mid-price meal-kit segment consolidated around three players in 2025. Retention — not acquisition — now separates winners: the leaders keep 40%+ of cohorts past month six while the long tail churns out below 20%.
+The mid-price meal-kit segment consolidated around three players in 2025. Retention, not acquisition, now separates winners: the leaders keep 40%+ of cohorts past month six while the long tail churns out below 20%.
 
 ## The field
 
@@ -325,9 +325,9 @@ The mid-price meal-kit segment consolidated around three players in 2025. Retent
 
 ## What the leaders do differently
 
-1. **Menu breadth without SKU explosion** — 30+ weekly recipes from a 60-ingredient pool.
-2. **Skip-friendly billing** — pausing is one tap; both leaders report pauses convert back at 70%.
-3. **First-box economics** — deep discounts are gone; onboarding boxes are margin-neutral.
+1. **Menu breadth without SKU explosion**, 30+ weekly recipes from a 60-ingredient pool.
+2. **Skip-friendly billing**, pausing is one tap; both leaders report pauses convert back at 70%.
+3. **First-box economics**, deep discounts are gone; onboarding boxes are margin-neutral.
 
 ## Recommendation
 
@@ -339,7 +339,7 @@ Risks worth flagging: ingredient inflation, and the category's exposure to groce
 Create `content/samples/meeting-notes.md`:
 
 ````markdown
-# Product Sync — 12 June 2026
+# Product Sync: 12 June 2026
 
 **Attendees:** Dana (PM), Luis (Eng), Priya (Design), Sam (Data)
 
@@ -351,14 +351,14 @@ Create `content/samples/meeting-notes.md`:
 
 ## Action items
 
-- [ ] Luis — flag rollout plan written up by Friday
-- [ ] Priya — final empty-state illustrations to eng
-- [x] Sam — churn dashboard backfill finished
-- [ ] Dana — customer council invites for July
+- [ ] Luis, flag rollout plan written up by Friday
+- [ ] Priya, final empty-state illustrations to eng
+- [x] Sam, churn dashboard backfill finished
+- [ ] Dana, customer council invites for July
 
 ## Notes
 
-Sam walked through the cohort view: activation is flat, but week-two retention moved +3pts since the onboarding change. Luis raised that the export queue needs a dead-letter alarm before the redesign ships — agreed, tracked in the rollout plan.
+Sam walked through the cohort view: activation is flat, but week-two retention moved +3pts since the onboarding change. Luis raised that the export queue needs a dead-letter alarm before the redesign ships, agreed, tracked in the rollout plan.
 
 > Next sync: June 19, same time. Agenda owner: Priya.
 ````
@@ -397,9 +397,9 @@ await q.drain()
 
 ## API
 
-- `queue(opts)` — create a queue. `concurrency` (default 1), `retries` (default 0).
-- `q.push(fn)` — enqueue a task returning a promise.
-- `q.drain()` — resolves when the queue is empty.
+- `queue(opts)`, create a queue. `concurrency` (default 1), `retries` (default 0).
+- `q.push(fn)`, enqueue a task returning a promise.
+- `q.drain()`, resolves when the queue is empty.
 
 ## License
 
@@ -445,74 +445,74 @@ export interface ConvertCopy {
 export const themeCopy: readonly ThemeCopy[] = [
   {
     id: 'paper',
-    title: 'Paper theme — style markdown as a warm, book-like report — markdown.style',
+    title: 'Paper theme, style markdown as a warm, book-like report, markdown.style',
     description: 'See a full report rendered in Paper: a warm book serif for AI-written documents meant to be read slowly. Free, in your browser.',
-    h1: 'Paper — a warm book serif for reports meant to be read',
-    intro: 'Paper sets your markdown like a well-made hardcover: a warm serif, generous line height, and quiet rules. Below is a complete sample report rendered in it — exactly what you would download.',
-    whoItSuits: 'Long-form reports, essays, and research summaries — anything an AI wrote that a human should enjoy reading. If the document will be printed and read on paper, start here.',
+    h1: 'Paper, a warm book serif for reports meant to be read',
+    intro: 'Paper sets your markdown like a well-made hardcover: a warm serif, generous line height, and quiet rules. Below is a complete sample report rendered in it, exactly what you would download.',
+    whoItSuits: 'Long-form reports, essays, and research summaries, anything an AI wrote that a human should enjoy reading. If the document will be printed and read on paper, start here.',
     pairWith: ['editorial', 'scholar'],
   },
   {
     id: 'slate',
-    title: 'Slate theme — clean product-doc styling for markdown — markdown.style',
+    title: 'Slate theme, clean product-doc styling for markdown, markdown.style',
     description: 'See a full report rendered in Slate: modern product-doc sans styling for specs, status reports, and technical summaries. Free, in your browser.',
-    h1: 'Slate — clean product-doc styling for technical reports',
+    h1: 'Slate, clean product-doc styling for technical reports',
     intro: 'Slate is the neutral, engineered look of good product documentation: a modern sans, blue accents, tables that behave. Below is a complete sample report rendered in it.',
-    whoItSuits: 'Specs, status updates, PRDs, and technical summaries — the workhorse theme when the document just needs to look professionally handled.',
+    whoItSuits: 'Specs, status updates, PRDs, and technical summaries, the workhorse theme when the document just needs to look professionally handled.',
     pairWith: ['carbon', 'swiss'],
   },
   {
     id: 'carbon',
-    title: 'Carbon theme — dark technical styling that prints light — markdown.style',
+    title: 'Carbon theme, dark technical styling that prints light, markdown.style',
     description: 'See a full report rendered in Carbon: a dark, terminal-adjacent theme for code-heavy markdown that automatically prints on white. Free, in your browser.',
-    h1: 'Carbon — dark technical styling that prints light',
+    h1: 'Carbon, dark technical styling that prints light',
     intro: 'Carbon reads like a good terminal: dark background, low glare, headings prefixed like markdown source. Print it and it flips to a light palette automatically. Below is a complete sample rendered in it.',
     whoItSuits: 'Engineering docs, runbooks, code-heavy AI answers, and anything an engineer reads on screen. The print flip means you never hand someone a black rectangle of toner.',
     pairWith: ['slate', 'contrast'],
   },
   {
     id: 'swiss',
-    title: 'Swiss theme — minimal typographic markdown styling — markdown.style',
+    title: 'Swiss theme, minimal typographic markdown styling, markdown.style',
     description: 'See a full report rendered in Swiss: minimal typographic design where whitespace does the work. Free, in your browser.',
-    h1: 'Swiss — minimal typography where whitespace does the work',
+    h1: 'Swiss, minimal typography where whitespace does the work',
     intro: 'Swiss strips everything back to type: Helvetica, uppercase labels, one red line. No boxes, no decoration. Below is a complete sample report rendered in it.',
     whoItSuits: 'Strategy memos, design documents, and briefs for readers who notice typography. When in doubt between “more” and “less”, Swiss is the “less”.',
     pairWith: ['contrast', 'slate'],
   },
   {
     id: 'contrast',
-    title: 'Contrast theme — bold poster styling for markdown — markdown.style',
+    title: 'Contrast theme, bold poster styling for markdown, markdown.style',
     description: 'See a full report rendered in Contrast: hard rules, big type, poster energy for documents that need to land. Free, in your browser.',
-    h1: 'Contrast — bold poster energy for documents that shout',
+    h1: 'Contrast, bold poster energy for documents that shout',
     intro: 'Contrast is zero subtlety by design: black rules, uppercase headings, a slab of accent color. Below is a complete sample report rendered in it.',
-    whoItSuits: 'Pitches, one-pagers, launch briefs — short documents that need to be impossible to skim past. Less suited to 40-page reports.',
+    whoItSuits: 'Pitches, one-pagers, launch briefs, short documents that need to be impossible to skim past. Less suited to 40-page reports.',
     pairWith: ['swiss', 'pop'],
   },
   {
     id: 'editorial',
-    title: 'Editorial theme — elegant magazine styling for markdown — markdown.style',
+    title: 'Editorial theme, elegant magazine styling for markdown, markdown.style',
     description: 'See a full report rendered in Editorial: display serif headings, pull-quote blockquotes, magazine air. Free, in your browser.',
-    h1: 'Editorial — an elegant magazine serif with display headings',
+    h1: 'Editorial, an elegant magazine serif with display headings',
     intro: 'Editorial styles your markdown like a feature article: display serif headings, blockquotes that read as pull quotes, air between everything. Below is a complete sample rendered in it.',
-    whoItSuits: 'Newsletters, essays, long reads, and public-facing writeups — documents with an audience rather than a recipient.',
+    whoItSuits: 'Newsletters, essays, long reads, and public-facing writeups, documents with an audience rather than a recipient.',
     pairWith: ['paper', 'scholar'],
   },
   {
     id: 'scholar',
-    title: 'Scholar theme — academic styling for markdown with footnotes — markdown.style',
+    title: 'Scholar theme, academic styling for markdown with footnotes, markdown.style',
     description: 'See a full report rendered in Scholar: justified text, a centered title, and footnotes that feel at home. Free, in your browser.',
-    h1: 'Scholar — academic restraint, footnotes at home',
-    intro: 'Scholar is the quiet academic register: justified body text, a centered title block, restrained navy accents. Footnotes — which LLMs love to emit — finally look intentional. Below is a complete sample rendered in it.',
+    h1: 'Scholar, academic restraint, footnotes at home',
+    intro: 'Scholar is the quiet academic register: justified body text, a centered title block, restrained navy accents. Footnotes, which LLMs love to emit, finally look intentional. Below is a complete sample rendered in it.',
     whoItSuits: 'Papers, literature reviews, citation-heavy research answers, and coursework. If the document has footnotes, Scholar was built for it.',
     pairWith: ['paper', 'editorial'],
   },
   {
     id: 'pop',
-    title: 'Pop theme — colorful, friendly markdown styling — markdown.style',
-    description: 'See a full report rendered in Pop: rounded corners, warm tints, wavy links — a friendly face for internal docs. Free, in your browser.',
-    h1: 'Pop — colorful and friendly, rounded and warm',
+    title: 'Pop theme, colorful, friendly markdown styling, markdown.style',
+    description: 'See a full report rendered in Pop: rounded corners, warm tints, wavy links, a friendly face for internal docs. Free, in your browser.',
+    h1: 'Pop, colorful and friendly, rounded and warm',
     intro: 'Pop keeps things human: rounded corners, a warm background tint, wavy link underlines. Serious content, unserious chrome. Below is a complete sample report rendered in it.',
-    whoItSuits: 'Team updates, internal newsletters, onboarding docs — places where “approachable” beats “authoritative”.',
+    whoItSuits: 'Team updates, internal newsletters, onboarding docs, places where “approachable” beats “authoritative”.',
     pairWith: ['contrast', 'paper'],
   },
 ]
@@ -521,54 +521,54 @@ export const useCases: readonly UseCaseCopy[] = [
   {
     slug: 'chatgpt-report',
     themeId: 'slate',
-    title: 'Turn a ChatGPT research answer into a styled report — markdown.style',
+    title: 'Turn a ChatGPT research answer into a styled report, markdown.style',
     description: 'Paste the markdown ChatGPT gives you, pick a theme, and send a designed report instead of a wall of text. Worked example inside. Free, no upload.',
     h1: 'Turn a ChatGPT research answer into a report you can send',
-    intro: 'Ask ChatGPT for research and it answers in clean markdown — headings, tables, recommendations. Paste that answer here and it becomes a designed report. Below is a real example: the exact markdown in, the styled result out.',
+    intro: 'Ask ChatGPT for research and it answers in clean markdown, headings, tables, recommendations. Paste that answer here and it becomes a designed report. Below is a real example: the exact markdown in, the styled result out.',
     sections: [
       {
         q: 'How do I get the markdown out of ChatGPT?',
-        a: 'Use the copy button under the answer — it copies markdown, not plain text. If the answer came out as prose, reply “format that as a markdown report with headings and tables” and copy the result.',
+        a: 'Use the copy button under the answer; it copies markdown, not plain text. If the answer came out as prose, reply “format that as a markdown report with headings and tables” and copy the result.',
       },
       {
         q: 'Can I change how it looks before sending?',
-        a: 'Yes — the editor previews live in any of the eight themes, and you can adjust the accent color, font size, and page width. Export is a self-contained HTML file or a print-to-PDF.',
+        a: 'Yes, the editor previews live in any of the eight themes, and you can adjust the accent color, font size, and page width. Export is a self-contained HTML file or a print-to-PDF.',
       },
     ],
   },
   {
     slug: 'meeting-notes',
     themeId: 'paper',
-    title: 'Style AI meeting notes into a clean, shareable document — markdown.style',
-    description: 'AI notetakers produce markdown — decisions, action items, task lists. Style them into a document worth circulating. Worked example inside. Free, no upload.',
+    title: 'Style AI meeting notes into a clean, shareable document, markdown.style',
+    description: 'AI notetakers produce markdown, decisions, action items, task lists. Style them into a document worth circulating. Worked example inside. Free, no upload.',
     h1: 'Style AI meeting notes into a document worth circulating',
     intro: 'Every AI notetaker exports the same thing: markdown with decisions, action items, and checkboxes. Paste it here and circulate something that looks deliberate instead. Below is a real example, notes in, document out.',
     sections: [
       {
         q: 'Do task lists and checkboxes render?',
-        a: 'Yes — GitHub-style task lists render as real checkboxes, checked and unchecked, in every theme. Action items survive the trip from notetaker to document.',
+        a: 'Yes, GitHub-style task lists render as real checkboxes, checked and unchecked, in every theme. Action items survive the trip from notetaker to document.',
       },
       {
         q: 'What is the fastest path from meeting to PDF?',
-        a: 'Paste the notes, pick a theme (Paper suits minutes), hit Print, and choose “Save as PDF”. Two clicks after paste — no account, nothing uploaded.',
+        a: 'Paste the notes, pick a theme (Paper suits minutes), hit Print, and choose “Save as PDF”. Two clicks after paste, no account, nothing uploaded.',
       },
     ],
   },
   {
     slug: 'readme',
     themeId: 'carbon',
-    title: 'Preview and style a README outside GitHub — markdown.style',
+    title: 'Preview and style a README outside GitHub, markdown.style',
     description: 'See a README rendered with syntax-highlighted code and real tables outside GitHub, then export it as styled HTML or PDF. Free, no upload.',
     h1: 'Preview a README as a styled document, outside GitHub',
-    intro: 'A README is markdown at its densest: code fences, tables, install commands. Paste one here to see it as a designed document — for docs sites, PDF handoffs, or just reading it properly. Below is a real example rendered in Carbon.',
+    intro: 'A README is markdown at its densest: code fences, tables, install commands. Paste one here to see it as a designed document, for docs sites, PDF handoffs, or just reading it properly. Below is a real example rendered in Carbon.',
     sections: [
       {
         q: 'Is code syntax-highlighted?',
-        a: 'Yes — fenced code blocks are highlighted at render time (Shiki, the same highlighter VS Code uses) in a palette matched to the theme, and the highlighting survives into the exported HTML and PDF.',
+        a: 'Yes, fenced code blocks are highlighted at render time (Shiki, the same highlighter VS Code uses) in a palette matched to the theme, and the highlighting survives into the exported HTML and PDF.',
       },
       {
         q: 'Can I use this for docs that live outside a repo?',
-        a: 'That is the point — the export is one self-contained HTML file with no external requests, so it can be attached, hosted anywhere, or printed without touching GitHub.',
+        a: 'That is the point, the export is one self-contained HTML file with no external requests, so it can be attached, hosted anywhere, or printed without touching GitHub.',
       },
     ],
   },
@@ -577,14 +577,14 @@ export const useCases: readonly UseCaseCopy[] = [
 export const convertPages: readonly ConvertCopy[] = [
   {
     slug: 'markdown-to-pdf',
-    title: 'Convert markdown to PDF — styled, free, in your browser — markdown.style',
-    description: 'Paste markdown, pick one of eight themes, print to PDF. Tables, code, math, and diagrams styled properly — free, no upload, no watermark.',
+    title: 'Convert markdown to PDF, styled, free, in your browser, markdown.style',
+    description: 'Paste markdown, pick one of eight themes, print to PDF. Tables, code, math, and diagrams styled properly, free, no upload, no watermark.',
     h1: 'Convert markdown to PDF without the plain-white look',
-    intro: 'Paste your markdown, pick a theme, press Print, and choose “Save as PDF” — that is the whole workflow. The difference from other converters is design: a real theme styles your tables, code, and headings, with print CSS that keeps them intact across page breaks.',
+    intro: 'Paste your markdown, pick a theme, press Print, and choose “Save as PDF”, that is the whole workflow. The difference from other converters is design: a real theme styles your tables, code, and headings, with print CSS that keeps them intact across page breaks.',
     sections: [
       {
         q: 'How do I convert markdown to a PDF for free?',
-        a: 'Open the editor, paste your markdown, and press “Print or save as PDF”. Your browser’s print dialog does the conversion locally — no account, no upload, no watermark, nothing installed.',
+        a: 'Open the editor, paste your markdown, and press “Print or save as PDF”. Your browser’s print dialog does the conversion locally, no account, no upload, no watermark, nothing installed.',
       },
       {
         q: 'Why do most markdown-to-PDF converters look bad?',
@@ -592,20 +592,20 @@ export const convertPages: readonly ConvertCopy[] = [
       },
       {
         q: 'Does it handle tables, code, math, and diagrams?',
-        a: 'Yes — GitHub-flavored tables and task lists, syntax-highlighted code, KaTeX math, and Mermaid diagrams all render and print. Exactly the constructs LLM answers are full of.',
+        a: 'Yes, GitHub-flavored tables and task lists, syntax-highlighted code, KaTeX math, and Mermaid diagrams all render and print. Exactly the constructs LLM answers are full of.',
       },
     ],
   },
   {
     slug: 'markdown-to-html',
-    title: 'Convert markdown to a styled, self-contained HTML file — markdown.style',
+    title: 'Convert markdown to a styled, self-contained HTML file, markdown.style',
     description: 'Turn markdown into one portable HTML file with a real theme, inline styles, and zero external requests. Free, no upload.',
     h1: 'Convert markdown to a single styled HTML file',
-    intro: 'Paste markdown, pick a theme, and download one self-contained HTML file: styles inlined, no external requests, opens identically everywhere. It is the portable version of your document — attach it, host it, or hand it off.',
+    intro: 'Paste markdown, pick a theme, and download one self-contained HTML file: styles inlined, no external requests, opens identically everywhere. It is the portable version of your document, attach it, host it, or hand it off.',
     sections: [
       {
         q: 'What does “self-contained” mean here?',
-        a: 'Everything the document needs — theme CSS, syntax-highlighting colors, even math fonts — is embedded in the one file. No CDN links, no tracking, nothing to break when the file moves.',
+        a: 'Everything the document needs, theme CSS, syntax-highlighting colors, even math fonts, is embedded in the one file. No CDN links, no tracking, nothing to break when the file moves.',
       },
       {
         q: 'When should I pick HTML over PDF?',
@@ -681,7 +681,7 @@ describe('page copy', () => {
 - [ ] **Step 4: Run the tests**
 
 Run: `bun test src/site/pages/copy.test.ts`
-Expected: PASS. (If a description length assertion fails, adjust the copy — not the bounds.)
+Expected: PASS. (If a description length assertion fails, adjust the copy, not the bounds.)
 
 - [ ] **Step 5: Commit**
 
@@ -694,9 +694,9 @@ git commit -m "feat: sample documents and SEO copy for programmatic pages"
 
 ### Task 4: CSS scoping and the shared page shell
 
-Two pure modules: `scopedSampleCss()` (wraps theme CSS in a scope class via native CSS nesting so a rendered sample can live inline in a marketing page) and `pageShell()` (the shared static-page skeleton with the same head invariants as `index.html`, site.css inlined, plus an `extraCss` slot so scoped sample CSS lands in the head — `<style>` in `<body>` is non-conforming HTML).
+Two pure modules: `scopedSampleCss()` (wraps theme CSS in a scope class via native CSS nesting so a rendered sample can live inline in a marketing page) and `pageShell()` (the shared static-page skeleton with the same head invariants as `index.html`, site.css inlined, plus an `extraCss` slot so scoped sample CSS lands in the head, `<style>` in `<body>` is non-conforming HTML).
 
-**Why scoping works:** our theme CSS is written with `:root`, `body`, and `html, body` selectors always at the start of a (possibly indented) line — the transform rewrites those to `&` and wraps everything in `.mds-theme-<id> { ... }`. Native CSS nesting gives nested bare selectors an implicit descendant combinator, and `@media` blocks nest legally inside style rules. `@page` cannot nest — it is dropped by the transform (embeds are not print targets; the standalone `/samples/*.html` files keep it).
+**Why scoping works:** our theme CSS is written with `:root`, `body`, and `html, body` selectors always at the start of a (possibly indented) line, the transform rewrites those to `&` and wraps everything in `.mds-theme-<id> { ... }`. Native CSS nesting gives nested bare selectors an implicit descendant combinator, and `@media` blocks nest legally inside style rules. `@page` cannot nest; it is dropped by the transform (embeds are not print targets; the standalone `/samples/*.html` files keep it).
 
 **Files:**
 - Create: `src/site/pages/scope-css.ts`
@@ -707,9 +707,9 @@ Two pure modules: `scopedSampleCss()` (wraps theme CSS in a scope class via nati
 **Interfaces:**
 - Consumes: `baseCss`, `Theme` from `src/themes/registry.ts`.
 - Produces (consumed by Task 5):
-  - `scopedSampleCss(theme: Theme): string` — base+theme CSS scoped under `.mds-theme-<id>`, with the theme's default accent applied.
+  - `scopedSampleCss(theme: Theme): string`, base+theme CSS scoped under `.mds-theme-<id>`, with the theme's default accent applied.
   - `escapeHtml(s: string): string`
-  - `pageShell(opts: { title: string; description: string; path: string; main: string; extraCss?: string }): string` — full page HTML; `path` is the extensionless route (e.g. `/themes/paper`) used for the canonical/og URL; `extraCss` is appended inside the head `<style>` (scoped sample CSS goes here).
+  - `pageShell(opts: { title: string; description: string; path: string; main: string; extraCss?: string }): string`, full page HTML; `path` is the extensionless route (e.g. `/themes/paper`) used for the canonical/og URL; `extraCss` is appended inside the head `<style>` (scoped sample CSS goes here).
   - `SITE_ORIGIN = 'https://markdown.style'`
 
 - [ ] **Step 1: Write the failing tests**
@@ -730,7 +730,7 @@ describe('scopedSampleCss', () => {
     expect(css).not.toMatch(/^\s*:root\b/m)
     expect(css).not.toMatch(/^\s*html,\s*body\b/m)
     expect(css).not.toMatch(/^\s*body\s*\{/m)
-    // @page cannot nest inside a style rule — must be stripped for embeds
+    // @page cannot nest inside a style rule and must be stripped for embeds
     expect(css).not.toContain('@page')
     // theme accent is applied for the embed (render() normally does this via knobs)
     expect(css).toContain(`--mds-accent: ${theme.defaultAccent}`)
@@ -753,7 +753,7 @@ import { escapeHtml, pageShell, SITE_ORIGIN } from './shell'
 
 describe('pageShell', () => {
   const html = pageShell({
-    title: 'Test page — markdown.style',
+    title: 'Test page, markdown.style',
     description: 'A test description that is long enough to look like real page copy for the assertions.',
     path: '/themes/paper',
     main: '<h1>Heading</h1><p>Body</p>',
@@ -800,7 +800,7 @@ describe('pageShell', () => {
 - [ ] **Step 2: Run tests to verify they fail**
 
 Run: `bun test src/site/pages`
-Expected: FAIL — modules don't exist.
+Expected: FAIL: modules don't exist.
 
 - [ ] **Step 3: Implement scope-css.ts**
 
@@ -812,7 +812,7 @@ import { baseCss, type Theme } from '../../themes/registry'
 /**
  * Rewrites document-level selectors to `&` and wraps the sheet in a scope
  * class, using native CSS nesting. Only used for samples embedded inline in
- * static marketing pages — standalone exports keep the unscoped sheet.
+ * static marketing pages, standalone exports keep the unscoped sheet.
  * Relies on the theme-CSS convention (enforced by scope-css.test.ts) that
  * `:root`, `body`, and `html, body` selectors start their line.
  */
@@ -839,7 +839,7 @@ ${scope} { --mds-accent: ${theme.defaultAccent}; }`
 }
 ```
 
-Note for the implementer: `registry.ts` exports `Theme` as an interface — `import { baseCss, type Theme }` works as-is.
+Note for the implementer: `registry.ts` exports `Theme` as an interface, `import { baseCss, type Theme }` works as-is.
 
 - [ ] **Step 4: Implement shell.ts**
 
@@ -863,7 +863,7 @@ export function escapeHtml(s: string): string {
  * Shared skeleton for generated static pages. Mirrors index.html's head
  * invariants (canonical, og, description) but inlines site.css so the files
  * need no Vite processing and make zero requests beyond themselves.
- * Zero JS by design — AI crawlers do not execute it (spec §6).
+ * Zero JS by design, AI crawlers do not execute it (spec §6).
  */
 export function pageShell(opts: {
   title: string
@@ -942,7 +942,7 @@ git commit -m "feat: css scoping and shared shell for generated static pages"
 
 ### Task 5: Page builders and sitemap
 
-Pure string builders for every generated page plus the sitemap, and the site.css additions they style with. The critical SEO property (advisor-mandated): **the rendered sample text must be present in the page's own HTML bytes** — non-JS AI crawlers must see the demo content without fetching anything else.
+Pure string builders for every generated page plus the sitemap, and the site.css additions they style with. The critical SEO property (advisor-mandated): **the rendered sample text must be present in the page's own HTML bytes**, non-JS AI crawlers must see the demo content without fetching anything else.
 
 **Files:**
 - Create: `src/site/pages/routes.ts`
@@ -957,13 +957,13 @@ Pure string builders for every generated page plus the sitemap, and the site.css
 - Consumes: `renderBody` (Task 2); `themeCopy`, `useCases`, `convertPages`, types (Task 3); `scopedSampleCss`, `pageShell`, `escapeHtml` (Task 4); `themes`, `getTheme` from the registry.
 - Produces (consumed by Task 6):
   - `routes.ts`: `GENERATED_ROUTES: readonly string[]`, `ALL_ROUTES: readonly string[]`, `routeToFile(route: string): string`
-  - `buildThemesHub(samples: ReadonlyMap<string, string>): string` — map of themeId → rendered sample body
+  - `buildThemesHub(samples: ReadonlyMap<string, string>): string`, map of themeId → rendered sample body
   - `buildThemePage(copy: ThemeCopy, sampleBody: string): string`
   - `buildUseCasePage(copy: UseCaseCopy, sampleMarkdown: string, sampleBody: string): string`
   - `buildConvertPage(copy: ConvertCopy): string`
   - `buildSitemap(routes: readonly string[]): string`
 
-- [ ] **Step 1: Write routes.ts** (tests come with the builders in Step 2 — this module is their fixture)
+- [ ] **Step 1: Write routes.ts** (tests come with the builders in Step 2; this module is their fixture)
 
 Create `src/site/pages/routes.ts`:
 
@@ -971,7 +971,7 @@ Create `src/site/pages/routes.ts`:
 import { themes } from '../../themes/registry'
 import { convertPages, useCases } from './copy'
 
-/** Extensionless routes the generator emits (samples are NOT routes — noindexed assets). */
+/** Extensionless routes the generator emits (samples are NOT routes, noindexed assets). */
 export const GENERATED_ROUTES: readonly string[] = [
   '/themes',
   ...themes.map(t => `/themes/${t.id}`),
@@ -979,7 +979,7 @@ export const GENERATED_ROUTES: readonly string[] = [
   ...convertPages.map(c => `/convert/${c.slug}`),
 ]
 
-/** Every canonical route on the site — the sitemap's exact contents. */
+/** Every canonical route on the site, the sitemap's exact contents. */
 export const ALL_ROUTES: readonly string[] = ['/', '/editor', '/privacy', '/terms', ...GENERATED_ROUTES]
 
 /** '/themes' -> 'themes.html'; '/themes/paper' -> 'themes/paper.html' (host clean-URLs). */
@@ -1038,7 +1038,7 @@ describe('generated page invariants', () => {
       expect(html, route).toContain(`<link rel="canonical" href="https://markdown.style${route}">`)
       expect(html, route).not.toContain('<script') // zero JS on citable pages
       // self-contained: nothing may be FETCHED from another origin (sample
-      // documents legitimately contain plain <a href> demo links — no request)
+      // documents legitimately contain plain <a href> demo links, no request)
       expect(html, route).not.toMatch(/src="https?:\/\/(?!markdown\.style[/"])/)
       expect(html, route).not.toMatch(/<link [^>]*href="https?:\/\/(?!markdown\.style[/"])/)
       expect(html, route).not.toMatch(/href="\/[a-z-]+\.html"/) // internal links extensionless
@@ -1125,7 +1125,7 @@ describe('buildSitemap', () => {
 - [ ] **Step 3: Run tests to verify they fail**
 
 Run: `bun test src/site/pages/pages.test.ts`
-Expected: FAIL — builder modules don't exist.
+Expected: FAIL: builder modules don't exist.
 
 - [ ] **Step 4: Implement the builders**
 
@@ -1152,7 +1152,7 @@ export function buildThemePage(copy: ThemeCopy, sampleBody: string): string {
   const related = copy.pairWith
     .map(id => {
       const rc = themeCopy.find(c => c.id === id)!
-      return `<li><a href="/themes/${id}">${escapeHtml(getTheme(id).name)}</a> — ${escapeHtml(rc.whoItSuits.split('—')[0]!.trim())}</li>`
+      return `<li><a href="/themes/${id}">${escapeHtml(getTheme(id).name)}</a>: ${escapeHtml(rc.whoItSuits.split(':')[0]!.trim())}</li>`
     })
     .join('\n')
   const main = `<section class="hero" aria-label="Introduction" style="border-top:0">
@@ -1166,7 +1166,7 @@ export function buildThemePage(copy: ThemeCopy, sampleBody: string): string {
 
 <section aria-label="Sample document">
   <h2>What does the ${escapeHtml(theme.name)} theme look like?</h2>
-  <p class="answer">This is a complete sample report rendered in ${escapeHtml(theme.name)} — the exact output the editor downloads, embedded here unmodified.</p>
+  <p class="answer">This is a complete sample report rendered in ${escapeHtml(theme.name)}, the exact output the editor downloads, embedded here unmodified.</p>
 ${sampleEmbed(copy.id, sampleBody, `Sample document rendered in the ${theme.name} theme`)}
 </section>
 
@@ -1208,7 +1208,7 @@ ${samples.get(t.id) ?? ''}
     .join('\n')
   const main = `<section class="hero" aria-label="Introduction" style="border-top:0">
   <h1>What do the markdown.style themes look like?</h1>
-  <p class="lede">Eight designed looks, each previewed below on the same real report — a warm book serif, a clean product-doc sans, a dark technical theme that prints light, and more. Click any theme for the full sample and a one-click way to apply it to your own markdown.</p>
+  <p class="lede">Eight designed looks, each previewed below on the same real report, a warm book serif, a clean product-doc sans, a dark technical theme that prints light, and more. Click any theme for the full sample and a one-click way to apply it to your own markdown.</p>
 </section>
 
 <section aria-label="Theme gallery">
@@ -1219,10 +1219,10 @@ ${cards}
 
 <section aria-label="Next steps">
   <h2>How do I use one of these on my own document?</h2>
-  <p class="answer">Open any theme page and click “Use this theme”, or go straight to the <a href="/editor">editor</a> and paste your markdown — the theme picker previews all eight live. See a worked example: <a href="/use-cases/chatgpt-report">a ChatGPT research answer styled into a report</a>, or the two-step paths to <a href="/convert/markdown-to-pdf">PDF</a> and <a href="/convert/markdown-to-html">a single HTML file</a>.</p>
+  <p class="answer">Open any theme page and click “Use this theme”, or go straight to the <a href="/editor">editor</a> and paste your markdown, the theme picker previews all eight live. See a worked example: <a href="/use-cases/chatgpt-report">a ChatGPT research answer styled into a report</a>, or the two-step paths to <a href="/convert/markdown-to-pdf">PDF</a> and <a href="/convert/markdown-to-html">a single HTML file</a>.</p>
 </section>`
   return pageShell({
-    title: 'Themes — eight designed looks for LLM markdown — markdown.style',
+    title: 'Themes, eight designed looks for LLM markdown, markdown.style',
     description: 'Compare all eight markdown.style themes on the same real report: book serif, product-doc sans, dark technical, minimal Swiss, academic, and more.',
     path: '/themes',
     main,
@@ -1255,7 +1255,7 @@ export function buildUseCasePage(copy: UseCaseCopy, sampleMarkdown: string, samp
 
 <section aria-label="Worked example">
   <h2>What goes in, what comes out</h2>
-  <p class="answer">The markdown below is the raw input. Under it: the same document rendered in the ${escapeHtml(theme.name)} theme — embedded here exactly as the editor would export it.</p>
+  <p class="answer">The markdown below is the raw input. Under it: the same document rendered in the ${escapeHtml(theme.name)} theme, embedded here exactly as the editor would export it.</p>
   <details class="md-source">
     <summary>See the markdown source</summary>
     <pre>${escapeHtml(sampleMarkdown)}</pre>
@@ -1265,7 +1265,7 @@ export function buildUseCasePage(copy: UseCaseCopy, sampleMarkdown: string, samp
 ${sampleBody}
   </div></div>
   </figure>
-  <p><a href="/samples/${copy.slug}.html">Open the exported file</a> — one self-contained HTML document, no external requests.</p>
+  <p><a href="/samples/${copy.slug}.html">Open the exported file</a>, one self-contained HTML document, no external requests.</p>
 </section>
 
 ${sections}
@@ -1360,7 +1360,7 @@ Append to `src/site/site.css`:
 - [ ] **Step 6: Run tests to verify they pass**
 
 Run: `bun test src/site/pages`
-Expected: PASS (pages tests use the real `renderBody` — Shiki bundles its grammars locally; nothing is fetched).
+Expected: PASS (pages tests use the real `renderBody`, Shiki bundles its grammars locally; nothing is fetched).
 
 - [ ] **Step 7: Commit**
 
@@ -1442,12 +1442,12 @@ describe('buildAllPages', () => {
 })
 ```
 
-Test-ordering note: the file-set test runs `buildAllPages` first; the later tests read its output from the same `outDir`. Vitest runs tests in a file sequentially by default — do not add `.concurrent`.
+Test-ordering note: the file-set test runs `buildAllPages` first; the later tests read its output from the same `outDir`. Vitest runs tests in a file sequentially by default, do not add `.concurrent`.
 
 - [ ] **Step 2: Run test to verify it fails**
 
 Run: `bun test src/site/pages/build.test.ts`
-Expected: FAIL — `build.ts` doesn't exist.
+Expected: FAIL: `build.ts` doesn't exist.
 
 - [ ] **Step 3: Implement build.ts**
 
@@ -1485,7 +1485,7 @@ export async function buildAllPages(outDir: string): Promise<string[]> {
   const showcase = readFileSync(join(samplesDir, 'showcase.md'), 'utf8')
 
   // theme pages + hub share one showcase render per theme; a rendering error
-  // in sample content is a build bug — fail loudly, never ship a broken demo
+  // in sample content is a build bug, fail loudly, never ship a broken demo
   const sampleBodies = new Map<string, string>()
   for (const t of themes) {
     const { body, errors } = await renderBody(showcase, t.id)
@@ -1523,7 +1523,7 @@ Create `scripts/build-pages.ts`:
 
 ```ts
 // Runs after `vite build`: writes the programmatic pages, standalone samples,
-// and sitemap straight into dist/. Plain bun — it resolves the pipeline's
+// and sitemap straight into dist/. Plain bun; it resolves the pipeline's
 // `?raw` css imports natively, so no bundler is involved (verified 2026-07-10).
 import { existsSync } from 'node:fs'
 import { join } from 'node:path'
@@ -1531,7 +1531,7 @@ import { buildAllPages } from '../src/site/pages/build'
 
 const dist = join(import.meta.dir, '..', 'dist')
 if (!existsSync(dist)) {
-  console.error('dist/ not found — run `vite build` first (or use `bun run build`)')
+  console.error('dist/ not found, run `vite build` first (or use `bun run build`)')
   process.exit(1)
 }
 const written = await buildAllPages(dist)
@@ -1547,7 +1547,7 @@ In `package.json`, change the build script and add a pages-only helper:
 "build:pages": "bun scripts/build-pages.ts",
 ```
 
-Delete `public/sitemap.xml` (`git rm public/sitemap.xml`) — the generator owns it now. `public/robots.txt` keeps its `Sitemap:` line unchanged.
+Delete `public/sitemap.xml` (`git rm public/sitemap.xml`), the generator owns it now. `public/robots.txt` keeps its `Sitemap:` line unchanged.
 
 In `public/llms.txt`, add one line to the "Key pages" list, after the editor line:
 
@@ -1565,7 +1565,7 @@ In `src/site/site.test.ts`, replace the `'sitemap covers exactly the live routes
   })
 ```
 
-(The generator's own coverage lives in `src/site/pages/build.test.ts` — do not duplicate it here.) Keep the robots.txt test unchanged; extend the llms.txt test with:
+(The generator's own coverage lives in `src/site/pages/build.test.ts`, do not duplicate it here.) Keep the robots.txt test unchanged; extend the llms.txt test with:
 
 ```ts
     expect(llms).toContain('https://markdown.style/themes')
@@ -1573,9 +1573,9 @@ In `src/site/site.test.ts`, replace the `'sitemap covers exactly the live routes
 
 - [ ] **Step 7: Run everything**
 
-Run: `bun test` — expected: all green.
-Run: `bunx tsc --noEmit` — expected: clean (`@types/node` and `@types/bun` are already devDependencies; `src/site/site.test.ts` already uses `import.meta.dirname`, so the tsconfig permits it).
-Run: `bun run build` — expected: vite build succeeds, then `wrote 26 files into dist/:` (14 route files + 11 samples + sitemap.xml = 26), and `ls dist/themes.html dist/themes dist/use-cases dist/convert dist/samples dist/sitemap.xml` shows everything in place.
+Run: `bun test`, expected: all green.
+Run: `bunx tsc --noEmit`, expected: clean (`@types/node` and `@types/bun` are already devDependencies; `src/site/site.test.ts` already uses `import.meta.dirname`, so the tsconfig permits it).
+Run: `bun run build`, expected: vite build succeeds, then `wrote 26 files into dist/:` (14 route files + 11 samples + sitemap.xml = 26), and `ls dist/themes.html dist/themes dist/use-cases dist/convert dist/samples dist/sitemap.xml` shows everything in place.
 
 - [ ] **Step 8: Commit**
 
@@ -1597,7 +1597,7 @@ Gallery pages link to `/editor?theme=<id>`. On mount, a valid `theme` query para
 
 **Interfaces:**
 - Consumes: `themes` from the registry (already imported in main.ts); `createStore` (unchanged).
-- Produces: URL contract `GET /editor?theme=<themeId>` — consumed by the pages built in Task 5 (already emitting these links).
+- Produces: URL contract `GET /editor?theme=<themeId>`, consumed by the pages built in Task 5 (already emitting these links).
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -1620,12 +1620,12 @@ describe('?theme= deep link', () => {
     history.replaceState(null, '', '/editor?theme=neon-vaporwave')
     await mount(document.getElementById('app')!)
     const accent = document.querySelector<HTMLInputElement>('[aria-label="Accent color"]')!
-    expect(accent.value).toBe('#0969da') // slate's defaultAccent — untouched
+    expect(accent.value).toBe('#0969da') // slate's defaultAccent, untouched
   })
 })
 ```
 
-Also reset the URL between tests — add `history.replaceState(null, '', '/')` to the existing `beforeEach`.
+Also reset the URL between tests, add `history.replaceState(null, '', '/')` to the existing `beforeEach`.
 
 - [ ] **Step 2: Run tests to verify they fail**
 
@@ -1671,11 +1671,11 @@ The landing page must link the new hub (it is currently the only path in from th
 
 **Interfaces:**
 - Consumes: routes from Task 5/6 output (`/themes`, `/themes/<id>`).
-- Produces: nothing downstream — this is the final task.
+- Produces: nothing downstream; this is the final task.
 
 - [ ] **Step 1: Write the failing tests**
 
-Append to `src/site/site.test.ts` (import `themes` from `../themes/registry` at the top — the file is `// @vitest-environment node`; the registry imports CSS via `?raw`, which vitest handles):
+Append to `src/site/site.test.ts` (import `themes` from `../themes/registry` at the top, the file is `// @vitest-environment node`; the registry imports CSS via `?raw`, which vitest handles):
 
 ```ts
 describe('landing ↔ registry sync', () => {
@@ -1688,7 +1688,7 @@ describe('landing ↔ registry sync', () => {
   it('theme strip mirrors the registry exactly and links every theme page', () => {
     for (const t of themes) {
       // one structural match per theme: swatch color, link target, and name
-      // must sit in the SAME strip item — presence-anywhere would let a
+      // must sit in the SAME strip item, presence-anywhere would let a
       // cross-wired strip (name A, accent B) slip through
       expect(html, t.id).toContain(
         `<span class="swatch" style="background:${t.defaultAccent}"></span><a href="/themes/${t.id}">${t.name}</a>`,
@@ -1702,7 +1702,7 @@ describe('landing ↔ registry sync', () => {
 - [ ] **Step 2: Run tests to verify they fail**
 
 Run: `bun test src/site/site.test.ts`
-Expected: FAIL — no `/themes` links yet.
+Expected: FAIL: no `/themes` links yet.
 
 - [ ] **Step 3: Update index.html and site.css**
 
@@ -1762,8 +1762,8 @@ git commit -m "feat: landing links the theme gallery; strip test-locked to the r
 - **`content/*.json` → `content/samples/*.md` + `src/site/pages/copy.ts`.** The spec's "content/themes.json / content/use-cases.json" describes the mechanism (content data feeding `render()` at build time), not a serialization mandate; markdown-in-JSON needs escaped newlines and fences, and typed TS copy gets checked by `tsc`.
 - **Samples are embedded inline with scoped CSS, not iframed.** Non-JS AI crawlers (the spec's own governing constraint) never merge iframe content into the referencing page; inlining is what makes each page "genuinely unique rendered content" in its own bytes. Standalone `/samples/*.html` files remain as noindexed human-facing demos of the actual export.
 - **Sample content additionally bans math** (spec only bans mermaid): any math render embeds ~360KB of KaTeX font CSS, which would sink the static pages' CWV. Enforced by test.
-- **Landing theme strip stays hand-authored, locked by a registry-sync test** rather than generated — index.html is a Vite MPA entry and the strip is 8 lines; a test is the cheaper drift guard.
+- **Landing theme strip stays hand-authored, locked by a registry-sync test** rather than generated, index.html is a Vite MPA entry and the strip is 8 lines; a test is the cheaper drift guard.
 
 ## Out of scope (unchanged from roadmap)
 
-Owner launch assets (og.png 1200×630, favicon, domain + Cloudflare Pages setup — including verifying CF's clean-URL/trailing-slash handling matches the extensionless canonicals); real-device mobile verification; post-launch GEO roadmap items.
+Owner launch assets (og.png 1200×630, favicon, domain + Cloudflare Pages setup, including verifying CF's clean-URL/trailing-slash handling matches the extensionless canonicals); real-device mobile verification; post-launch GEO roadmap items.

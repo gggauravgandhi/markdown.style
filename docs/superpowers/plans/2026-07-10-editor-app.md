@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** The `/editor` SPA — CodeMirror editor + live themed preview + theme picker + three knobs + Download HTML / Print-PDF / Copy exports, all consuming Plan 1's `render()`.
+**Goal:** The `/editor` SPA, CodeMirror editor + live themed preview + theme picker + three knobs + Download HTML / Print-PDF / Copy exports, all consuming Plan 1's `render()`.
 
 **Architecture:** Vanilla TS Vite app (`editor.html` entry). One store module holds `{ markdown, themeId, knobs }` with debounced localStorage persistence. Preview is an `<iframe sandbox="allow-same-origin">` whose `srcdoc` is the render() string; markdown/theme changes re-render debounced (200ms), knob changes mutate CSS custom properties on the iframe document (no re-render). Exports always call `render()` fresh at click time, so preview staleness can never leak into an export.
 
@@ -12,7 +12,7 @@
 
 ## Global Constraints
 
-- Use `bun` for everything — never npm/npx/yarn/node.
+- Use `bun` for everything, never npm/npx/yarn/node.
 - `render()` from `src/pipeline/render.ts` is the ONLY producer of preview/export/print HTML. The app never assembles document HTML itself.
 - Preview iframe: `sandbox="allow-same-origin"` EXACTLY. `allow-scripts` must NEVER be added (content is script-free by construction; same-origin is required for the knob fast-path into `contentDocument`). A test pins this attribute value.
 - Print = `window.open('', '_blank')` + write the render() string + wait `document.fonts.ready` (+ load) + `print()`. NEVER print the preview iframe.
@@ -21,17 +21,17 @@
 - localStorage: key `mds-state-v1`, persist debounced 500ms, restore on load; quota/availability failure warns ONCE via notice and the app keeps working.
 - File open: `.md`/`.markdown`/`.txt`; files >2MB get a warning notice but still load (never a block).
 - Empty document + export click → friendly notice, no empty file (spec §7).
-- render() `errors[]` surface as a transient notice (e.g. "1 diagram failed to render") — no silent failures.
+- render() `errors[]` surface as a transient notice (e.g. "1 diagram failed to render"), no silent failures.
 - A11y: every control keyboard-reachable with an accessible name; notices region `role="status"` `aria-live="polite"`; iframe has `title`.
 - No new dependencies beyond `codemirror` + `@codemirror/lang-markdown`.
-- TypeScript strict. Vanilla TS/DOM — no framework. Conventional commits, no Co-Authored-By.
-- TDD for logic modules (store, exports, file-input, preview scheduling). Pure DOM/visual behavior that jsdom cannot exercise is deferred to Task 7's browser QA checklist — each deferral named explicitly in the task.
+- TypeScript strict. Vanilla TS/DOM, no framework. Conventional commits, no Co-Authored-By.
+- TDD for logic modules (store, exports, file-input, preview scheduling). Pure DOM/visual behavior that jsdom cannot exercise is deferred to Task 7's browser QA checklist, each deferral named explicitly in the task.
 
 ## File Structure
 
 ```
-vite.config.ts        # NEW — MPA input: editor.html
-editor.html           # NEW — static head (title/description/canonical), #app mount
+vite.config.ts        # NEW: MPA input: editor.html
+editor.html           # NEW: static head (title/description/canonical), #app mount
 src/app/
   main.ts             # UI assembly & wiring (largest file; DOM-only, thin logic)
   app.css             # app chrome styling (toolbar, panes, dialog, notices)
@@ -53,7 +53,7 @@ src/app/*.test.ts     # colocated vitest tests (jsdom)
 
 **Interfaces:**
 - Consumes: nothing new
-- Produces: `bun run dev` serves the editor at `/editor.html`; `bun run build` emits `dist/editor.html` + assets. `main.ts` exports `mount(root: HTMLElement): Promise<void>` — later tasks fill it in.
+- Produces: `bun run dev` serves the editor at `/editor.html`; `bun run build` emits `dist/editor.html` + assets. `main.ts` exports `mount(root: HTMLElement): Promise<void>`, later tasks fill it in.
 
 - [ ] **Step 1: Install CodeMirror and add scripts**
 
@@ -92,8 +92,8 @@ export default defineConfig({
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Markdown Editor — markdown.style</title>
-<meta name="description" content="Paste markdown, pick a theme, and download styled HTML or save as PDF. Free, no upload — everything happens in your browser.">
+<title>Markdown Editor, markdown.style</title>
+<meta name="description" content="Paste markdown, pick a theme, and download styled HTML or save as PDF. Free, no upload, everything happens in your browser.">
 <link rel="canonical" href="https://markdown.style/editor">
 </head>
 <body>
@@ -105,7 +105,7 @@ export default defineConfig({
 
 - [ ] **Step 4: Create vitest.setup.ts and wire it into vitest.config.ts**
 
-Node v22+ ships an experimental global `localStorage` getter that returns `undefined` and shadows jsdom's real `Storage` in vitest's `populateGlobal` (verified live on this toolchain: without this fix, Task 2 fails 0/7 and Task 6 fails 0/2). Do NOT fix this by changing `test.pool` — that breaks Plan 1's `render.node.test.ts`.
+Node v22+ ships an experimental global `localStorage` getter that returns `undefined` and shadows jsdom's real `Storage` in vitest's `populateGlobal` (verified live on this toolchain: without this fix, Task 2 fails 0/7 and Task 6 fails 0/2). Do NOT fix this by changing `test.pool`, that breaks Plan 1's `render.node.test.ts`.
 
 `vitest.setup.ts` (repo root):
 ```ts
@@ -125,7 +125,7 @@ Update `vitest.config.ts`:
 import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
-  // css: true is REQUIRED — without it, `?raw` imports of .css files resolve
+  // css: true is REQUIRED, without it, `?raw` imports of .css files resolve
   // to empty strings under vitest and Tasks 7/8/10 fail with baffling output.
   test: { environment: 'jsdom', css: true, setupFiles: ['./vitest.setup.ts'] },
 })
@@ -147,7 +147,7 @@ if (appRoot) void mount(appRoot)
 
 `src/app/app.css`:
 ```css
-/* App chrome only — document styling lives in src/themes (never here). */
+/* App chrome only, document styling lives in src/themes (never here). */
 :root {
   --app-bg: #101014;
   --app-surface: #1a1a21;
@@ -168,7 +168,7 @@ Run: `bun run build`
 Expected: succeeds; `dist/editor.html` exists.
 
 Run: `bun run test && bun run typecheck`
-Expected: 58/58 pass (nothing broken — the setup file must not disturb Plan 1's node-env tests), typecheck clean.
+Expected: 58/58 pass (nothing broken, the setup file must not disturb Plan 1's node-env tests), typecheck clean.
 
 - [ ] **Step 7: Commit**
 
@@ -190,7 +190,7 @@ git commit -m "feat: vite editor app scaffold with MPA entry"
 - Produces (Tasks 5–6 rely on exactly this):
   - `interface AppState { markdown: string; themeId: string; knobs: Knobs }`
   - `createStore(fallback: AppState): Store` where `Store = { get(): AppState; set(patch: Partial<AppState>): void; subscribe(fn: (s: AppState) => void): () => void; onQuotaWarning(fn: () => void): void }`
-  - `set` patch semantics: shallow replace per key — passing `knobs` REPLACES the whole knobs object (callers own the full knob set; reset = `set({ knobs: {} })`).
+  - `set` patch semantics: shallow replace per key, passing `knobs` REPLACES the whole knobs object (callers own the full knob set; reset = `set({ knobs: {} })`).
   - `restore(): AppState | null` (exported for tests)
   - Constants: `STORAGE_KEY = 'mds-state-v1'`, `PERSIST_DELAY_MS = 500`
 
@@ -273,7 +273,7 @@ describe('store', () => {
 - [ ] **Step 2: Run tests to verify they fail**
 
 Run: `bunx vitest run src/app/store.test.ts`
-Expected: FAIL — module missing.
+Expected: FAIL: module missing.
 
 - [ ] **Step 3: Implement store.ts**
 
@@ -365,16 +365,16 @@ git commit -m "feat: app state store with debounced localStorage persistence"
 **Interfaces:**
 - Consumes: nothing (pure/DOM APIs)
 - Produces (Task 6 relies on exactly this):
-  - `sample.ts`: `SAMPLE_MARKDOWN: string` (showcase doc: h1 title, intro, table, task list, code fence, math, mermaid fence, blockquote, footnote), `THUMB_MARKDOWN: string` (short excerpt for theme thumbnails: h1, short paragraph, small table, tiny code fence — NO mermaid/math, keeps thumbnails instant)
+  - `sample.ts`: `SAMPLE_MARKDOWN: string` (showcase doc: h1 title, intro, table, task list, code fence, math, mermaid fence, blockquote, footnote), `THUMB_MARKDOWN: string` (short excerpt for theme thumbnails: h1, short paragraph, small table, tiny code fence, NO mermaid/math, keeps thumbnails instant)
   - `exports.ts`: `filenameFor(title: string): string`; `downloadHtml(html: string, title: string): void`; `copyHtml(html: string): Promise<boolean>`; `printDocument(html: string): boolean` (false when popup blocked)
 
 - [ ] **Step 1: Create sample.ts**
 
 ```ts
-/** Pre-loaded showcase document — first-visit users see every feature themed. */
+/** Pre-loaded showcase document, first-visit users see every feature themed. */
 export const SAMPLE_MARKDOWN = `# Quarterly Growth Report
 
-*Generated by an LLM — styled by markdown.style.*
+*Generated by an LLM, styled by markdown.style.*
 
 Paste your own markdown to replace this sample. Everything renders live: tables, code, math, diagrams.
 
@@ -420,7 +420,7 @@ export function netGrowth(rates: number[], churn: number[]): number {
 [^1]: See the finance memo for reconciliation details.
 `
 
-/** Short excerpt for theme-picker thumbnails — no mermaid/math so thumbs render instantly. */
+/** Short excerpt for theme-picker thumbnails, no mermaid/math so thumbs render instantly. */
 export const THUMB_MARKDOWN = `# The Quick Report
 
 A short paragraph showing body text, a [link](https://example.com), and \`inline code\`.
@@ -515,7 +515,7 @@ describe('printDocument', () => {
 - [ ] **Step 3: Run tests to verify they fail**
 
 Run: `bunx vitest run src/app/exports.test.ts`
-Expected: FAIL — module missing.
+Expected: FAIL: module missing.
 
 - [ ] **Step 4: Implement exports.ts**
 
@@ -548,7 +548,7 @@ export async function copyHtml(html: string): Promise<boolean> {
 }
 
 /**
- * Print via a fresh tab — never the preview iframe (spec §2: cross-browser
+ * Print via a fresh tab, never the preview iframe (spec §2: cross-browser
  * iframe-print quirks). Waits for fonts (KaTeX) before invoking the dialog.
  * Returns false when the popup was blocked so the caller can show a notice.
  */
@@ -596,7 +596,7 @@ git commit -m "feat: sample documents and export actions (download, copy, print)
 - Produces (Task 6 relies on exactly this):
   - `isMarkdownFile(name: string): boolean` (`.md`/`.markdown`/`.txt`, case-insensitive)
   - `interface FileLoad { text: string; warning?: string }`
-  - `loadMarkdownFile(file: File): Promise<FileLoad>` — warning set when >2MB (`MAX_FILE_BYTES` exported), never rejects the load for size.
+  - `loadMarkdownFile(file: File): Promise<FileLoad>`, warning set when >2MB (`MAX_FILE_BYTES` exported), never rejects the load for size.
 
 - [ ] **Step 1: Write failing tests**
 
@@ -638,7 +638,7 @@ describe('loadMarkdownFile', () => {
 - [ ] **Step 2: Run tests to verify they fail**
 
 Run: `bunx vitest run src/app/file-input.test.ts`
-Expected: FAIL — module missing.
+Expected: FAIL: module missing.
 
 - [ ] **Step 3: Implement file-input.ts**
 
@@ -659,7 +659,7 @@ export async function loadMarkdownFile(file: File): Promise<FileLoad> {
   const text = await file.text()
   if (file.size > MAX_FILE_BYTES) {
     const mb = (file.size / (1024 * 1024)).toFixed(1)
-    return { text, warning: `Large file (${mb} MB) — preview may be slow` }
+    return { text, warning: `Large file (${mb} MB), preview may be slow` }
   }
   return { text }
 }
@@ -668,7 +668,7 @@ export async function loadMarkdownFile(file: File): Promise<FileLoad> {
 - [ ] **Step 4: Run tests to verify they pass**
 
 Run: `bunx vitest run src/app/file-input.test.ts`
-Expected: PASS (4 tests). If jsdom lacks `File.prototype.text`, read via `new Response(file).text()` inside `loadMarkdownFile` instead — same behavior, and note it in the report.
+Expected: PASS (4 tests). If jsdom lacks `File.prototype.text`, read via `new Response(file).text()` inside `loadMarkdownFile` instead, same behavior, and note it in the report.
 
 - [ ] **Step 5: Commit**
 
@@ -740,7 +740,7 @@ describe('preview', () => {
     const preview = createPreview(makeIframe(), () => {})
     const iframe = document.querySelector('iframe')!
     // fire two renders without awaiting the first; the second must win.
-    // markers MUST be strings that cannot appear in theme CSS — 'Old' collides
+    // markers MUST be strings that cannot appear in theme CSS, 'Old' collides
     // with the paper theme's 'Iowan Old Style' font stack (verified failure).
     const p1 = preview.renderNow({ ...STATE, markdown: '# ZZZStale' })
     const p2 = preview.renderNow({ ...STATE, markdown: '# ZZZFresh' })
@@ -766,7 +766,7 @@ describe('preview', () => {
 - [ ] **Step 2: Run tests to verify they fail**
 
 Run: `bunx vitest run src/app/preview.test.ts`
-Expected: FAIL — module missing.
+Expected: FAIL: module missing.
 
 - [ ] **Step 3: Implement preview.ts**
 
@@ -787,7 +787,7 @@ export function createPreview(
   async function renderNow(state: AppState): Promise<void> {
     const ticket = ++seq
     const result = await render(state.markdown, state.themeId, state.knobs)
-    if (ticket !== seq) return // superseded by a newer render — drop
+    if (ticket !== seq) return // superseded by a newer render, drop
     iframe.srcdoc = result.html
     onErrors(result.errors)
   }
@@ -819,7 +819,7 @@ export type Preview = ReturnType<typeof createPreview>
 - [ ] **Step 4: Run tests to verify they pass**
 
 Run: `bunx vitest run src/app/preview.test.ts`
-Expected: PASS (4 tests). Note: `render()` runs for real here — STATE has no fences, so no heavy libs load and the tests stay fast.
+Expected: PASS (4 tests). Note: `render()` runs for real here, STATE has no fences, so no heavy libs load and the tests stay fast.
 
 - [ ] **Step 5: Commit**
 
@@ -838,7 +838,7 @@ git commit -m "feat: preview manager with debounce, stale-drop, knob fast-path"
 
 **Interfaces:**
 - Consumes: everything from Tasks 2–5 plus `themes` from `../themes/registry`, `render` from `../pipeline/render`
-- Produces: `mount(root: HTMLElement): Promise<void>` — full editor UI. No new exports.
+- Produces: `mount(root: HTMLElement): Promise<void>`, full editor UI. No new exports.
 
 - [ ] **Step 1: Write failing smoke tests**
 
@@ -859,7 +859,7 @@ describe('editor app shell', () => {
   it('mounts toolbar controls, editor, and sandboxed preview', async () => {
     await mount(document.getElementById('app')!)
     const iframe = document.querySelector<HTMLIFrameElement>('.pane-preview iframe')!
-    expect(iframe.getAttribute('sandbox')).toBe('allow-same-origin') // security invariant — never add allow-scripts
+    expect(iframe.getAttribute('sandbox')).toBe('allow-same-origin') // security invariant, never add allow-scripts
     expect(iframe.title).toBe('Document preview')
     expect(document.querySelector('.cm-editor')).toBeTruthy()
     const buttons = [...document.querySelectorAll('button')].map(b => b.textContent?.trim())
@@ -887,7 +887,7 @@ describe('editor app shell', () => {
 - [ ] **Step 2: Run tests to verify they fail**
 
 Run: `bunx vitest run src/app/main.test.ts`
-Expected: FAIL — mount is still the skeleton.
+Expected: FAIL: mount is still the skeleton.
 
 - [ ] **Step 3: Implement main.ts**
 
@@ -985,7 +985,7 @@ export async function mount(root: HTMLElement): Promise<void> {
     view.dispatch({ changes: { from: 0, to: view.state.doc.length, insert: text } })
   }
 
-  store.onQuotaWarning(() => notice('Autosave unavailable (storage full) — your work stays in this tab only'))
+  store.onQuotaWarning(() => notice('Autosave unavailable (storage full), your work stays in this tab only'))
 
   // --- knobs --------------------------------------------------------------------
   function currentKnobs(): AppState['knobs'] {
@@ -1040,7 +1040,7 @@ export async function mount(root: HTMLElement): Promise<void> {
   async function withDocument(action: (html: string, title: string) => void | Promise<void>): Promise<void> {
     const state = store.get()
     if (!state.markdown.trim()) {
-      notice('Nothing to export — the document is empty')
+      notice('Nothing to export, the document is empty')
       return
     }
     const { html, title } = await render(state.markdown, state.themeId, state.knobs)
@@ -1049,19 +1049,19 @@ export async function mount(root: HTMLElement): Promise<void> {
   downloadBtn.addEventListener('click', () => void withDocument((html, title) => downloadHtml(html, title)))
   printBtn.addEventListener('click', () =>
     void withDocument(html => {
-      if (!printDocument(html)) notice('Popup blocked — allow popups for this site to print')
+      if (!printDocument(html)) notice('Popup blocked, allow popups for this site to print')
     }),
   )
   copyBtn.addEventListener('click', () =>
     void withDocument(async html => {
-      notice((await copyHtml(html)) ? 'HTML copied to clipboard' : 'Copy failed — clipboard unavailable')
+      notice((await copyHtml(html)) ? 'HTML copied to clipboard' : 'Copy failed, clipboard unavailable')
     }),
   )
 
   // --- file open / drag-drop -------------------------------------------------------------
   async function acceptFile(file: File): Promise<void> {
     if (!isMarkdownFile(file.name)) {
-      notice('Unsupported file — use .md, .markdown, or .txt')
+      notice('Unsupported file, use .md, .markdown, or .txt')
       return
     }
     try {
@@ -1069,7 +1069,7 @@ export async function mount(root: HTMLElement): Promise<void> {
       if (warning) notice(warning)
       setEditorText(text)
     } catch {
-      notice('Could not read the file — try again') // spec §7: read failures toast
+      notice('Could not read the file, try again') // spec §7: read failures toast
     }
   }
   openBtn.addEventListener('click', () => fileInput.click())
@@ -1182,7 +1182,7 @@ Expected: all pass, clean, build succeeds.
 
 ```bash
 git add src/app/main.ts src/app/main.test.ts src/app/app.css
-git commit -m "feat: editor UI — toolbar, theme picker, knobs, exports, drag-drop"
+git commit -m "feat: editor UI, toolbar, theme picker, knobs, exports, drag-drop"
 ```
 
 ---
@@ -1195,14 +1195,14 @@ git commit -m "feat: editor UI — toolbar, theme picker, knobs, exports, drag-d
 
 This task CANNOT be completed by an agent alone: browser automation is disabled by default in this environment (owner rule). The executor's job is to start the dev server, present this checklist to the human, and wait. If the human explicitly grants browser-tool permission, the checks may be automated with claude-in-chrome instead.
 
-- [ ] **Step 1: Start dev server** — `bun run dev` (background), confirm the URL serves.
+- [ ] **Step 1: Start dev server**, `bun run dev` (background), confirm the URL serves.
 
 - [ ] **Step 2: Present this checklist to the human:**
 
 **Deferred Plan 1 items (highest priority):**
 1. Mermaid happy path: sample doc's `graph LR` renders as an SVG diagram in the preview (jsdom could never verify this).
 2. Mermaid temp-element cleanup: in devtools Elements, after several edits to a mermaid fence, confirm no accumulation of orphan `#dmds-mermaid-*` / `#mds-mermaid-*` elements in the app document (`src/pipeline/mermaid.ts` cleanup id needs this empirical check).
-3. Hostile mermaid label: paste a mermaid fence whose node label is `A["<img src=x onerror=alert(1)>"]` — NO alert may fire anywhere (securityLevel strict is the sole control).
+3. Hostile mermaid label: paste a mermaid fence whose node label is `A["<img src=x onerror=alert(1)>"]`, NO alert may fire anywhere (securityLevel strict is the sole control).
 
 **Editor QA:**
 4. Type in the editor → preview updates ~200ms after typing stops; no flicker while typing.
@@ -1216,21 +1216,21 @@ This task CANNOT be completed by an agent alone: browser automation is disabled 
 12. Narrow the window below 768px → Editor/Preview toggle appears and works.
 13. Keyboard-only pass: Tab reaches every toolbar control, dialog closes on Esc, focus rings visible.
 
-- [ ] **Step 3: Record outcomes** — every failed check becomes a fix commit (with the covering test where jsdom can express one) before this task is marked complete.
+- [ ] **Step 3: Record outcomes**, every failed check becomes a fix commit (with the covering test where jsdom can express one) before this task is marked complete.
 
 ---
 
 ## Self-Review Notes
 
-- Preview iframe sandbox reasoning documented at the element and pinned by test (Task 6 Step 1) — `allow-same-origin` without `allow-scripts` is the deliberate pairing; the spec's two requirements (sandboxed preview + knob CSS-var fast-path) are only satisfiable together this way.
-- Exports never read the preview — `withDocument` renders fresh (Task 6), so the knob fast-path can't leak stale state into files.
+- Preview iframe sandbox reasoning documented at the element and pinned by test (Task 6 Step 1), `allow-same-origin` without `allow-scripts` is the deliberate pairing; the spec's two requirements (sandboxed preview + knob CSS-var fast-path) are only satisfiable together this way.
+- Exports never read the preview, `withDocument` renders fresh (Task 6), so the knob fast-path can't leak stale state into files.
 - CodeMirror-in-jsdom is a known rough edge: the smoke test ships the two standard `Range` shims and instructs narrow additions only.
-- Theme thumbnails use `sandbox=""` (fully locked; no interaction needed) vs the main preview's `allow-same-origin` (knob fast-path needed) — intentional difference.
+- Theme thumbnails use `sandbox=""` (fully locked; no interaction needed) vs the main preview's `allow-same-origin` (knob fast-path needed), intentional difference.
 - `store.set` knobs-replacement semantics are pinned by test (Task 2) because the reset flow depends on it.
 
 ## Advisor-Verified Fixes (applied after a full scratch-copy execution of this plan)
 
-1. `vitest.setup.ts` with a real-JSDOM `localStorage`/`Storage` stub is REQUIRED on this toolchain (Node v26 shadows jsdom's Storage; 9 tests fail without it). Never fix via `test.pool` — that breaks Plan 1's node-env tests.
+1. `vitest.setup.ts` with a real-JSDOM `localStorage`/`Storage` stub is REQUIRED on this toolchain (Node v26 shadows jsdom's Storage; 9 tests fail without it). Never fix via `test.pool`, that breaks Plan 1's node-env tests.
 2. Stale-render test markers must not collide with theme CSS ('Old' appears in the paper font stack 'Iowan Old Style').
-3. `store.subscribe()` is intentionally pinned-but-unused in Plan 2 (main.ts wires explicit calls); it becomes load-bearing in later plans — reviewers should not flag it as dead code to delete.
+3. `store.subscribe()` is intentionally pinned-but-unused in Plan 2 (main.ts wires explicit calls); it becomes load-bearing in later plans, reviewers should not flag it as dead code to delete.
 4. Verified clean as written: CodeMirror-in-jsdom with the two Range shims, copyHtml navigator stub, File.text() in jsdom, applyKnobs contentDocument, debounce fake-timer interplay, Vite MPA build incl. the pipeline's dynamic imports.

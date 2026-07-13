@@ -25,7 +25,7 @@ describe('highlightFences', () => {
     expect(out).not.toContain('<script>')
   })
 
-  it('inserts highlighted HTML literally — $ sequences in code survive', async () => {
+  it('inserts highlighted HTML literally: $ sequences in code survive', async () => {
     const body = '<p>x</p><pre data-mds-slot="code:0"></pre><p>y</p>'
     const out = await highlightFences(body, [{ index: 0, lang: 'bash', code: 'echo $$ $& then $\'a\'\n' }], 'github-light')
     expect(out).toContain('$$')

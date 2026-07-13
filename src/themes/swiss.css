@@ -1,4 +1,4 @@
-/* Swiss — minimal typographic. Whitespace does the work. */
+/* Swiss: minimal typographic. Whitespace does the work. */
 :root {
   --mds-bg: #ffffff;
   --mds-fg: #111111;
@@ -19,7 +19,8 @@ p { margin: 1.1em 0; }
 a { color: inherit; text-decoration: underline; text-decoration-color: var(--mds-accent); text-decoration-thickness: 2px; text-underline-offset: 3px; }
 
 blockquote { margin: 2em 0; padding: 0; border: 0; font-size: 1.15em; color: var(--mds-fg); }
-blockquote p::before { content: '— '; color: var(--mds-accent); }
+/* opening curly quote, not a dash: sidesteps the em/en-dash ambiguity entirely */
+blockquote p::before { content: '\201C'; color: var(--mds-accent); }
 
 hr { border: 0; border-top: 3px solid var(--mds-fg); width: 48px; margin: 3em 0; }
 

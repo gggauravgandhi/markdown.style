@@ -1,6 +1,6 @@
 # Quarterly Growth Report
 
-*Written by an LLM in seconds — styled by markdown.style.*
+*Written by an LLM in seconds, styled by markdown.style.*
 
 This is the markdown an AI assistant hands you: solid structure, zero design. The theme you are looking at is doing all of the visual work.
 

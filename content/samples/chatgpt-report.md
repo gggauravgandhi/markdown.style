@@ -4,7 +4,7 @@
 
 ## Executive summary
 
-The mid-price meal-kit segment consolidated around three players in 2025. Retention — not acquisition — now separates winners: the leaders keep 40%+ of cohorts past month six while the long tail churns out below 20%.
+The mid-price meal-kit segment consolidated around three players in 2025. Retention, not acquisition, now separates winners: the leaders keep 40%+ of cohorts past month six while the long tail churns out below 20%.
 
 ## The field
 
@@ -16,9 +16,9 @@ The mid-price meal-kit segment consolidated around three players in 2025. Retent
 
 ## What the leaders do differently
 
-1. **Menu breadth without SKU explosion** — 30+ weekly recipes from a 60-ingredient pool.
-2. **Skip-friendly billing** — pausing is one tap; both leaders report pauses convert back at 70%.
-3. **First-box economics** — deep discounts are gone; onboarding boxes are margin-neutral.
+1. **Menu breadth without SKU explosion**: 30+ weekly recipes from a 60-ingredient pool.
+2. **Skip-friendly billing**: pausing is one tap; both leaders report pauses convert back at 70%.
+3. **First-box economics**: deep discounts are gone; onboarding boxes are margin-neutral.
 
 ## Recommendation
 

@@ -1,5 +1,5 @@
 /* Base layer shared by all themes: reset, structure, knob defaults, print scaffolding.
-   Content is plain flowing blocks — no flex/grid wrappers (Paged.js v2 constraint). */
+   Content is plain flowing blocks (no flex/grid wrappers, Paged.js v2 constraint). */
 :root {
   --mds-accent: #0f62fe;
   --mds-font-scale: 1;

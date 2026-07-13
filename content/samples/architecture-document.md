@@ -1,4 +1,4 @@
-# Notification Fan-Out Service — Architecture Document
+# Notification Fan-Out Service: Architecture Document
 
 *Owner: Platform Infrastructure. Status: Approved.*
 
@@ -20,7 +20,7 @@ Three approaches were evaluated:
 | Shard by producer | Partial | Yes | Medium |
 | Shard by channel | Yes | Per-channel only | Medium |
 
-> Ordering only matters within a single channel — a user should not see an SMS delayed behind an unrelated email retry. Cross-channel ordering was never a real requirement; it was inherited by accident from the original single-queue design.
+> Ordering only matters within a single channel: a user should not see an SMS delayed behind an unrelated email retry. Cross-channel ordering was never a real requirement; it was inherited by accident from the original single-queue design.
 
 **Sharding by channel** was chosen. Each channel gets its own queue and worker pool, so a slow SMS provider no longer head-of-line blocks email or push.[^1]
 

@@ -41,7 +41,7 @@ describe('preview', () => {
     const preview = createPreview(makeIframe(), () => {})
     const iframe = document.querySelector('iframe')!
     // fire two renders without awaiting the first; the second must win.
-    // markers MUST be strings that cannot appear in theme CSS — 'Old' collides
+    // markers MUST be strings that cannot appear in theme CSS; 'Old' collides
     // with the paper theme's 'Iowan Old Style' font stack (verified failure).
     const p1 = preview.renderNow({ ...STATE, markdown: '# ZZZStale' })
     const p2 = preview.renderNow({ ...STATE, markdown: '# ZZZFresh' })

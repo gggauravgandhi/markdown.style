@@ -40,7 +40,7 @@ describe('render (integration)', () => {
     expect(html).toContain('katex')
     expect(html).toContain('shiki')
     expect(html).toContain('data:font/woff2;base64,') // math present → fonts inlined
-    // jsdom cannot render mermaid — it must degrade to a visible error block
+    // jsdom cannot render mermaid; it must degrade to a visible error block
     expect(html).toContain('mds-error')
     expect(errors.length).toBeGreaterThanOrEqual(1)
     expect(html).not.toContain('data-mds-slot')
@@ -51,7 +51,7 @@ describe('render (integration)', () => {
     expect(html).not.toMatch(/<script/i)
     expect(html).not.toMatch(/\son\w+=/i)
     expect(html).not.toContain('javascript:')
-    // no external url() refs in CSS — fonts/backgrounds must be data: or none
+    // no external url() refs in CSS: fonts/backgrounds must be data: or none
     const cssUrls = [...html.matchAll(/url\(\s*['"]?(?!data:)([^'")]+)/g)]
     expect(cssUrls).toEqual([])
   })
@@ -72,7 +72,7 @@ describe('render (integration)', () => {
     ].join('\n\n')
     const { html } = await render(hostile, 'paper')
     expect(html).not.toMatch(/<script/i)
-    // escaped text legitimately contains the substring "onerror" — only a
+    // escaped text legitimately contains the substring "onerror"; only a
     // handler inside a LIVE tag is a failure, so anchor the match to a real tag
     expect(html).not.toMatch(/<\w+[^>]*\son\w+=/i)
     expect(html).not.toContain('<iframe')
@@ -110,6 +110,6 @@ describe('renderBody', () => {
     expect(usedMath).toBe(false)
     expect(body).toContain('shiki') // fences highlighted
     expect(body).not.toContain('<!doctype') // not assembled
-    expect(body).not.toContain('<style') // no css — caller owns styling
+    expect(body).not.toContain('<style') // no css: caller owns styling
   })
 })

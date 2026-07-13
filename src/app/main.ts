@@ -8,7 +8,6 @@ import './app.css'
 import { editorTheme } from './editor-theme'
 import { copyHtml, downloadHtml, downloadMarkdown, printDocument } from './exports'
 import { isMarkdownFile, loadMarkdownFile } from './file-input'
-import { takeHandoff } from './handoff'
 import { createPreview } from './preview'
 import { SAMPLE_MARKDOWN, THUMB_MARKDOWN } from './sample'
 import { createStore, type AppState } from './store'
@@ -41,19 +40,13 @@ export async function mount(root: HTMLElement): Promise<void> {
   const initial: AppState = { markdown: SAMPLE_MARKDOWN, themeId: themes[0]!.id, knobs: {} }
   const store = createStore(initial)
 
-  // landing-page paste gateway: a pasted document waiting in the handoff key
-  // takes precedence over the restored autosave doc, but a missing handoff
-  // must never touch the saved document (spec §8)
-  const handoff = takeHandoff()
-  if (handoff !== null) store.set({ markdown: handoff })
-
   // --- menus ------------------------------------------------------------------
   // dismiss fns for every menu built by this mount; enforces "only one open at a
   // time" and lets the Escape handler below find whichever menu is open
   const menuHandles: Array<{ wrapper: HTMLDivElement; dismiss: (returnFocus: boolean) => void }> = []
 
   /** Vanilla menu: trigger + menu-list, both always in the DOM (display:none when closed).
-      Disclosure pattern (not role="menu"/"menuitem" — we don't implement arrow-key nav). */
+      Disclosure pattern (not role="menu"/"menuitem"; we don't implement arrow-key nav). */
   function buildMenu(
     triggerId: string,
     triggerLabel: string,

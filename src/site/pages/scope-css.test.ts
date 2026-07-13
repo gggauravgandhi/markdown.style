@@ -11,7 +11,7 @@ describe('scopedSampleCss', () => {
     expect(css).not.toMatch(/^\s*:root\b/m)
     expect(css).not.toMatch(/^\s*html,\s*body\b/m)
     expect(css).not.toMatch(/^\s*body\s*\{/m)
-    // @page cannot nest inside a style rule — must be stripped for embeds
+    // @page cannot nest inside a style rule; must be stripped for embeds
     expect(css).not.toContain('@page')
     // theme accent is applied for the embed (render() normally does this via knobs)
     expect(css).toContain(`--mds-accent: ${theme.defaultAccent}`)

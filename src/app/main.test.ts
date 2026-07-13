@@ -1,6 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { themes } from '../themes/registry'
-import { HANDOFF_KEY, putHandoff } from './handoff'
 import { mount } from './main'
 
 afterEach(() => vi.restoreAllMocks())
@@ -21,7 +20,7 @@ describe('editor app shell', () => {
   it('mounts toolbar controls, editor, and sandboxed preview', async () => {
     await mount(document.getElementById('app')!)
     const iframe = document.querySelector<HTMLIFrameElement>('.pane-preview iframe')!
-    expect(iframe.getAttribute('sandbox')).toBe('allow-same-origin') // security invariant — never add allow-scripts
+    expect(iframe.getAttribute('sandbox')).toBe('allow-same-origin') // security invariant: never add allow-scripts
     expect(iframe.title).toBe('Document preview')
     expect(document.querySelector('.cm-editor')).toBeTruthy()
     const buttons = [...document.querySelectorAll('button')].map(b => b.textContent?.trim())
@@ -119,7 +118,7 @@ describe('?theme= deep link', () => {
     history.replaceState(null, '', '/editor?theme=neon-vaporwave')
     await mount(document.getElementById('app')!)
     const accent = document.querySelector<HTMLInputElement>('[aria-label="Accent color"]')!
-    expect(accent.value).toBe('#0969da') // slate's defaultAccent — untouched
+    expect(accent.value).toBe('#0969da') // slate's defaultAccent, untouched
   })
 })
 
@@ -176,21 +175,6 @@ describe('file menu', () => {
   })
 })
 
-describe('landing-page handoff', () => {
-  it('opens the editor on handed-off content, taking precedence over the saved document', async () => {
-    localStorage.setItem('mds-state-v1', JSON.stringify({ markdown: '# Saved', themeId: 'paper', knobs: {} }))
-    putHandoff('# From landing')
-    await mount(document.getElementById('app')!)
-    expect(document.querySelector('.cm-content')!.textContent).toBe('# From landing')
-    expect(localStorage.getItem(HANDOFF_KEY)).toBeNull()
-  })
-
-  it('leaves the saved document untouched when no handoff is waiting', async () => {
-    localStorage.setItem('mds-state-v1', JSON.stringify({ markdown: '# Saved', themeId: 'paper', knobs: {} }))
-    await mount(document.getElementById('app')!)
-    expect(document.querySelector('.cm-content')!.textContent).toBe('# Saved')
-  })
-})
 
 describe('toolbar layout', () => {
   it('theme controls live in the top toolbar; no preview bar or fullscreen button', async () => {

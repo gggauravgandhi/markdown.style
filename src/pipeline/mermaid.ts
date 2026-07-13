@@ -12,7 +12,7 @@ type StageOutput = { html: string; ok: boolean }
 
 /**
  * Fill mermaid slots with inline SVG; any failure becomes a visible error block.
- * Security: output bypasses DOMPurify by design (see Interfaces note) —
+ * Security: output bypasses DOMPurify by design (see Interfaces note),
  * securityLevel 'strict' is the control; never weaken it.
  */
 export async function renderMermaidFences(
@@ -55,7 +55,7 @@ export async function renderMermaidFences(
     if (!result.ok) {
       errors.push({ source: 'mermaid', message: `diagram ${fence.index + 1} failed to render` })
     }
-    // mermaid.render can leave an error element behind in the live DOM — remove it.
+    // mermaid.render can leave an error element behind in the live DOM; remove it.
     // Guarded with typeof: a bare `document?.` still ReferenceErrors when undeclared.
     if (typeof document !== 'undefined') {
       document.getElementById(`dmds-mermaid-${fence.index}`)?.remove()

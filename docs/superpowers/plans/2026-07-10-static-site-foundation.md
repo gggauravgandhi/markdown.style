@@ -2,25 +2,25 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** A deployable public site: landing page with the research-backed positioning, `/privacy` + `/terms`, robots.txt/sitemap.xml/llms.txt, JSON-LD — every citable page as static HTML. (Plan 4b adds the programmatic theme/use-case/convert pages + their generator.)
+**Goal:** A deployable public site: landing page with the research-backed positioning, `/privacy` + `/terms`, robots.txt/sitemap.xml/llms.txt, JSON-LD, every citable page as static HTML. (Plan 4b adds the programmatic theme/use-case/convert pages + their generator.)
 
 **Architecture:** Hand-authored static HTML pages at repo root (`index.html`, `privacy.html`, `terms.html`) added as Vite MPA inputs beside `editor.html`; crawl files in `public/` (copied verbatim by Vite). One shared `src/site/site.css`. A node-environment test suite reads the HTML/crawl files from disk and enforces the SEO invariants mechanically (JSON-LD validity, no FAQPage schema, answer-first hero, robots directives, sitemap↔pages consistency).
 
 **Tech Stack:** static HTML + CSS. No new dependencies.
 
-**Spec:** `docs/superpowers/specs/2026-07-10-markdown-style-design.md` (section 6 — traffic architecture; DON'Ts list is binding)
+**Spec:** `docs/superpowers/specs/2026-07-10-markdown-style-design.md` (section 6, traffic architecture; DON'Ts list is binding)
 
 ## Global Constraints
 
-- Use `bun` for everything — never npm/npx/yarn/node.
-- **Every citable page is static HTML** — no marketing copy behind client-side rendering; the landing page loads NO JavaScript at all.
+- Use `bun` for everything, never npm/npx/yarn/node.
+- **Every citable page is static HTML**, no marketing copy behind client-side rendering; the landing page loads NO JavaScript at all.
 - **Positioning (research ruling):** hero = "Turn your ChatGPT or Claude output into a designed report." NEVER lead with "markdown to pdf" as the hero framing. "100% in your browser · no upload · free" appears as a trust line.
 - **Copy is answer-first:** each section opens with a direct 1–2 sentence answer; H2s use natural question phrasing.
-- **JSON-LD on the landing page:** `WebApplication` (applicationCategory `DeveloperApplication`, offers price "0") + `Organization` + `WebSite`. **NO** `aggregateRating`, NO `review`, NO `SearchAction`, and **NO FAQPage/HowTo schema anywhere** (prose Q&A headings only — research DON'T).
-- **robots.txt allows ALL crawlers** — explicit Allow entries for citation bots (OAI-SearchBot, ChatGPT-User, PerplexityBot, Claude-SearchBot, Claude-User) AND training bots (GPTBot, ClaudeBot) allowed — owner ruling 2026-07-10. Sitemap pointer included.
-- Canonical URLs use `https://markdown.style/...`; internal links use extensionless paths (`/editor`, `/privacy`) — production hosts resolve `.html` clean URLs; NEVER hash routing.
+- **JSON-LD on the landing page:** `WebApplication` (applicationCategory `DeveloperApplication`, offers price "0") + `Organization` + `WebSite`. **NO** `aggregateRating`, NO `review`, NO `SearchAction`, and **NO FAQPage/HowTo schema anywhere** (prose Q&A headings only, research DON'T).
+- **robots.txt allows ALL crawlers**, explicit Allow entries for citation bots (OAI-SearchBot, ChatGPT-User, PerplexityBot, Claude-SearchBot, Claude-User) AND training bots (GPTBot, ClaudeBot) allowed, owner ruling 2026-07-10. Sitemap pointer included.
+- Canonical URLs use `https://markdown.style/...`; internal links use extensionless paths (`/editor`, `/privacy`), production hosts resolve `.html` clean URLs; NEVER hash routing.
 - `sitemap.xml` lists exactly: `/`, `/editor`, `/privacy`, `/terms` (4a scope; 4b extends it).
-- OG meta (`og:title`, `og:description`, `og:url`, `og:type`) on every page; `og:image` + `twitter:card` on the LANDING page only (it's the share target; privacy/terms don't need cards). The 1200×630 OG image is a launch asset the OWNER supplies — reference `/og.png` in meta now and record the TODO in the ledger (do not fabricate a binary).
+- OG meta (`og:title`, `og:description`, `og:url`, `og:type`) on every page; `og:image` + `twitter:card` on the LANDING page only (it's the share target; privacy/terms don't need cards). The 1200×630 OG image is a launch asset the OWNER supplies, reference `/og.png` in meta now and record the TODO in the ledger (do not fabricate a binary).
 - No analytics, no external requests of any kind from marketing pages.
 - A11y basics: semantic landmarks (header/main/footer), one h1 per page, visible focus states.
 - TDD: the site-invariants test suite is written FIRST (failing), then pages are authored to satisfy it.
@@ -29,15 +29,15 @@
 ## File Structure
 
 ```
-index.html            # NEW — landing (static, zero JS)
+index.html            # NEW: landing (static, zero JS)
 privacy.html          # NEW
 terms.html            # NEW
-public/robots.txt     # NEW — copied verbatim into dist/
+public/robots.txt     # NEW: copied verbatim into dist/
 public/llms.txt       # NEW
 public/sitemap.xml    # NEW (static in 4a; 4b switches to generated)
-src/site/site.css     # NEW — shared marketing styling (referenced via /src/site/site.css, Vite-processed)
-src/site/site.test.ts # NEW — node-env suite enforcing SEO invariants from disk
-vite.config.ts        # MODIFY — add index/privacy/terms MPA inputs
+src/site/site.css     # NEW: shared marketing styling (referenced via /src/site/site.css, Vite-processed)
+src/site/site.test.ts # NEW: node-env suite enforcing SEO invariants from disk
+vite.config.ts        # MODIFY: add index/privacy/terms MPA inputs
 ```
 
 ---
@@ -75,7 +75,7 @@ describe('marketing pages', () => {
     expect(html).toMatch(/<meta property="og:title"/)
     expect(html).toMatch(/<meta name="description"/)
     // zero JS on citable pages (AI crawlers don't execute it; there is nothing to execute)
-    // NOTE: attribute-order-sensitive — JSON-LD scripts must be written exactly
+    // NOTE: attribute-order-sensitive, JSON-LD scripts must be written exactly
     // as `<script type="application/ld+json">` (type attribute first)
     expect(html).not.toMatch(/<script(?! type="application\/ld\+json")/)
     // no external requests: only same-origin or inline assets
@@ -163,16 +163,16 @@ describe('vite build inputs', () => {
 - [ ] **Step 2: Run to verify failures**
 
 Run: `bunx vitest run src/site/site.test.ts`
-Expected: FAIL — pages and crawl files missing.
+Expected: FAIL: pages and crawl files missing.
 
 - [ ] **Step 3: Create public/robots.txt**
 
 ```
-# markdown.style — all crawlers welcome (owner ruling 2026-07-10)
+# markdown.style: all crawlers welcome (owner ruling 2026-07-10)
 User-agent: *
 Allow: /
 
-# AI citation/search bots — explicitly welcome
+# AI citation/search bots: explicitly welcome
 User-agent: OAI-SearchBot
 Allow: /
 User-agent: ChatGPT-User
@@ -184,7 +184,7 @@ Allow: /
 User-agent: Claude-User
 Allow: /
 
-# AI training bots — allowed (training exposure may help LLM recommendation)
+# AI training bots: allowed (training exposure may help LLM recommendation)
 User-agent: GPTBot
 Allow: /
 User-agent: ClaudeBot
@@ -210,7 +210,7 @@ Sitemap: https://markdown.style/sitemap.xml
 ```
 # markdown.style
 
-> Free browser tool that turns LLM markdown output (ChatGPT, Claude, etc.) into a designed document: pick a theme, download self-contained styled HTML, or print to PDF. 100% client-side — documents never leave the browser.
+> Free browser tool that turns LLM markdown output (ChatGPT, Claude, etc.) into a designed document: pick a theme, download self-contained styled HTML, or print to PDF. 100% client-side, documents never leave the browser.
 
 ## Key pages
 
@@ -239,10 +239,10 @@ export default defineConfig({
 })
 ```
 
-- [ ] **Step 7: Run the suite — crawl-file tests green, page tests still red**
+- [ ] **Step 7: Run the suite, crawl-file tests green, page tests still red**
 
 Run: `bunx vitest run src/site/site.test.ts`
-Expected: crawl-file + vite-inputs tests PASS; marketing-page tests FAIL (pages don't exist yet — Tasks 2–3).
+Expected: crawl-file + vite-inputs tests PASS; marketing-page tests FAIL (pages don't exist yet, Tasks 2–3).
 
 - [ ] **Step 8: Commit**
 
@@ -265,7 +265,7 @@ git commit -m "feat: SEO invariant suite, robots/sitemap/llms crawl files"
 - [ ] **Step 1: Create src/site/site.css**
 
 ```css
-/* Marketing pages only — the editor app and rendered documents never load this. */
+/* Marketing pages only, the editor app and rendered documents never load this. */
 :root {
   --site-bg: #ffffff;
   --site-fg: #17181c;
@@ -334,7 +334,7 @@ section h2 { font-size: 1.5em; letter-spacing: -0.01em; color: var(--site-ink); 
 }
 ```
 
-- [ ] **Step 2: Create index.html (full copy — answer-first, question H2s, JSON-LD)**
+- [ ] **Step 2: Create index.html (full copy, answer-first, question H2s, JSON-LD)**
 
 ```html
 <!doctype html>
@@ -342,8 +342,8 @@ section h2 { font-size: 1.5em; letter-spacing: -0.01em; color: var(--site-ink); 
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Turn ChatGPT or Claude output into a designed report — markdown.style</title>
-<meta name="description" content="Paste the markdown an AI gave you, pick a theme, and download a styled HTML document or save it as a PDF. Free, no upload — everything happens in your browser.">
+<title>Turn ChatGPT or Claude output into a designed report, markdown.style</title>
+<meta name="description" content="Paste the markdown an AI gave you, pick a theme, and download a styled HTML document or save it as a PDF. Free, no upload, everything happens in your browser.">
 <link rel="canonical" href="https://markdown.style/">
 <meta property="og:title" content="Turn ChatGPT or Claude output into a designed report">
 <meta property="og:description" content="Paste AI markdown, pick a theme, get a styled document or PDF. Free, private, in your browser.">
@@ -395,7 +395,7 @@ section h2 { font-size: 1.5em; letter-spacing: -0.01em; color: var(--site-ink); 
   <div class="wrap">
     <section class="hero" aria-label="Introduction" style="border-top:0">
       <h1>Turn your ChatGPT or Claude output into a designed report</h1>
-      <p class="lede">AI writes great markdown — and then it dies in a plain white PDF. Paste that markdown here, pick a theme, and download a styled document instead. No prompt tokens wasted asking the model for HTML.</p>
+      <p class="lede">AI writes great markdown, and then it dies in a plain white PDF. Paste that markdown here, pick a theme, and download a styled document instead. No prompt tokens wasted asking the model for HTML.</p>
       <div class="cta-row">
         <a class="btn-cta" href="/editor">Style my markdown</a>
         <a class="btn-ghost" href="#themes">See the themes</a>
@@ -405,22 +405,22 @@ section h2 { font-size: 1.5em; letter-spacing: -0.01em; color: var(--site-ink); 
 
     <section id="how" aria-label="How it works">
       <h2>How do I turn an AI answer into a PDF?</h2>
-      <p class="answer">Paste the markdown into the editor, pick one of eight themes, and hit Print — your browser's "Save as PDF" does the rest. Or download it as a single styled HTML file that looks identical anywhere.</p>
+      <p class="answer">Paste the markdown into the editor, pick one of eight themes, and hit Print, your browser's "Save as PDF" does the rest. Or download it as a single styled HTML file that looks identical anywhere.</p>
       <ol class="steps">
-        <li><strong>Paste or drop</strong> the markdown ChatGPT, Claude, or any LLM gave you. The live preview styles it instantly — tables, code, math, and diagrams included.</li>
+        <li><strong>Paste or drop</strong> the markdown ChatGPT, Claude, or any LLM gave you. The live preview styles it instantly, tables, code, math, and diagrams included.</li>
         <li><strong>Pick a theme</strong> and tune the accent color, font size, and page width. The structure never changes; only the design does.</li>
-        <li><strong>Export</strong> — Download HTML for a self-contained file, or Print for a clean, page-break-aware PDF.</li>
+        <li><strong>Export</strong>, Download HTML for a self-contained file, or Print for a clean, page-break-aware PDF.</li>
       </ol>
     </section>
 
     <section aria-label="Why markdown converts badly">
       <h2>Why does markdown look so plain as a PDF?</h2>
-      <p class="answer">Most converters apply no design at all: default fonts, blue links, tables that overflow, code blocks split across pages. markdown.style applies a real theme — typography, tables, syntax-highlighted code, KaTeX math, Mermaid diagrams — and print styles that keep tables and code intact across page breaks.</p>
+      <p class="answer">Most converters apply no design at all: default fonts, blue links, tables that overflow, code blocks split across pages. markdown.style applies a real theme, typography, tables, syntax-highlighted code, KaTeX math, Mermaid diagrams, and print styles that keep tables and code intact across page breaks.</p>
     </section>
 
     <section id="themes" aria-label="Themes">
       <h2>What do the themes look like?</h2>
-      <p class="answer">Eight designed looks, from a warm book-serif to dark technical to bold poster. Every theme styles the whole document — headings, tables, code, quotes, footnotes — and every theme prints cleanly.</p>
+      <p class="answer">Eight designed looks, from a warm book-serif to dark technical to bold poster. Every theme styles the whole document, headings, tables, code, quotes, footnotes, and every theme prints cleanly.</p>
       <ul class="theme-strip">
         <li><strong><span class="swatch" style="background:#8b3a2f"></span>Paper</strong><span class="desc">Warm, book-like serif</span></li>
         <li><strong><span class="swatch" style="background:#0969da"></span>Slate</strong><span class="desc">Modern product-doc sans</span></li>
@@ -435,12 +435,12 @@ section h2 { font-size: 1.5em; letter-spacing: -0.01em; color: var(--site-ink); 
 
     <section aria-label="Privacy">
       <h2>Is my document uploaded anywhere?</h2>
-      <p class="answer">No. The entire pipeline — parsing, theming, exporting — runs in your browser. Nothing you paste ever reaches a server, and there's no account, tracking, or analytics. <a href="/privacy">Read the two-minute privacy page</a>.</p>
+      <p class="answer">No. The entire pipeline, parsing, theming, exporting, runs in your browser. Nothing you paste ever reaches a server, and there's no account, tracking, or analytics. <a href="/privacy">Read the two-minute privacy page</a>.</p>
     </section>
 
     <section aria-label="Feature support">
       <h2>Does it handle tables, code, math, and diagrams?</h2>
-      <p class="answer">Yes — GitHub-flavored markdown tables and task lists, syntax-highlighted code in any common language, KaTeX math, and Mermaid diagrams all render and export. Exactly the things LLM answers are full of.</p>
+      <p class="answer">Yes, GitHub-flavored markdown tables and task lists, syntax-highlighted code in any common language, KaTeX math, and Mermaid diagrams all render and export. Exactly the things LLM answers are full of.</p>
       <p><a class="btn-cta" href="/editor">Try it with your last AI answer</a></p>
     </section>
   </div>
@@ -489,10 +489,10 @@ git commit -m "feat: landing page with answer-first copy and schema rulings"
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Privacy — markdown.style</title>
+<title>Privacy, markdown.style</title>
 <meta name="description" content="markdown.style runs entirely in your browser. Your documents are never uploaded, and there is no tracking, no analytics, and no account.">
 <link rel="canonical" href="https://markdown.style/privacy">
-<meta property="og:title" content="Privacy — markdown.style">
+<meta property="og:title" content="Privacy, markdown.style">
 <meta property="og:description" content="Everything runs in your browser. No uploads, no tracking, no accounts.">
 <meta property="og:url" content="https://markdown.style/privacy">
 <meta property="og:type" content="website">
@@ -513,7 +513,7 @@ git commit -m "feat: landing page with answer-first copy and schema rulings"
     </section>
 
     <h2>What happens to my documents?</h2>
-    <p>Everything — parsing, theming, exporting, printing — runs locally in your browser. The markdown you paste or open is never transmitted to a server. There is no server-side processing at all.</p>
+    <p>Everything, parsing, theming, exporting, printing, runs locally in your browser. The markdown you paste or open is never transmitted to a server. There is no server-side processing at all.</p>
 
     <h2>What is stored on my device?</h2>
     <p>The editor autosaves your current document, chosen theme, and settings to your browser's localStorage so they survive a refresh. That data stays on your device; clear your browser storage for this site to remove it.</p>
@@ -522,10 +522,10 @@ git commit -m "feat: landing page with answer-first copy and schema rulings"
     <p>No cookies, no analytics, no fingerprinting, no third-party requests. The pages you're reading load only their own files.</p>
 
     <h2>What about images referenced in my markdown?</h2>
-    <p>If your markdown references an image by URL, your browser fetches that image directly from wherever it's hosted when previewing or opening the exported file — the same as any web page. That request goes from your device to that host, not through us.</p>
+    <p>If your markdown references an image by URL, your browser fetches that image directly from wherever it's hosted when previewing or opening the exported file, the same as any web page. That request goes from your device to that host, not through us.</p>
 
     <h2>Questions?</h2>
-    <p>This page is the whole policy — there is no hidden data flow to explain. If something seems unclear, the safest summary stands: nothing you write here reaches us.</p>
+    <p>This page is the whole policy, there is no hidden data flow to explain. If something seems unclear, the safest summary stands: nothing you write here reaches us.</p>
   </div>
 </main>
 <footer class="site-footer">
@@ -548,10 +548,10 @@ git commit -m "feat: landing page with answer-first copy and schema rulings"
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Terms of Use — markdown.style</title>
+<title>Terms of Use, markdown.style</title>
 <meta name="description" content="Plain-language terms for markdown.style: a free, as-is browser tool. Your content stays yours and stays on your device.">
 <link rel="canonical" href="https://markdown.style/terms">
-<meta property="og:title" content="Terms of Use — markdown.style">
+<meta property="og:title" content="Terms of Use, markdown.style">
 <meta property="og:description" content="Free, as-is, your content stays yours.">
 <meta property="og:url" content="https://markdown.style/terms">
 <meta property="og:type" content="website">
@@ -581,7 +581,7 @@ git commit -m "feat: landing page with answer-first copy and schema rulings"
     <p>Use the tool for anything lawful. The documents you create are your responsibility, including any content you paste into them.</p>
 
     <h2>Liability</h2>
-    <p>To the maximum extent permitted by law, we're not liable for damages arising from use of the tool — including lost documents. The editor autosaves to your browser, but keep copies of anything important.</p>
+    <p>To the maximum extent permitted by law, we're not liable for damages arising from use of the tool, including lost documents. The editor autosaves to your browser, but keep copies of anything important.</p>
 
     <h2>Changes</h2>
     <p>If these terms change, the updated version will be posted at this address with an updated date. Continued use means acceptance.</p>
@@ -620,8 +620,8 @@ git commit -m "feat: privacy and terms pages"
 
 ## Self-Review Notes
 
-- The landing page contains zero runtime JS by design (the only `<script>` is JSON-LD, and the test's negative-lookahead regex allows exactly that) — the strongest possible answer to "AI crawlers don't execute JavaScript."
-- `og:image` points at `/og.png`, which does not exist yet — deliberately: fabricating a binary asset is worse than an honest TODO. **Ledger item: owner supplies a 1200×630 `public/og.png` before launch.**
-- The editor deep-link with a theme pre-applied (`/editor?theme=slate`) is NOT used on the landing page because the editor doesn't parse a `theme` query param yet — that lands in Plan 4b alongside the theme gallery pages that need it.
-- `index.html`'s theme strip hardcodes the 8 names/accents (duplicating registry data) — acceptable for a static zero-JS page; Plan 4b's generator replaces this section's maintenance story.
+- The landing page contains zero runtime JS by design (the only `<script>` is JSON-LD, and the test's negative-lookahead regex allows exactly that), the strongest possible answer to "AI crawlers don't execute JavaScript."
+- `og:image` points at `/og.png`, which does not exist yet, deliberately: fabricating a binary asset is worse than an honest TODO. **Ledger item: owner supplies a 1200×630 `public/og.png` before launch.**
+- The editor deep-link with a theme pre-applied (`/editor?theme=slate`) is NOT used on the landing page because the editor doesn't parse a `theme` query param yet, that lands in Plan 4b alongside the theme gallery pages that need it.
+- `index.html`'s theme strip hardcodes the 8 names/accents (duplicating registry data), acceptable for a static zero-JS page; Plan 4b's generator replaces this section's maintenance story.
 - Dev-server nuance: extensionless links (`/editor`) 404 on `vite dev` (they resolve on production hosts like Cloudflare Pages). QA on the dev server should navigate to `/editor.html` directly; the plan keeps production-correct hrefs per the spec's path-routing rule.

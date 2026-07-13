@@ -4,7 +4,7 @@ import { escapeHtml, pageShell, SITE_ORIGIN } from './shell'
 
 describe('pageShell', () => {
   const html = pageShell({
-    title: 'Test page — markdown.style',
+    title: 'Test page: markdown.style',
     description: 'A test description that is long enough to look like real page copy for the assertions.',
     path: '/themes/paper',
     main: '<h1>Heading</h1><p>Body</p>',

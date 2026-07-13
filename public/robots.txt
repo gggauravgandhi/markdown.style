@@ -1,8 +1,8 @@
-# markdown.style — all crawlers welcome (owner ruling 2026-07-10)
+# markdown.style: all crawlers welcome (owner ruling 2026-07-10)
 User-agent: *
 Allow: /
 
-# AI citation/search bots — explicitly welcome
+# AI citation/search bots: explicitly welcome
 User-agent: OAI-SearchBot
 Allow: /
 User-agent: ChatGPT-User
@@ -14,7 +14,7 @@ Allow: /
 User-agent: Claude-User
 Allow: /
 
-# AI training bots — allowed (training exposure may help LLM recommendation)
+# AI training bots: allowed (training exposure may help LLM recommendation)
 User-agent: GPTBot
 Allow: /
 User-agent: ClaudeBot

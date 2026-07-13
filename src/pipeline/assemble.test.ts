@@ -43,7 +43,7 @@ describe('assembleDocument', () => {
 
   // NOTE: baseCss (inlined in every document) legitimately declares default
   // --mds-* variables, so assert on the knob OVERRIDE block (`:root { --mds-…`,
-  // single-line format unique to knobsToCss) — never on bare variable names.
+  // single-line format unique to knobsToCss); never on bare variable names.
   it('drops CSS-injection attempts in accent', () => {
     const html = assembleDocument({ ...base, knobs: { accent: 'red;}body{background:url(javascript:alert(1))' } })
     expect(html).not.toContain('javascript:alert')

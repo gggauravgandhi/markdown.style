@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AI Markdown to PDF &amp; Styled Documents — markdown.style</title>
+<title>AI Markdown to PDF &amp; Styled Documents | markdown.style</title>
 <meta name="description" content="Paste Markdown from ChatGPT, Claude, Gemini, or any AI assistant. Choose a document style and download a polished PDF. Free, local, and no signup.">
 <link rel="canonical" href="https://markdown.style/">
 <meta property="og:title" content="Turn AI-generated Markdown into a polished document">
@@ -14,18 +14,9 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="/src/site/site.css">
 <style>
-/* Homepage-only rules: gateway, compare-grid, and FAQ markup exist only on
-   this page, so they live here instead of site.css (which shell.ts inlines
-   into every generated page — those rules would be dead weight there). */
-.gateway-label { display: block; font-size: 0.85em; font-weight: 600; color: var(--site-muted); margin-bottom: 6px; }
-.gateway { border: 1px solid var(--site-rule); border-radius: 10px; padding: 20px; margin: 24px 0; }
-.gateway textarea { width: 100%; min-height: 160px; resize: vertical; border: 1px solid var(--site-rule); border-radius: 6px; padding: 12px; font: inherit; color: inherit; background: transparent; }
-.gateway .cta-row { margin-top: 12px; }
-.gateway #md-error { min-height: 1.2em; margin: 12px 0 0; font-size: 0.9em; color: var(--site-muted); }
-/* drag-over and error states are conveyed via #md-error's text (set in home.ts), not color alone */
-.gateway[data-dragover="true"] { border-style: dashed; background: var(--site-accent-soft); }
-.gateway[data-error="true"] #md-error { font-weight: 600; }
-.gateway[data-error="true"] #md-error::before { content: '⚠ '; }
+/* Homepage-only rules (compare-grid, faq): this markup exists only on this
+   page, so it lives here instead of site.css, which shell.ts inlines into
+   every generated page where these rules would be dead weight. */
 .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 20px; }
 .compare-grid .compare-after { padding: 16px 20px; }
 .compare-grid table { border-collapse: collapse; width: 100%; font-size: 0.9em; }
@@ -34,16 +25,6 @@
 .faq details { border-top: 1px solid var(--site-rule); padding: 14px 0; }
 .faq summary { cursor: pointer; font-weight: 600; }
 </style>
-<!--
-  USER-AUTHORIZED DEVIATION (2026-07): this page loads one module script, the
-  homepage paste-gateway (src/site/home.ts). It is progressive enhancement
-  only — every word of marketing copy below is static HTML a crawler reads
-  without executing anything; the script just wires up the textarea/drop-zone
-  buttons that were already visible and usable as plain HTML. Generated pages
-  and privacy/terms stay 100% script-free, so the AEO "nothing to execute"
-  guarantee holds everywhere except this one enhanced entry point.
--->
-<script type="module" src="/src/site/home.ts"></script>
 <script type="application/ld+json">
 [
   {
@@ -88,20 +69,12 @@
   <div class="wrap">
     <section class="hero" aria-label="Introduction" style="border-top:0">
       <h1>Turn AI-generated Markdown into a polished document.</h1>
-      <p class="lede">Paste output from ChatGPT, Claude, Gemini, Copilot, or any AI assistant. Choose a document style and download a polished PDF — without asking the AI to regenerate your content.</p>
+      <p class="lede">Paste output from ChatGPT, Claude, Gemini, Copilot, or any AI assistant. Choose a document style and download a polished PDF, without asking the AI to regenerate your content.</p>
       <p class="lede">Generate the content once. Style and export it as many times as you need, with no additional AI tokens.</p>
 
-      <div class="gateway" id="md-drop">
-        <label for="md-input" class="gateway-label">Your Markdown</label>
-        <textarea id="md-input" class="gateway-input" rows="7" aria-describedby="md-error" placeholder="Paste your Markdown here…"></textarea>
-        <input type="file" id="md-file" accept=".md,.markdown,.txt" hidden>
-        <div class="cta-row">
-          <button type="button" id="md-go" class="btn-cta" disabled>Style this Markdown</button>
-          <button type="button" id="md-open" class="btn-ghost">Open a file</button>
-          <button type="button" id="md-example" class="btn-ghost">Try an example</button>
-        </div>
-        <p class="trust">Drop a Markdown file anywhere in this box, or open one from your device.</p>
-        <p id="md-error" role="status" aria-live="polite"></p>
+      <div class="cta-row">
+        <a class="btn-cta" href="/editor">Open the editor</a>
+        <a class="btn-ghost" href="#examples">See examples</a>
       </div>
 
       <p class="trust">Free · No signup · No limits · Everything stays on your device</p>
@@ -145,16 +118,16 @@ quarter after the March launch.
       <p class="answer">Technical specifications, PRDs, research papers, and business reports should not all look the same.</p>
       <ul class="theme-grid">
         <li><a class="theme-card-link" href="/use-cases/architecture-document">
-          <span class="theme-card-meta"><strong>Architecture document</strong><span class="desc">Decision tables, config blocks, and footnotes for the tradeoffs — styled in Blueprint.</span></span>
+          <span class="theme-card-meta"><strong>Architecture document</strong><span class="desc">Decision tables, config blocks, and footnotes for the tradeoffs, styled in Blueprint.</span></span>
         </a></li>
         <li><a class="theme-card-link" href="/use-cases/product-requirements">
-          <span class="theme-card-meta"><strong>Product requirements</strong><span class="desc">A requirements table, user stories, and acceptance-criteria checkboxes — styled in Briefing.</span></span>
+          <span class="theme-card-meta"><strong>Product requirements</strong><span class="desc">A requirements table, user stories, and acceptance-criteria checkboxes, styled in Briefing.</span></span>
         </a></li>
         <li><a class="theme-card-link" href="/use-cases/research-paper">
-          <span class="theme-card-meta"><strong>Research paper</strong><span class="desc">An abstract, a data table, and footnotes that read like citations — styled in Scholar.</span></span>
+          <span class="theme-card-meta"><strong>Research paper</strong><span class="desc">An abstract, a data table, and footnotes that read like citations, styled in Scholar.</span></span>
         </a></li>
         <li><a class="theme-card-link" href="/use-cases/business-report">
-          <span class="theme-card-meta"><strong>Business report</strong><span class="desc">A metrics table, findings, and footnoted recommendations — styled in Boardroom.</span></span>
+          <span class="theme-card-meta"><strong>Business report</strong><span class="desc">A metrics table, findings, and footnoted recommendations, styled in Boardroom.</span></span>
         </a></li>
       </ul>
     </section>
@@ -238,7 +211,7 @@ quarter after the March launch.
         </details>
         <details>
           <summary>Can I turn Claude or Gemini output into a styled PDF?</summary>
-          <p class="answer">Yes — the paste gateway and editor work with Markdown from any AI assistant, not just one brand.</p>
+          <p class="answer">Yes. The editor works with Markdown from any AI assistant, not just one brand.</p>
         </details>
         <details>
           <summary>Does markdown.style upload my document?</summary>
@@ -246,11 +219,11 @@ quarter after the March launch.
         </details>
         <details>
           <summary>Does it support tables, code, Mermaid diagrams, and math?</summary>
-          <p class="answer">Yes — GitHub-flavored tables and task lists, syntax-highlighted code, Mermaid diagrams, and KaTeX math all render live and carry through to export.</p>
+          <p class="answer">Yes, GitHub-flavored tables and task lists, syntax-highlighted code, Mermaid diagrams, and KaTeX math all render live and carry through to export.</p>
         </details>
         <details>
           <summary>Can I export Markdown as HTML?</summary>
-          <p class="answer">Yes — download a self-contained HTML file, or copy the rendered HTML directly.</p>
+          <p class="answer">Yes, download a self-contained HTML file, or copy the rendered HTML directly.</p>
         </details>
         <details>
           <summary>Do I need an account?</summary>

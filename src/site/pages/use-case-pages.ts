@@ -19,7 +19,7 @@ export function buildUseCasePage(copy: UseCaseCopy, sampleMarkdown: string, samp
 
 <section aria-label="Worked example">
   <h2>What goes in, what comes out</h2>
-  <p class="answer">The markdown below is the raw input. Under it: the same document rendered in the ${escapeHtml(theme.name)} theme — embedded here exactly as the editor would export it.</p>
+  <p class="answer">The markdown below is the raw input. Under it: the same document rendered in the ${escapeHtml(theme.name)} theme, embedded here exactly as the editor would export it.</p>
   <details class="md-source">
     <summary>See the markdown source</summary>
     <pre>${escapeHtml(sampleMarkdown)}</pre>
@@ -29,7 +29,7 @@ export function buildUseCasePage(copy: UseCaseCopy, sampleMarkdown: string, samp
 ${sampleBody}
   </div></div>
   </figure>
-  <p><a href="/samples/${copy.slug}.html">Open the exported file</a> — one self-contained HTML document, no external requests.</p>
+  <p><a href="/samples/${copy.slug}.html">Open the exported file</a>: one self-contained HTML document, no external requests.</p>
 </section>
 
 ${sections}

@@ -36,7 +36,7 @@ export async function copyHtml(html: string): Promise<boolean> {
 }
 
 /**
- * Print via a fresh tab — never the preview iframe (spec §2: cross-browser
+ * Print via a fresh tab, never the preview iframe (spec §2: cross-browser
  * iframe-print quirks). Waits for fonts (KaTeX) before invoking the dialog.
  * Returns false when the popup was blocked so the caller can show a notice.
  */

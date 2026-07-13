@@ -1,4 +1,4 @@
-/* App chrome only — document styling lives in src/themes (never here). */
+/* App chrome only: document styling lives in src/themes (never here). */
 :root {
   --app-bg: #101014;
   --app-surface: #1a1a21;

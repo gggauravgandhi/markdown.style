@@ -29,9 +29,9 @@ await q.drain()
 
 ## API
 
-- `queue(opts)` — create a queue. `concurrency` (default 1), `retries` (default 0).
-- `q.push(fn)` — enqueue a task returning a promise.
-- `q.drain()` — resolves when the queue is empty.
+- `queue(opts)`: create a queue. `concurrency` (default 1), `retries` (default 0).
+- `q.push(fn)`: enqueue a task returning a promise.
+- `q.drain()`: resolves when the queue is empty.
 
 ## License
 

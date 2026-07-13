@@ -30,7 +30,7 @@ export interface Theme {
   name: string
   description: string
   category: Category        // NEW
-  featured?: true           // NEW — exactly one per category
+  featured?: true           // NEW, exactly one per category
   defaultAccent: string
   shikiTheme: string
   mermaidTheme: MermaidTheme
@@ -40,7 +40,7 @@ export interface Theme {
 
 - Registry stays one flat ordered array; `paper` stays first (pinned by test). New themes append after the existing eight, grouped by category in source order.
 - Category grouping is always derived (`themes.filter(t => t.category === c)`); no per-category arrays.
-- Every theme is a standalone `src/themes/<id>.css` with a static `?raw` import. **Static imports only** — the page generator runs under plain bun, where Vite-only mechanisms (`import.meta.glob`) do not exist.
+- Every theme is a standalone `src/themes/<id>.css` with a static `?raw` import. **Static imports only**, the page generator runs under plain bun, where Vite-only mechanisms (`import.meta.glob`) do not exist.
 - Existing themes' categories: slate, carbon → technical; scholar → academic; paper, editorial → editorial; swiss, contrast → minimal; pop → bold.
 - Featured six: **boardroom** (business), **slate** (technical), **scholar** (academic), **paper** (editorial), **swiss** (minimal), **pop** (bold).
 

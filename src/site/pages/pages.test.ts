@@ -27,7 +27,7 @@ async function buildAll(): Promise<Map<string, string>> {
     specimenBodies.set(t.id, (await renderBody(specimen, t.id)).body)
   }
   pages.set('/themes', buildThemesHub(sampleBodies))
-  for (const c of themeCopy) pages.set(`/themes/${c.id}`, buildThemePage(c, sampleBodies.get(c.id)!, specimenBodies.get(c.id)!))
+  for (const c of themeCopy) pages.set(`/themes/${c.id}`, await buildThemePage(c, sampleBodies.get(c.id)!, specimenBodies.get(c.id)!, specimen))
   for (const u of useCases) {
     const md = readFileSync(join(samplesDir, `${u.slug}.md`), 'utf8')
     const { body } = await renderBody(md, u.themeId)
@@ -48,7 +48,7 @@ describe('generated page invariants', () => {
       expect(html, route).toContain(`<link rel="canonical" href="https://markdown.style${route}">`)
       expect(html, route).not.toContain('<script') // zero JS on citable pages
       // self-contained: nothing may be FETCHED from another origin (sample
-      // documents legitimately contain plain <a href> demo links — no request)
+      // documents legitimately contain plain <a href> demo links, no request)
       expect(html, route).not.toMatch(/src="https?:\/\/(?!markdown\.style[/"])/)
       expect(html, route).not.toMatch(/<link [^>]*href="https?:\/\/(?!markdown\.style[/"])/)
       expect(html, route).not.toMatch(/href="\/[a-z-]+\.html"/) // internal links extensionless
@@ -105,11 +105,21 @@ describe('generated page invariants', () => {
       expect(html, t.id).toContain('type="checkbox"')
       expect(html, t.id).toContain('specimen-fn')
       // byte strings unique to specimen.md (absent from showcase.md, the other
-      // embed on this page) — catches the specimen body being dropped or
+      // embed on this page); catches the specimen body being dropped or
       // swapped for the sample, which the assertions above cannot
       expect(html, t.id).toContain('A quoted aside, set apart from the body copy.')
       expect(html, t.id).toContain('GFM pipe syntax')
       expect(html, t.id).toContain('The citation backing that claim.')
+    }
+  })
+
+  it('theme pages show the specimen markdown source and a math example', async () => {
+    const pages = await pagesPromise
+    for (const t of themes) {
+      const html = pages.get(`/themes/${t.id}`)!
+      expect(html, t.id).toContain('<details class="md-source">') // escaped source, zero-JS disclosure
+      expect(html, t.id).toContain('| Component | Kind') // raw specimen markdown, escaped
+      expect(html, t.id).toContain('class="katex"') // math specimen rendered
     }
   })
 

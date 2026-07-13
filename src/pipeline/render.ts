@@ -6,7 +6,7 @@ import { renderMermaidFences } from './mermaid'
 import { sanitizeBody } from './sanitize'
 import type { Knobs, RenderError, RenderResult } from './types'
 
-/** The processed document body before assembly — used by the static-page generator. */
+/** The processed document body before assembly, used by the static-page generator. */
 export async function renderBody(
   markdown: string,
   themeId: string,

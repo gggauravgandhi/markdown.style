@@ -16,7 +16,7 @@
 - Static `?raw` CSS imports only in the registry. No `import.meta.glob`.
 - Theme CSS contract (spec §4): define `--mds-bg`, `--mds-fg`, `--mds-font-body`, `--mds-font-heading` in `:root`; include an `@media print` block; style headings, links, blockquotes, hr, inline code, `pre`/`pre.shiki`, tables, list markers, `.footnotes`; no flex/grid on `.mds-content`; decorative `::before/::after` content uses alt-text syntax `content: '…' / ''`; system/web-safe font stacks only; dark themes must print light (follow carbon's `@media print` token-flip pattern).
 - `defaultAccent` must match `/^#[0-9a-fA-F]{6}$/` (existing contract test).
-- No em dashes in registry `description` strings or any new UI string. New `themeCopy` entries follow the existing house title pattern (`Name theme — tagline — markdown.style`), which is marketing copy, not UI chrome.
+- No em dashes in registry `description` strings or any new UI string. New `themeCopy` entries follow the existing house title pattern (`Name theme, tagline, markdown.style`), which is marketing copy, not UI chrome.
 - `themeCopy.pairWith` may only reference theme ids already registered at that task's state (the builder crashes on unknown ids).
 - Every task ends with `bun run test` fully green + `bunx tsc --noEmit` clean + a commit.
 - Categories: `business | technical | academic | editorial | minimal | bold`; labels exactly "Business & Reports", "Technical & Docs", "Academic & Research", "Editorial & Longform", "Minimal & Clean", "Bold & Creative".
@@ -25,14 +25,14 @@
 
 ## File Structure
 
-- `src/themes/registry.ts` — types, labels, all 30 entries (flat array, paper first).
-- `src/themes/<id>.css` ×22 new — one standalone stylesheet per new theme.
-- `src/themes/registry.test.ts` — lineup, category, featured, description-hygiene tests.
-- `src/app/main.ts` + `src/app/app.css` + `src/app/main.test.ts` — sectioned lazy picker.
-- `src/site/pages/copy.ts` — `themeCopy` grows to 30 (category batches append).
-- `src/site/pages/theme-pages.ts` — hub category sections; theme-page category link; count-safe strings.
-- `src/site/pages/pages.test.ts` — hub/sitemap assertions evolve (cap ≤50, derived counts).
-- `index.html` + `src/site/site.test.ts` — featured-six strip + browse-all link.
+- `src/themes/registry.ts`, types, labels, all 30 entries (flat array, paper first).
+- `src/themes/<id>.css` ×22 new, one standalone stylesheet per new theme.
+- `src/themes/registry.test.ts`, lineup, category, featured, description-hygiene tests.
+- `src/app/main.ts` + `src/app/app.css` + `src/app/main.test.ts`, sectioned lazy picker.
+- `src/site/pages/copy.ts`, `themeCopy` grows to 30 (category batches append).
+- `src/site/pages/theme-pages.ts`, hub category sections; theme-page category link; count-safe strings.
+- `src/site/pages/pages.test.ts`, hub/sitemap assertions evolve (cap ≤50, derived counts).
+- `index.html` + `src/site/site.test.ts`, featured-six strip + browse-all link.
 
 ---
 
@@ -72,7 +72,7 @@ describe('categories', () => {
   })
 
   it('descriptions carry no em dashes (UI copy rule)', () => {
-    for (const t of themes) expect(t.description, t.id).not.toContain('—')
+    for (const t of themes) expect(t.description, t.id).not.toContain('\u2014')
   })
 })
 ```
@@ -80,7 +80,7 @@ describe('categories', () => {
 - [ ] **Step 2: Run tests to verify they fail**
 
 Run: `bun run test src/themes/registry.test.ts`
-Expected: FAIL — `CATEGORY_LABELS` has no export; `category` undefined; descriptions contain em dashes.
+Expected: FAIL: `CATEGORY_LABELS` has no export; `category` undefined; descriptions contain em dashes.
 
 - [ ] **Step 3: Implement the model**
 
@@ -107,7 +107,7 @@ Add to `interface Theme` after `description: string`:
   featured?: true
 ```
 
-Update the existing eight entries per this table (add `category:` after `description:`; add `featured: true,` where marked; rewrite `description` replacing the ` — ` separator with `: ` so no em dash remains — keep every other word identical):
+Update the existing eight entries per this table (add `category:` after `description:`; add `featured: true,` where marked; rewrite `description` replacing the `, ` separator with `: ` so no em dash remains, keep every other word identical):
 
 | id | category | featured |
 |---|---|---|
@@ -123,7 +123,7 @@ Update the existing eight entries per this table (add `category:` after `descrip
 - [ ] **Step 4: Run the full suite**
 
 Run: `bun run test && bunx tsc --noEmit`
-Expected: all green. Note: `src/site/site.test.ts` strip-sync iterates all themes against `index.html`, which still lists all eight — descriptions in `index.html` are NOT asserted, only swatch+link+name, so the description rewrite cannot break it.
+Expected: all green. Note: `src/site/site.test.ts` strip-sync iterates all themes against `index.html`, which still lists all eight, descriptions in `index.html` are NOT asserted, only swatch+link+name, so the description rewrite cannot break it.
 
 - [ ] **Step 5: Commit**
 
@@ -162,7 +162,7 @@ In `src/site/site.test.ts`, replace the `theme strip mirrors the registry exactl
 - [ ] **Step 2: Run it to verify it fails**
 
 Run: `bun run test src/site/site.test.ts`
-Expected: FAIL — strip has 8 swatches and no browse-all line.
+Expected: FAIL: strip has 8 swatches and no browse-all line.
 
 - [ ] **Step 3: Rewrite the strip in `index.html`**
 
@@ -225,14 +225,14 @@ In `src/themes/registry.test.ts` `categories` block, replace the `featured theme
 - [ ] **Step 2: Run tests to verify they fail**
 
 Run: `bun run test src/themes/registry.test.ts`
-Expected: FAIL — no boardroom, business count 0.
+Expected: FAIL: no boardroom, business count 0.
 
 - [ ] **Step 3: Create the five stylesheets**
 
 Create `src/themes/boardroom.css`:
 
 ```css
-/* Boardroom — confident corporate report. Navy authority, disciplined tables. */
+/* Boardroom, confident corporate report. Navy authority, disciplined tables. */
 :root {
   --mds-bg: #ffffff;
   --mds-fg: #1c2431;
@@ -280,7 +280,7 @@ li::marker { color: var(--mds-accent); }
 Create `src/themes/ledger.css`:
 
 ```css
-/* Ledger — financial-statement style. Tabular numerals, hairline rules, closing lines. */
+/* Ledger, financial-statement style. Tabular numerals, hairline rules, closing lines. */
 :root {
   --mds-bg: #fdfdfb;
   --mds-fg: #21261f;
@@ -326,7 +326,7 @@ li::marker { color: var(--mds-accent); }
 Create `src/themes/briefing.css`:
 
 ```css
-/* Briefing — consulting brief. Numbered sections, decisive charcoal and signal red. */
+/* Briefing, consulting brief. Numbered sections, decisive charcoal and signal red. */
 :root {
   --mds-bg: #ffffff;
   --mds-fg: #2a2d31;
@@ -372,7 +372,7 @@ li::marker { color: var(--mds-accent); font-weight: 700; }
 Create `src/themes/memo.css`:
 
 ```css
-/* Memo — interoffice memo. Small-caps headings, typewriter code, warm paper. */
+/* Memo, interoffice memo. Small-caps headings, typewriter code, warm paper. */
 :root {
   --mds-bg: #faf8f4;
   --mds-fg: #33302b;
@@ -413,7 +413,7 @@ li { margin: 0.3em 0; }
 Create `src/themes/quarterly.css`:
 
 ```css
-/* Quarterly — annual-report editorial. Generous margins, burgundy headlines. */
+/* Quarterly, annual-report editorial. Generous margins, burgundy headlines. */
 :root {
   --mds-bg: #ffffff;
   --mds-fg: #262223;
@@ -531,47 +531,47 @@ Append to `themeCopy` in `src/site/pages/copy.ts` (before the closing `]`):
 ```ts
   {
     id: 'boardroom',
-    title: 'Boardroom theme — corporate report styling for markdown — markdown.style',
+    title: 'Boardroom theme, corporate report styling for markdown, markdown.style',
     description: 'See a full report rendered in Boardroom: navy corporate styling for board packs, client reports, and executive summaries. Free, in your browser.',
-    h1: 'Boardroom — corporate polish for reports that go up the chain',
+    h1: 'Boardroom, corporate polish for reports that go up the chain',
     intro: 'Boardroom dresses your markdown for the meeting that matters: a navy-anchored sans, filled table headers, and a double-ruled title. Below is a complete sample report rendered in it.',
-    whoItSuits: 'Board packs, client deliverables, and executive summaries — documents where the reader judges rigor by presentation before reading a word.',
+    whoItSuits: 'Board packs, client deliverables, and executive summaries, documents where the reader judges rigor by presentation before reading a word.',
     pairWith: ['quarterly', 'slate'],
   },
   {
     id: 'ledger',
-    title: 'Ledger theme — financial-statement styling for markdown — markdown.style',
+    title: 'Ledger theme, financial-statement styling for markdown, markdown.style',
     description: 'See a full report rendered in Ledger: accounting-style rules, tabular numerals, and closing lines for finance-flavored documents. Free, in your browser.',
-    h1: 'Ledger — statement styling with numerals that line up',
+    h1: 'Ledger, statement styling with numerals that line up',
     intro: 'Ledger borrows the discipline of a financial statement: tabular numerals, hairline rules, and a closing line under every table. Below is a complete sample rendered in it.',
-    whoItSuits: 'Budget summaries, financial reviews, and quantitative status reports — any document where columns of numbers must read cleanly.',
+    whoItSuits: 'Budget summaries, financial reviews, and quantitative status reports, any document where columns of numbers must read cleanly.',
     pairWith: ['boardroom', 'swiss'],
   },
   {
     id: 'briefing',
-    title: 'Briefing theme — consulting-brief styling for markdown — markdown.style',
+    title: 'Briefing theme, consulting-brief styling for markdown, markdown.style',
     description: 'See a full report rendered in Briefing: numbered sections and decisive charcoal-and-red styling for recommendations that need a verdict. Free, in your browser.',
-    h1: 'Briefing — numbered sections that walk the reader to a verdict',
+    h1: 'Briefing, numbered sections that walk the reader to a verdict',
     intro: 'Briefing structures your markdown like a consulting deliverable: auto-numbered sections, a heavy title, and one signal color used sparingly. Below is a complete sample rendered in it.',
-    whoItSuits: 'Recommendations, decision memos, and strategy briefs — documents built around a numbered argument rather than a narrative.',
+    whoItSuits: 'Recommendations, decision memos, and strategy briefs, documents built around a numbered argument rather than a narrative.',
     pairWith: ['boardroom', 'contrast'],
   },
   {
     id: 'memo',
-    title: 'Memo theme — classic interoffice styling for markdown — markdown.style',
+    title: 'Memo theme, classic interoffice styling for markdown, markdown.style',
     description: 'See a full report rendered in Memo: centered memorandum title, small-caps headings, and typewriter code on warm paper. Free, in your browser.',
-    h1: 'Memo — the interoffice classic, typeset properly',
+    h1: 'Memo, the interoffice classic, typeset properly',
     intro: 'Memo gives your markdown the calm authority of a well-run office: a ruled memorandum title, small-caps section heads, and typewriter code. Below is a complete sample rendered in it.',
-    whoItSuits: 'Internal updates, policy notes, and one-page decisions — short documents that should feel official without feeling corporate.',
+    whoItSuits: 'Internal updates, policy notes, and one-page decisions, short documents that should feel official without feeling corporate.',
     pairWith: ['ledger', 'paper'],
   },
   {
     id: 'quarterly',
-    title: 'Quarterly theme — annual-report styling for markdown — markdown.style',
+    title: 'Quarterly theme, annual-report styling for markdown, markdown.style',
     description: 'See a full report rendered in Quarterly: display serif headlines, burgundy rules, and annual-report generosity for milestone documents. Free, in your browser.',
-    h1: 'Quarterly — annual-report elegance for milestone documents',
+    h1: 'Quarterly, annual-report elegance for milestone documents',
     intro: 'Quarterly sets your markdown like the front section of a good annual report: a display serif, burgundy overlines, and room to breathe. Below is a complete sample rendered in it.',
-    whoItSuits: 'Quarterly reviews, investor updates, and year-in-review documents — reporting that doubles as a keepsake.',
+    whoItSuits: 'Quarterly reviews, investor updates, and year-in-review documents, reporting that doubles as a keepsake.',
     pairWith: ['boardroom', 'editorial'],
   },
 ```
@@ -579,7 +579,7 @@ Append to `themeCopy` in `src/site/pages/copy.ts` (before the closing `]`):
 - [ ] **Step 6: Run the full suite**
 
 Run: `bun run test && bunx tsc --noEmit`
-Expected: green — the end-to-end render test (`src/themes/themes-render.test.ts`) now covers 13 themes; a typo'd shiki name or broken CSS fails there.
+Expected: green, the end-to-end render test (`src/themes/themes-render.test.ts`) now covers 13 themes; a typo'd shiki name or broken CSS fails there.
 
 - [ ] **Step 7: Commit**
 
@@ -620,7 +620,7 @@ Also raise THIS test's timeout unconditionally now (the eager fallback renders e
 - [ ] **Step 2: Run it to verify it fails**
 
 Run: `bun run test src/app/main.test.ts`
-Expected: FAIL — no `.theme-cat` headings exist.
+Expected: FAIL: no `.theme-cat` headings exist.
 
 - [ ] **Step 3: Rewrite buildThumbs in `src/app/main.ts`**
 
@@ -737,7 +737,7 @@ git commit -m "feat: categorized theme picker with lazy thumbnails"
 
 In `src/site/pages/pages.test.ts`:
 
-1. The test named `the hub previews all eight themes inline and links each theme page`: rename to `the hub previews every theme inline and links each theme page` and replace any hardcoded count (`8`, `eight`) with values derived from `themes.length` — the assertions must iterate the registry, not a literal list. Add to it:
+1. The test named `the hub previews all eight themes inline and links each theme page`: rename to `the hub previews every theme inline and links each theme page` and replace any hardcoded count (`8`, `eight`) with values derived from `themes.length`, the assertions must iterate the registry, not a literal list. Add to it:
 
 ```ts
       for (const category of Object.keys(CATEGORY_LABELS)) {
@@ -769,7 +769,7 @@ In `src/site/pages/pages.test.ts`:
 - [ ] **Step 2: Run tests to verify they fail**
 
 Run: `bun run test src/site/pages/pages.test.ts`
-Expected: FAIL — hub has no category section ids.
+Expected: FAIL: hub has no category section ids.
 
 - [ ] **Step 3: Rewrite `buildThemesHub` and touch `buildThemePage`**
 
@@ -815,10 +815,10 @@ ${sections}
 
 <section aria-label="Next steps">
   <h2>How do I use one of these on my own document?</h2>
-  <p class="answer">Open any theme page and click “Use this theme”, or go straight to the <a href="/editor">editor</a> and paste your markdown — the theme picker previews every theme live. See a worked example: <a href="/use-cases/chatgpt-report">a ChatGPT research answer styled into a report</a>, or the two-step paths to <a href="/convert/markdown-to-pdf">PDF</a> and <a href="/convert/markdown-to-html">a single HTML file</a>.</p>
+  <p class="answer">Open any theme page and click “Use this theme”, or go straight to the <a href="/editor">editor</a> and paste your markdown, the theme picker previews every theme live. See a worked example: <a href="/use-cases/chatgpt-report">a ChatGPT research answer styled into a report</a>, or the two-step paths to <a href="/convert/markdown-to-pdf">PDF</a> and <a href="/convert/markdown-to-html">a single HTML file</a>.</p>
 </section>`
   return pageShell({
-    title: 'Themes — designed looks for LLM markdown, by category — markdown.style',
+    title: 'Themes, designed looks for LLM markdown, by category, markdown.style',
     description: 'Compare all markdown.style themes on the same real report, organized by use case: business reports, technical docs, academic papers, editorial longform, minimal, and bold.',
     path: '/themes',
     main,
@@ -870,14 +870,14 @@ In `src/themes/registry.test.ts`, inside `category population matches the shippe
 - [ ] **Step 2: Run it to verify it fails**
 
 Run: `bun run test src/themes/registry.test.ts`
-Expected: FAIL — technical is 2.
+Expected: FAIL: technical is 2.
 
 - [ ] **Step 3: Create the three stylesheets**
 
 Create `src/themes/terminal.css`:
 
 ```css
-/* Terminal — amber phosphor CRT. Monospace everything on near-black. Prints light. */
+/* Terminal, amber phosphor CRT. Monospace everything on near-black. Prints light. */
 :root {
   --mds-bg: #171208;
   --mds-fg: #ecc372;
@@ -933,7 +933,7 @@ li::marker { color: var(--mds-accent); }
 Create `src/themes/blueprint.css`:
 
 ```css
-/* Blueprint — engineering drawing. Drafting blues, uppercase mono annotations. */
+/* Blueprint, engineering drawing. Drafting blues, uppercase mono annotations. */
 :root {
   --mds-bg: #f5f8fc;
   --mds-fg: #23324a;
@@ -978,7 +978,7 @@ li::marker { color: var(--mds-accent); }
 Create `src/themes/manual.css`:
 
 ```css
-/* Manual — reference-manual structure. Man-page bones, no-nonsense hierarchy. */
+/* Manual, reference-manual structure. Man-page bones, no-nonsense hierarchy. */
 :root {
   --mds-bg: #ffffff;
   --mds-fg: #24292f;
@@ -1065,29 +1065,29 @@ Append to `themeCopy`:
 ```ts
   {
     id: 'terminal',
-    title: 'Terminal theme — amber CRT styling for markdown — markdown.style',
+    title: 'Terminal theme, amber CRT styling for markdown, markdown.style',
     description: 'See a full report rendered in Terminal: amber-on-black monospace styling that flips to a light palette when printed. Free, in your browser.',
-    h1: 'Terminal — amber phosphor for documents that live in the shell',
+    h1: 'Terminal, amber phosphor for documents that live in the shell',
     intro: 'Terminal renders your markdown like a well-kept CRT: amber monospace on near-black, prompt-prefixed headings, and a print stylesheet that lands on paper in ink-friendly light. Below is a complete sample rendered in it.',
-    whoItSuits: 'Runbooks, CLI documentation, and incident notes — documents whose readers already have a terminal open. Printing flips it light automatically.',
+    whoItSuits: 'Runbooks, CLI documentation, and incident notes, documents whose readers already have a terminal open. Printing flips it light automatically.',
     pairWith: ['carbon', 'manual'],
   },
   {
     id: 'blueprint',
-    title: 'Blueprint theme — engineering-drawing styling for markdown — markdown.style',
+    title: 'Blueprint theme, engineering-drawing styling for markdown, markdown.style',
     description: 'See a full report rendered in Blueprint: drafting blues, boxed title, and uppercase annotations for specs and technical plans. Free, in your browser.',
-    h1: 'Blueprint — drafting-table discipline for specs and plans',
+    h1: 'Blueprint, drafting-table discipline for specs and plans',
     intro: 'Blueprint borrows the visual language of an engineering drawing: a boxed title block, uppercase mono annotations, and drafting blues on cool paper. Below is a complete sample rendered in it.',
-    whoItSuits: 'Specs, architecture documents, and implementation plans — writing that describes something to be built and benefits from looking like it.',
+    whoItSuits: 'Specs, architecture documents, and implementation plans, writing that describes something to be built and benefits from looking like it.',
     pairWith: ['slate', 'manual'],
   },
   {
     id: 'manual',
-    title: 'Manual theme — reference-manual styling for markdown — markdown.style',
+    title: 'Manual theme, reference-manual styling for markdown, markdown.style',
     description: 'See a full report rendered in Manual: man-page bones, bold sans headings, and code blocks that lead the page. Free, in your browser.',
-    h1: 'Manual — reference styling with man-page bones',
+    h1: 'Manual, reference styling with man-page bones',
     intro: 'Manual sets your markdown like documentation that has shipped with software for decades: uppercase section heads, a serif reading measure, and code that stands proud of the prose. Below is a complete sample rendered in it.',
-    whoItSuits: 'API references, how-to guides, and README-grade documentation — anything a reader consults rather than reads cover to cover.',
+    whoItSuits: 'API references, how-to guides, and README-grade documentation, anything a reader consults rather than reads cover to cover.',
     pairWith: ['slate', 'terminal'],
   },
 ```
@@ -1128,14 +1128,14 @@ Add to `category population matches the shipped roadmap`:
 - [ ] **Step 2: Run it to verify it fails**
 
 Run: `bun run test src/themes/registry.test.ts`
-Expected: FAIL — academic is 1.
+Expected: FAIL: academic is 1.
 
 - [ ] **Step 3: Create the four stylesheets**
 
 Create `src/themes/thesis.css`:
 
 ```css
-/* Thesis — dissertation formality. Times lineage, numbered headings, sober rules. */
+/* Thesis, dissertation formality. Times lineage, numbered headings, sober rules. */
 :root {
   --mds-bg: #ffffff;
   --mds-fg: #1d1d20;
@@ -1182,7 +1182,7 @@ li { margin: 0.3em 0; }
 Create `src/themes/preprint.css`:
 
 ```css
-/* Preprint — LaTeX spirit. Computer Modern lineage, booktabs tables, hyperref links. */
+/* Preprint, LaTeX spirit. Computer Modern lineage, booktabs tables, hyperref links. */
 :root {
   --mds-bg: #ffffff;
   --mds-fg: #111114;
@@ -1228,7 +1228,7 @@ li { margin: 0.25em 0; }
 Create `src/themes/notebook.css`:
 
 ```css
-/* Notebook — lab notebook. Ruled callouts, ballpoint-blue annotations. */
+/* Notebook, lab notebook. Ruled callouts, ballpoint-blue annotations. */
 :root {
   --mds-bg: #fffef8;
   --mds-fg: #2c2a24;
@@ -1276,7 +1276,7 @@ input[type='checkbox'] { transform: scale(1.15); }
 Create `src/themes/lecture.css`:
 
 ```css
-/* Lecture — lecture notes. Crisp sans, tinted key-point blocks. */
+/* Lecture, lecture notes. Crisp sans, tinted key-point blocks. */
 :root {
   --mds-bg: #ffffff;
   --mds-fg: #212a28;
@@ -1373,38 +1373,38 @@ Append entries to the END of the `themes` array:
 ```ts
   {
     id: 'thesis',
-    title: 'Thesis theme — dissertation styling for markdown — markdown.style',
+    title: 'Thesis theme, dissertation styling for markdown, markdown.style',
     description: 'See a full report rendered in Thesis: Times lineage, numbered sections, and examiner-grade sobriety. Free, in your browser.',
-    h1: 'Thesis — dissertation formality with numbered sections',
+    h1: 'Thesis, dissertation formality with numbered sections',
     intro: 'Thesis sets your markdown the way graduate schools expect: a Times lineage, automatically numbered sections, justified text, and rules that know when to stop. Below is a complete sample rendered in it.',
-    whoItSuits: 'Dissertations, formal literature reviews, and committee-bound documents — writing that will be judged by people who notice margins.',
+    whoItSuits: 'Dissertations, formal literature reviews, and committee-bound documents, writing that will be judged by people who notice margins.',
     pairWith: ['scholar', 'preprint'],
   },
   {
     id: 'preprint',
-    title: 'Preprint theme — LaTeX-style markdown rendering — markdown.style',
+    title: 'Preprint theme, LaTeX-style markdown rendering, markdown.style',
     description: 'See a full report rendered in Preprint: Computer Modern spirit, booktabs tables, and hyperref-blue links without touching LaTeX. Free, in your browser.',
-    h1: 'Preprint — the LaTeX look without the LaTeX',
+    h1: 'Preprint, the LaTeX look without the LaTeX',
     intro: 'Preprint borrows what people love about a good arXiv paper: the Computer Modern voice, centered booktabs tables, and quiet blue links. Below is a complete sample rendered in it.',
-    whoItSuits: 'Research notes, paper drafts, and technical writeups for readers who live on arXiv — when the content is markdown but the audience expects LaTeX.',
+    whoItSuits: 'Research notes, paper drafts, and technical writeups for readers who live on arXiv, when the content is markdown but the audience expects LaTeX.',
     pairWith: ['thesis', 'scholar'],
   },
   {
     id: 'notebook',
-    title: 'Notebook theme — lab-notebook styling for markdown — markdown.style',
+    title: 'Notebook theme, lab-notebook styling for markdown, markdown.style',
     description: 'See a full report rendered in Notebook: warm ruled paper, dashed annotation boxes, and ballpoint-blue accents. Free, in your browser.',
-    h1: 'Notebook — a lab notebook that keeps itself legible',
+    h1: 'Notebook, a lab notebook that keeps itself legible',
     intro: 'Notebook styles your markdown like a well-kept lab book: warm paper, ballpoint-blue rules, and dashed boxes where observations get taped in. Below is a complete sample rendered in it.',
-    whoItSuits: 'Experiment logs, research journals, and working notes — documents that grow daily and still need to read cleanly at review time.',
+    whoItSuits: 'Experiment logs, research journals, and working notes, documents that grow daily and still need to read cleanly at review time.',
     pairWith: ['lecture', 'slate'],
   },
   {
     id: 'lecture',
-    title: 'Lecture theme — lecture-notes styling for markdown — markdown.style',
+    title: 'Lecture theme, lecture-notes styling for markdown, markdown.style',
     description: 'See a full report rendered in Lecture: crisp humanist sans, tinted key-point blocks, and headings that underline themselves. Free, in your browser.',
-    h1: 'Lecture — notes that teach as clearly as they read',
+    h1: 'Lecture, notes that teach as clearly as they read',
     intro: 'Lecture turns your markdown into the notes everyone borrows before the exam: a crisp humanist sans, tinted key-point blocks, and short accent underlines that keep sections scannable. Below is a complete sample rendered in it.',
-    whoItSuits: 'Course notes, tutorials, and study guides — explanatory writing where the key point must be findable in three seconds.',
+    whoItSuits: 'Course notes, tutorials, and study guides, explanatory writing where the key point must be findable in three seconds.',
     pairWith: ['notebook', 'scholar'],
   },
 ```
@@ -1443,14 +1443,14 @@ git commit -m "feat: add Academic & Research theme batch (thesis, preprint, note
 - [ ] **Step 2: Run it to verify it fails**
 
 Run: `bun run test src/themes/registry.test.ts`
-Expected: FAIL — editorial is 2.
+Expected: FAIL: editorial is 2.
 
 - [ ] **Step 3: Create the three stylesheets**
 
 Create `src/themes/gazette.css`:
 
 ```css
-/* Gazette — front page. Condensed headlines, uppercase kickers, dense measure. */
+/* Gazette, front page. Condensed headlines, uppercase kickers, dense measure. */
 :root {
   --mds-bg: #fdfcf9;
   --mds-fg: #191817;
@@ -1494,7 +1494,7 @@ li { margin: 0.25em 0; }
 Create `src/themes/novella.css`:
 
 ```css
-/* Novella — fiction manuscript. Serene serif, first-line indents, zero clutter. */
+/* Novella, fiction manuscript. Serene serif, first-line indents, zero clutter. */
 :root {
   --mds-bg: #fffdf9;
   --mds-fg: #2e2a26;
@@ -1541,7 +1541,7 @@ li { margin: 0.3em 0; }
 Create `src/themes/columnist.css`:
 
 ```css
-/* Columnist — opinion page. Assertive pull-quote blockquotes, byline italics. */
+/* Columnist, opinion page. Assertive pull-quote blockquotes, byline italics. */
 :root {
   --mds-bg: #ffffff;
   --mds-fg: #1f1c1c;
@@ -1629,29 +1629,29 @@ Append to the `themes` array:
 ```ts
   {
     id: 'gazette',
-    title: 'Gazette theme — newspaper styling for markdown — markdown.style',
+    title: 'Gazette theme, newspaper styling for markdown, markdown.style',
     description: 'See a full report rendered in Gazette: double-ruled masthead, condensed headlines, and newsroom density. Free, in your browser.',
-    h1: 'Gazette — front-page energy for dense reporting',
+    h1: 'Gazette, front-page energy for dense reporting',
     intro: 'Gazette lays your markdown out like a broadsheet front page: a double-ruled masthead title, condensed bold headlines, and a measure tuned for density. Below is a complete sample rendered in it.',
-    whoItSuits: 'Newsletters, digests, and weekly roundups — documents that carry many stories at once and want the reader to skim like a front page.',
+    whoItSuits: 'Newsletters, digests, and weekly roundups, documents that carry many stories at once and want the reader to skim like a front page.',
     pairWith: ['editorial', 'columnist'],
   },
   {
     id: 'novella',
-    title: 'Novella theme — manuscript styling for markdown — markdown.style',
+    title: 'Novella theme, manuscript styling for markdown, markdown.style',
     description: 'See a full report rendered in Novella: serene serif, first-line indents, and chapter ornaments with nothing else in the way. Free, in your browser.',
-    h1: 'Novella — manuscript serenity for writing that flows',
+    h1: 'Novella, manuscript serenity for writing that flows',
     intro: 'Novella removes everything between the reader and the prose: indented paragraphs, centered chapter heads under a small ornament, and a warm page. Below is a complete sample rendered in it.',
-    whoItSuits: 'Fiction drafts, essays, and personal writing — longform where the typography should disappear into the reading.',
+    whoItSuits: 'Fiction drafts, essays, and personal writing, longform where the typography should disappear into the reading.',
     pairWith: ['paper', 'editorial'],
   },
   {
     id: 'columnist',
-    title: 'Columnist theme — opinion-page styling for markdown — markdown.style',
+    title: 'Columnist theme, opinion-page styling for markdown, markdown.style',
     description: 'See a full report rendered in Columnist: oversized pull quotes, byline italics, and an argument that looks like it belongs in print. Free, in your browser.',
-    h1: 'Columnist — opinion-page conviction for arguments in print',
+    h1: 'Columnist, opinion-page conviction for arguments in print',
     intro: 'Columnist treats every blockquote as a pull quote: oversized, italic, and ruled in your accent color, with byline-style italics under the headline. Below is a complete sample rendered in it.',
-    whoItSuits: 'Op-eds, position pieces, and persuasive memos — writing built around quotable lines that deserve to be displayed, not buried.',
+    whoItSuits: 'Op-eds, position pieces, and persuasive memos, writing built around quotable lines that deserve to be displayed, not buried.',
     pairWith: ['gazette', 'quarterly'],
   },
 ```
@@ -1690,14 +1690,14 @@ git commit -m "feat: add Editorial & Longform theme batch (gazette, novella, col
 - [ ] **Step 2: Run it to verify it fails**
 
 Run: `bun run test src/themes/registry.test.ts`
-Expected: FAIL — minimal is 2.
+Expected: FAIL: minimal is 2.
 
 - [ ] **Step 3: Create the three stylesheets**
 
 Create `src/themes/mist.css`:
 
 ```css
-/* Mist — hairline minimal. Feather rules, whispered hierarchy. */
+/* Mist, hairline minimal. Feather rules, whispered hierarchy. */
 :root {
   --mds-bg: #fcfcfd;
   --mds-fg: #3a3f46;
@@ -1742,7 +1742,7 @@ li::marker { color: var(--mds-muted); }
 Create `src/themes/mono.css`:
 
 ```css
-/* Mono — typewriter monospace. One family, two weights, zero decoration. */
+/* Mono, typewriter monospace. One family, two weights, zero decoration. */
 :root {
   --mds-bg: #ffffff;
   --mds-fg: #26282b;
@@ -1786,7 +1786,7 @@ li { margin: 0.25em 0; }
 Create `src/themes/airy.css`:
 
 ```css
-/* Airy — air and whitespace. A small text block adrift in generous margins. */
+/* Airy, air and whitespace. A small text block adrift in generous margins. */
 :root {
   --mds-bg: #ffffff;
   --mds-fg: #43464d;
@@ -1874,29 +1874,29 @@ Append to the `themes` array:
 ```ts
   {
     id: 'mist',
-    title: 'Mist theme — hairline minimal styling for markdown — markdown.style',
+    title: 'Mist theme, hairline minimal styling for markdown, markdown.style',
     description: 'See a full report rendered in Mist: feather-light rules, a soft gray-blue voice, and hierarchy you feel more than see. Free, in your browser.',
-    h1: 'Mist — minimalism at the hairline weight',
+    h1: 'Mist, minimalism at the hairline weight',
     intro: 'Mist keeps everything at a whisper: hairline rules, a light title weight, and gray-blue restraint. Below is a complete sample rendered in it.',
-    whoItSuits: 'Design documents, product notes, and portfolios of thought — for readers who consider heavy borders a personal insult.',
+    whoItSuits: 'Design documents, product notes, and portfolios of thought, for readers who consider heavy borders a personal insult.',
     pairWith: ['swiss', 'airy'],
   },
   {
     id: 'mono',
-    title: 'Mono theme — typewriter monospace styling for markdown — markdown.style',
+    title: 'Mono theme, typewriter monospace styling for markdown, markdown.style',
     description: 'See a full report rendered in Mono: one monospace family, two weights, underlined links, and no decoration at all. Free, in your browser.',
-    h1: 'Mono — one family, two weights, nothing else',
+    h1: 'Mono, one family, two weights, nothing else',
     intro: 'Mono is the plaintext ideal taken seriously: a single monospace family for everything, underlined links, and ruled headings. Below is a complete sample rendered in it.',
-    whoItSuits: 'Changelogs, RFCs, and engineering notes — documents whose authors trust content over costume.',
+    whoItSuits: 'Changelogs, RFCs, and engineering notes, documents whose authors trust content over costume.',
     pairWith: ['contrast', 'terminal'],
   },
   {
     id: 'airy',
-    title: 'Airy theme — whitespace-first styling for markdown — markdown.style',
+    title: 'Airy theme, whitespace-first styling for markdown, markdown.style',
     description: 'See a full report rendered in Airy: a small measured text block, oversized margins, and section labels in tracked-out caps. Free, in your browser.',
-    h1: 'Airy — whitespace doing the heavy lifting',
+    h1: 'Airy, whitespace doing the heavy lifting',
     intro: 'Airy gives your markdown room: an unhurried line height, tracked-out section labels, and margins most themes would call wasteful. Below is a complete sample rendered in it.',
-    whoItSuits: 'Manifestos, letters, and short strategy notes — writing that gains authority from calm. Not the theme for a 40-page appendix.',
+    whoItSuits: 'Manifestos, letters, and short strategy notes, writing that gains authority from calm. Not the theme for a 40-page appendix.',
     pairWith: ['mist', 'swiss'],
   },
 ```
@@ -1935,14 +1935,14 @@ git commit -m "feat: add Minimal & Clean theme batch (mist, mono, airy)"
 - [ ] **Step 2: Run it to verify it fails**
 
 Run: `bun run test src/themes/registry.test.ts`
-Expected: FAIL — bold is 1.
+Expected: FAIL: bold is 1.
 
 - [ ] **Step 3: Create the four stylesheets**
 
 Create `src/themes/neon.css`:
 
 ```css
-/* Neon — electric dark. Cyan and magenta on violet-black. Prints light. */
+/* Neon, electric dark. Cyan and magenta on violet-black. Prints light. */
 :root {
   --mds-bg: #0e0716;
   --mds-fg: #e9e4f7;
@@ -1996,7 +1996,7 @@ li::marker { color: var(--mds-neon-2); }
 Create `src/themes/poster.css`:
 
 ```css
-/* Poster — poster type. Massive headlines, unapologetic scale jumps. */
+/* Poster, poster type. Massive headlines, unapologetic scale jumps. */
 :root {
   --mds-bg: #ffffff;
   --mds-fg: #141414;
@@ -2041,7 +2041,7 @@ li::marker { color: var(--mds-accent); font-weight: 900; }
 Create `src/themes/riso.css`:
 
 ```css
-/* Riso — risograph print. Two-ink overprint charm on tinted paper. */
+/* Riso, risograph print. Two-ink overprint charm on tinted paper. */
 :root {
   --mds-bg: #fbf7ef;
   --mds-fg: #33312c;
@@ -2087,7 +2087,7 @@ li::marker { color: var(--mds-accent); }
 Create `src/themes/retro.css`:
 
 ```css
-/* Retro — warm 70s. Burnt orange, mustard rules, rounded corners. */
+/* Retro, warm 70s. Burnt orange, mustard rules, rounded corners. */
 :root {
   --mds-bg: #f9f1df;
   --mds-fg: #453423;
@@ -2178,45 +2178,45 @@ Append to the `themes` array:
   },
 ```
 
-Note: `riso`'s `defaultAccent` `#ff4d6d` — keep the exact hex; the contract test requires 6-digit hex.
+Note: `riso`'s `defaultAccent` `#ff4d6d`, keep the exact hex; the contract test requires 6-digit hex.
 
 - [ ] **Step 5: Add the four themeCopy entries**
 
 ```ts
   {
     id: 'neon',
-    title: 'Neon theme — electric dark styling for markdown — markdown.style',
+    title: 'Neon theme, electric dark styling for markdown, markdown.style',
     description: 'See a full report rendered in Neon: cyan and magenta on violet-black, flipping to a printable light palette on paper. Free, in your browser.',
-    h1: 'Neon — electric dark for documents with a pulse',
+    h1: 'Neon, electric dark for documents with a pulse',
     intro: 'Neon runs your markdown through the night: cyan headings, magenta accents, violet-black depth, and a print stylesheet that lands light. Below is a complete sample rendered in it.',
-    whoItSuits: 'Launch notes, event recaps, and gaming or creative-tech writeups — documents meant to be read on a screen with the lights down.',
+    whoItSuits: 'Launch notes, event recaps, and gaming or creative-tech writeups, documents meant to be read on a screen with the lights down.',
     pairWith: ['pop', 'terminal'],
   },
   {
     id: 'poster',
-    title: 'Poster theme — display-type styling for markdown — markdown.style',
+    title: 'Poster theme, display-type styling for markdown, markdown.style',
     description: 'See a full report rendered in Poster: massive uppercase headlines, thick black rules, and reversed pull blocks. Free, in your browser.',
-    h1: 'Poster — headlines that read across the room',
+    h1: 'Poster, headlines that read across the room',
     intro: 'Poster typesets your markdown like something meant for a wall: enormous uppercase headlines, six-pixel rules, and blockquotes reversed out in black. Below is a complete sample rendered in it.',
-    whoItSuits: 'Announcements, manifestos, and one-page briefs — short documents that win or lose in the first two seconds.',
+    whoItSuits: 'Announcements, manifestos, and one-page briefs, short documents that win or lose in the first two seconds.',
     pairWith: ['contrast', 'pop'],
   },
   {
     id: 'riso',
-    title: 'Riso theme — risograph two-ink styling for markdown — markdown.style',
+    title: 'Riso theme, risograph two-ink styling for markdown, markdown.style',
     description: 'See a full report rendered in Riso: pink and blue inks overprinting on cream stock, straight from the community print shop. Free, in your browser.',
-    h1: 'Riso — two inks, one very charming document',
+    h1: 'Riso, two inks, one very charming document',
     intro: 'Riso borrows the community print-shop look: pink headings, blue working text, dotted rules, and cream stock that makes both inks sing. Below is a complete sample rendered in it.',
-    whoItSuits: 'Zines, event programs, community updates, and side-project docs — writing that should feel hand-made and a little joyful.',
+    whoItSuits: 'Zines, event programs, community updates, and side-project docs, writing that should feel hand-made and a little joyful.',
     pairWith: ['pop', 'retro'],
   },
   {
     id: 'retro',
-    title: 'Retro theme — warm 70s styling for markdown — markdown.style',
+    title: 'Retro theme, warm 70s styling for markdown, markdown.style',
     description: 'See a full report rendered in Retro: burnt orange, mustard rules, rounded corners, and cream paper straight from 1974. Free, in your browser.',
-    h1: 'Retro — 1970s warmth for documents with personality',
+    h1: 'Retro, 1970s warmth for documents with personality',
     intro: 'Retro pours your markdown a glass of orange juice in 1974: burnt-orange headings, mustard underlines, rounded blocks, and cream paper. Below is a complete sample rendered in it.',
-    whoItSuits: 'Newsletters, personal sites turned PDFs, and culture-team documents — anywhere warmth beats formality.',
+    whoItSuits: 'Newsletters, personal sites turned PDFs, and culture-team documents, anywhere warmth beats formality.',
     pairWith: ['riso', 'paper'],
   },
 ```

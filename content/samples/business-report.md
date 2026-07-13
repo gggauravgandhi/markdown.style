@@ -1,4 +1,4 @@
-# Q2 Customer Retention Review — Executive Summary
+# Q2 Customer Retention Review: Executive Summary
 
 *Prepared for the executive team. Distribution: leadership only.*
 

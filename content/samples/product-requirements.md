@@ -1,4 +1,4 @@
-# Bulk Export API — Product Requirements
+# Bulk Export API: Product Requirements
 
 *Owner: Platform Team. Target: Q3.*
 
@@ -14,7 +14,7 @@ Customers with more than 10,000 records cannot export their data. The existing e
 
 ## Non-goals
 
-- Real-time or streaming export — this is a batch job, not a live feed.
+- Real-time or streaming export: this is a batch job, not a live feed.
 - Custom export formats beyond CSV and JSON.
 - Scheduled or recurring exports; that is a separate proposal.
 

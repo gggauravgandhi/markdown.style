@@ -4,7 +4,7 @@ import type StateBlock from 'markdown-it/lib/rules_block/state_block.mjs'
 import type StateInline from 'markdown-it/lib/rules_inline/state_inline.mjs'
 
 // Replaces @vscode/markdown-it-katex: that fork's bundled KaTeX lexer breaks
-// under Vite's dep optimizer (control words truncate to one letter — found in
+// under Vite's dep optimizer (control words truncate to one letter, found in
 // browser QA 2026-07-10). Delimiter rules follow the pandoc-style convention
 // (opening $ not followed by space; closing $ not preceded by space nor
 // followed by a digit); rendering calls our own pinned katex directly.

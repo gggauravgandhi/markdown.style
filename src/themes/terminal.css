@@ -1,4 +1,4 @@
-/* Terminal — amber phosphor CRT. Monospace everything on near-black. Prints light. */
+/* Terminal: amber phosphor CRT. Monospace everything on near-black. Prints light. */
 :root {
   --mds-bg: #171208;
   --mds-fg: #ecc372;

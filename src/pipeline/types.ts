@@ -12,7 +12,7 @@ export interface RenderError {
   message: string
 }
 
-/** Shared literal union — mermaid.initialize rejects a bare `string` theme. */
+/** Shared literal union: mermaid.initialize rejects a bare `string` theme. */
 export type MermaidTheme = 'default' | 'dark' | 'neutral' | 'forest'
 
 export interface RenderResult {

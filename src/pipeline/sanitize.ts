@@ -14,7 +14,7 @@ let purify: { sanitize: (src: string, cfg?: typeof PURIFY_CONFIG) => string } | 
  * DOMPurify keeps (ALLOW_DATA_ATTR default) while comments would be stripped.
  * svg+mathMl profiles keep KaTeX MathML output intact.
  * Async because non-DOM environments (the Plan 4 static build) lazily
- * construct a jsdom window for DOMPurify — browsers never hit that path.
+ * construct a jsdom window for DOMPurify; browsers never hit that path.
  */
 export async function sanitizeBody(body: string): Promise<string> {
   if (!purify) {

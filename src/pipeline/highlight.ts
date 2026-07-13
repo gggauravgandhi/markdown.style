@@ -10,7 +10,7 @@ export async function highlightFences(body: string, fences: Fence[], shikiTheme:
     try {
       html = await codeToHtml(fence.code, { lang, theme: shikiTheme })
     } catch {
-      // unknown language or grammar load failure — plain text, never a blank hole
+      // unknown language or grammar load failure: plain text, never a blank hole
       html = await codeToHtml(fence.code, { lang: 'text', theme: shikiTheme })
     }
     // function replacer: a string replacement would interpret $$, $&, $`, $'

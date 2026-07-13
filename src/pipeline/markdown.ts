@@ -10,7 +10,7 @@ export function stripFrontmatter(src: string): string {
 
 /**
  * Cheap gate for lazy-loading KaTeX. False positives only cost an unneeded
- * plugin load, so this is intentionally permissive — but a lone $amount must
+ * plugin load, so this is intentionally permissive, but a lone $amount must
  * not trigger (inline math requires both $ on one line).
  */
 export function hasMath(src: string): boolean {
@@ -19,7 +19,7 @@ export function hasMath(src: string): boolean {
 
 export async function markdownToHtml(src: string): Promise<MarkdownPass> {
   const md = new MarkdownIt({
-    html: false, // security boundary — never enable (spec §2)
+    html: false, // security boundary: never enable (spec §2)
     linkify: true,
     typographer: true,
   })

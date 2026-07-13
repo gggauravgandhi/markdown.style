@@ -11,7 +11,7 @@ import { buildUseCasePage } from './use-case-pages'
 
 const samplesDir = join(import.meta.dirname, '..', '..', '..', 'content', 'samples')
 
-function injectNoindex(html: string): string {
+export function injectNoindex(html: string): string {
   // standalone samples are demo assets, not pages: keep them out of the index
   return html.replace('<head>', '<head>\n<meta name="robots" content="noindex">')
 }
@@ -30,7 +30,7 @@ export async function buildAllPages(outDir: string): Promise<string[]> {
   const specimen = readFileSync(join(samplesDir, 'specimen.md'), 'utf8')
 
   // theme pages + hub share one showcase render per theme; a rendering error
-  // in sample content is a build bug — fail loudly, never ship a broken demo
+  // in sample content is a build bug; fail loudly, never ship a broken demo
   const sampleBodies = new Map<string, string>()
   const specimenBodies = new Map<string, string>()
   for (const t of themes) {
@@ -45,7 +45,7 @@ export async function buildAllPages(outDir: string): Promise<string[]> {
   }
   write(routeToFile('/themes'), buildThemesHub(sampleBodies))
   for (const c of themeCopy) {
-    write(routeToFile(`/themes/${c.id}`), buildThemePage(c, sampleBodies.get(c.id)!, specimenBodies.get(c.id)!))
+    write(routeToFile(`/themes/${c.id}`), await buildThemePage(c, sampleBodies.get(c.id)!, specimenBodies.get(c.id)!, specimen))
   }
 
   for (const u of useCases) {

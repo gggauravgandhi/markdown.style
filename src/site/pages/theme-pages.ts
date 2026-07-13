@@ -1,8 +1,15 @@
+import { mathCss } from '../../pipeline/katex-css'
+import { renderBody } from '../../pipeline/render'
 import { CATEGORY_LABELS, getTheme, themes, type Category } from '../../themes/registry'
 import type { ThemeCopy } from './copy'
 import { themeCopy } from './copy'
 import { scopedSampleCss } from './scope-css'
 import { escapeHtml, pageShell } from './shell'
+
+// Rendered inline (not through content/samples/*.md) so the sample-hygiene
+// test's math ban stays intact; this is the only math example on a theme page.
+const MATH_SPECIMEN_MD =
+  'Inline math renders too: the quadratic formula is $x = \\dfrac{-b \\pm \\sqrt{b^2-4ac}}{2a}$.\n\nAnd block math: $$E = mc^2$$'
 
 function sampleEmbed(themeId: string, sampleBody: string, label: string): string {
   // the matching scoped css travels via pageShell's extraCss (style-in-body is non-conforming)
@@ -17,19 +24,27 @@ ${sampleBody}
     render. Theme pages already embed one footnote via the sample document, so
     a second embed needs its footnote ids namespaced to avoid duplicate DOM ids
     breaking footnote navigation.
-    Ceiling: this is a blind regex over the rendered body, not markdown-aware —
+    Ceiling: this is a blind regex over the rendered body, not markdown-aware;
     if specimen.md ever demonstrates a literal id="fn or href="#fn inside a
     code example, this would corrupt it. Revisit then. */
 function namespaceFootnotes(body: string): string {
   return body.replace(/id="fn/g, 'id="specimen-fn').replace(/href="#fn/g, 'href="#specimen-fn')
 }
 
-export function buildThemePage(copy: ThemeCopy, sampleBody: string, specimenBody: string): string {
+export async function buildThemePage(
+  copy: ThemeCopy,
+  sampleBody: string,
+  specimenBody: string,
+  specimenMarkdown: string,
+): Promise<string> {
   const theme = getTheme(copy.id)
+  const math = await renderBody(MATH_SPECIMEN_MD, copy.id)
+  if (math.errors.length > 0) throw new Error(`math specimen render failed for ${copy.id}: ${math.errors[0]!.message}`)
+  const mathCssStr = await mathCss()
   const related = copy.pairWith
     .map(id => {
       const rc = themeCopy.find(c => c.id === id)!
-      return `<li><a href="/themes/${id}">${escapeHtml(getTheme(id).name)}</a> — ${escapeHtml(rc.whoItSuits.split('—')[0]!.trim())}</li>`
+      return `<li><a href="/themes/${id}">${escapeHtml(getTheme(id).name)}</a>: ${escapeHtml(rc.whoItSuits.split(';')[0]!.trim())}</li>`
     })
     .join('\n')
   const main = `<section class="hero" aria-label="Introduction" style="border-top:0">
@@ -43,14 +58,18 @@ export function buildThemePage(copy: ThemeCopy, sampleBody: string, specimenBody
 
 <section aria-label="Sample document">
   <h2>What does the ${escapeHtml(theme.name)} theme look like?</h2>
-  <p class="answer">This is a complete sample report rendered in ${escapeHtml(theme.name)} — the exact output the editor downloads, embedded here unmodified.</p>
+  <p class="answer">This is a complete sample report rendered in ${escapeHtml(theme.name)}: the exact output the editor downloads, embedded here unmodified.</p>
 ${sampleEmbed(copy.id, sampleBody, `Sample document rendered in the ${theme.name} theme`)}
 </section>
 
 <section aria-label="Component specimens">
   <h2>What does every element look like in ${escapeHtml(theme.name)}?</h2>
-  <p class="answer">The same markdown building blocks, one by one: headings, tables, code, quotes, lists, and footnotes, exactly as ${escapeHtml(theme.name)} styles them.</p>
-${sampleEmbed(copy.id, namespaceFootnotes(specimenBody), `Component specimens rendered in the ${theme.name} theme`)}
+  <p class="answer">The same markdown building blocks, one by one: headings, tables, code, quotes, lists, footnotes, and math, exactly as ${escapeHtml(theme.name)} styles them.</p>
+  <details class="md-source">
+    <summary>See the markdown source</summary>
+    <pre>${escapeHtml(specimenMarkdown)}</pre>
+  </details>
+${sampleEmbed(copy.id, namespaceFootnotes(specimenBody) + math.body, `Component specimens rendered in the ${theme.name} theme`)}
 </section>
 
 <section aria-label="Who it suits">
@@ -71,11 +90,11 @@ ${related}
     description: copy.description,
     path: `/themes/${copy.id}`,
     main,
-    extraCss: scopedSampleCss(theme),
+    extraCss: `${scopedSampleCss(theme)}\n${mathCssStr}`,
   })
 }
 
-/** Anchors nested inside the card's own <a> are invalid HTML — the parser
+/** Anchors nested inside the card's own <a> are invalid HTML; the parser
     splits the card link apart, killing its clickability. Previews are inert
     (aria-hidden, pointer-events: none), so demote their links to spans. */
 function inertLinks(body: string): string {
@@ -115,10 +134,10 @@ ${sections}
 
 <section aria-label="Next steps">
   <h2>How do I use one of these on my own document?</h2>
-  <p class="answer">Open any theme page and click “Use this theme”, or go straight to the <a href="/editor">editor</a> and paste your markdown — the theme picker previews every theme live. See a worked example: <a href="/use-cases/chatgpt-report">a ChatGPT research answer styled into a report</a>, or the two-step paths to <a href="/convert/markdown-to-pdf">PDF</a> and <a href="/convert/markdown-to-html">a single HTML file</a>.</p>
+  <p class="answer">Open any theme page and click “Use this theme”, or go straight to the <a href="/editor">editor</a> and paste your markdown: the theme picker previews every theme live. See a worked example: <a href="/use-cases/chatgpt-report">a ChatGPT research answer styled into a report</a>, or the two-step paths to <a href="/convert/markdown-to-pdf">PDF</a> and <a href="/convert/markdown-to-html">a single HTML file</a>.</p>
 </section>`
   return pageShell({
-    title: 'Themes — designed looks for LLM markdown, by category — markdown.style',
+    title: 'Themes: designed looks for LLM markdown, by category | markdown.style',
     description: 'Compare all markdown.style themes on the same real report, organized by use case: business reports, technical docs, academic papers, editorial longform, minimal, and bold.',
     path: '/themes',
     main,
