@@ -13,7 +13,15 @@ ${sampleBody}
 </figure>`
 }
 
-export function buildThemePage(copy: ThemeCopy, sampleBody: string): string {
+/** markdown-it-footnote emits identical ids (id="fn1", id="fnref1") on every
+    render. Theme pages already embed one footnote via the sample document, so
+    a second embed needs its footnote ids namespaced to avoid duplicate DOM ids
+    breaking footnote navigation. */
+function namespaceFootnotes(body: string): string {
+  return body.replace(/id="fn/g, 'id="specimen-fn').replace(/href="#fn/g, 'href="#specimen-fn')
+}
+
+export function buildThemePage(copy: ThemeCopy, sampleBody: string, specimenBody: string): string {
   const theme = getTheme(copy.id)
   const related = copy.pairWith
     .map(id => {
@@ -34,6 +42,12 @@ export function buildThemePage(copy: ThemeCopy, sampleBody: string): string {
   <h2>What does the ${escapeHtml(theme.name)} theme look like?</h2>
   <p class="answer">This is a complete sample report rendered in ${escapeHtml(theme.name)} — the exact output the editor downloads, embedded here unmodified.</p>
 ${sampleEmbed(copy.id, sampleBody, `Sample document rendered in the ${theme.name} theme`)}
+</section>
+
+<section aria-label="Component specimens">
+  <h2>What does every element look like in ${escapeHtml(theme.name)}?</h2>
+  <p class="answer">The same markdown building blocks, one by one: headings, tables, code, quotes, lists, and footnotes, exactly as ${escapeHtml(theme.name)} styles them.</p>
+${sampleEmbed(copy.id, namespaceFootnotes(specimenBody), `Component specimens rendered in the ${theme.name} theme`)}
 </section>
 
 <section aria-label="Who it suits">

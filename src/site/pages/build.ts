@@ -27,20 +27,25 @@ export async function buildAllPages(outDir: string): Promise<string[]> {
   }
 
   const showcase = readFileSync(join(samplesDir, 'showcase.md'), 'utf8')
+  const specimen = readFileSync(join(samplesDir, 'specimen.md'), 'utf8')
 
   // theme pages + hub share one showcase render per theme; a rendering error
   // in sample content is a build bug — fail loudly, never ship a broken demo
   const sampleBodies = new Map<string, string>()
+  const specimenBodies = new Map<string, string>()
   for (const t of themes) {
     const { body, errors } = await renderBody(showcase, t.id)
     if (errors.length > 0) throw new Error(`sample render failed for ${t.id}: ${errors[0]!.message}`)
     sampleBodies.set(t.id, body)
+    const specimenResult = await renderBody(specimen, t.id)
+    if (specimenResult.errors.length > 0) throw new Error(`specimen render failed for ${t.id}: ${specimenResult.errors[0]!.message}`)
+    specimenBodies.set(t.id, specimenResult.body)
     const full = await render(showcase, t.id)
     write(`samples/${t.id}.html`, injectNoindex(full.html))
   }
   write(routeToFile('/themes'), buildThemesHub(sampleBodies))
   for (const c of themeCopy) {
-    write(routeToFile(`/themes/${c.id}`), buildThemePage(c, sampleBodies.get(c.id)!))
+    write(routeToFile(`/themes/${c.id}`), buildThemePage(c, sampleBodies.get(c.id)!, specimenBodies.get(c.id)!))
   }
 
   for (const u of useCases) {

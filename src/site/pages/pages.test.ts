@@ -1,7 +1,8 @@
 // @vitest-environment node
-import { readFileSync } from 'node:fs'
+import { readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
+import { hasMath } from '../../pipeline/markdown'
 import { renderBody } from '../../pipeline/render'
 import { CATEGORY_LABELS, themes, type Category } from '../../themes/registry'
 import { convertPages, themeCopy, useCases } from './copy'
@@ -14,16 +15,19 @@ import { buildUseCasePage } from './use-case-pages'
 
 const samplesDir = join(import.meta.dirname, '..', '..', '..', 'content', 'samples')
 const showcase = readFileSync(join(samplesDir, 'showcase.md'), 'utf8')
+const specimen = readFileSync(join(samplesDir, 'specimen.md'), 'utf8')
 
 // build everything once; individual tests assert invariants across the set
 async function buildAll(): Promise<Map<string, string>> {
   const pages = new Map<string, string>()
   const sampleBodies = new Map<string, string>()
+  const specimenBodies = new Map<string, string>()
   for (const t of themes) {
     sampleBodies.set(t.id, (await renderBody(showcase, t.id)).body)
+    specimenBodies.set(t.id, (await renderBody(specimen, t.id)).body)
   }
   pages.set('/themes', buildThemesHub(sampleBodies))
-  for (const c of themeCopy) pages.set(`/themes/${c.id}`, buildThemePage(c, sampleBodies.get(c.id)!))
+  for (const c of themeCopy) pages.set(`/themes/${c.id}`, buildThemePage(c, sampleBodies.get(c.id)!, specimenBodies.get(c.id)!))
   for (const u of useCases) {
     const md = readFileSync(join(samplesDir, `${u.slug}.md`), 'utf8')
     const { body } = await renderBody(md, u.themeId)
@@ -80,6 +84,29 @@ describe('generated page invariants', () => {
     }
   })
 
+  it('theme pages carry a namespaced component specimen section with no id clash', async () => {
+    const pages = await pagesPromise
+    for (const t of themes) {
+      const html = pages.get(`/themes/${t.id}`)!
+      expect(html, t.id).toContain('What does every element look like in')
+      expect(html, t.id).toContain('specimen-fn')
+      const fn1Count = (html.match(/id="fn1"/g) ?? []).length
+      expect(fn1Count, t.id).toBeLessThanOrEqual(1)
+    }
+  })
+
+  it('theme pages render every specimen component', async () => {
+    const pages = await pagesPromise
+    for (const t of themes) {
+      const html = pages.get(`/themes/${t.id}`)!
+      expect(html, t.id).toContain('<table')
+      expect(html, t.id).toContain('<pre')
+      expect(html, t.id).toContain('<blockquote')
+      expect(html, t.id).toContain('type="checkbox"')
+      expect(html, t.id).toContain('specimen-fn')
+    }
+  })
+
   it('hub previews carry no nested anchors (nesting splits the card links)', async () => {
     const hub = (await pagesPromise).get('/themes')!
     // each preview's HTML sits between its mini-preview opener and the card meta
@@ -133,6 +160,17 @@ describe('generated page invariants', () => {
     const pages = await pagesPromise
     for (const [route, html] of pages) {
       expect(html, route).not.toMatch(/eight themes?/i)
+    }
+  })
+})
+
+describe('sample hygiene', () => {
+  it('no sample content contains a mermaid fence or math (build-time render has no DOM)', () => {
+    const files = readdirSync(samplesDir).filter(f => f.endsWith('.md'))
+    for (const f of files) {
+      const src = readFileSync(join(samplesDir, f), 'utf8')
+      expect(src, f).not.toContain('```mermaid')
+      expect(hasMath(src), f).toBe(false)
     }
   })
 })
