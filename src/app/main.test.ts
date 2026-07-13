@@ -22,7 +22,7 @@ describe('editor app shell', () => {
     expect(iframe.title).toBe('Document preview')
     expect(document.querySelector('.cm-editor')).toBeTruthy()
     const buttons = [...document.querySelectorAll('button')].map(b => b.textContent?.trim())
-    for (const label of ['Download HTML', 'Print or save as PDF', 'Copy HTML', 'Open file', 'Reset to sample']) {
+    for (const label of ['Download HTML', 'Print or save as PDF', 'Copy HTML', 'Open…', 'Reset to sample', 'New']) {
       expect(buttons, label).toContain(label)
     }
     // theme button shows the active theme, not a bare "Theme"
@@ -117,5 +117,60 @@ describe('?theme= deep link', () => {
     await mount(document.getElementById('app')!)
     const accent = document.querySelector<HTMLInputElement>('[aria-label="Accent color"]')!
     expect(accent.value).toBe('#0969da') // slate's defaultAccent — untouched
+  })
+})
+
+describe('export menu', () => {
+  it('opens on trigger click, exports through the open menu, then closes and returns focus', async () => {
+    localStorage.setItem('mds-state-v1', JSON.stringify({ markdown: '   ', themeId: 'paper', knobs: {} }))
+    await mount(document.getElementById('app')!)
+    const trigger = document.getElementById('export-menu-trigger') as HTMLButtonElement
+    expect(trigger.getAttribute('aria-expanded')).toBe('false')
+    trigger.click()
+    expect(trigger.getAttribute('aria-expanded')).toBe('true')
+    expect(trigger.closest('.menu')!.hasAttribute('data-open')).toBe(true)
+    const download = [...document.querySelectorAll('[role="menuitem"]')].find(b => b.textContent === 'Download HTML')!
+    download.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    await vi.waitFor(() => expect(document.querySelector('[role="status"]')!.textContent).toMatch(/empty/i))
+    expect(trigger.getAttribute('aria-expanded')).toBe('false')
+    expect(trigger.closest('.menu')!.hasAttribute('data-open')).toBe(false)
+    expect(document.activeElement).toBe(trigger)
+  })
+})
+
+describe('file menu', () => {
+  it('New empties the editor document', async () => {
+    await mount(document.getElementById('app')!)
+    const trigger = document.getElementById('file-menu-trigger') as HTMLButtonElement
+    trigger.click()
+    const newItem = [...document.querySelectorAll('[role="menuitem"]')].find(b => b.textContent === 'New')!
+    newItem.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    await vi.waitFor(() => expect(document.querySelector('.cm-content')!.textContent).toBe(''))
+  })
+})
+
+describe('fullscreen toggle', () => {
+  it('toggles app fullscreen state and aria-pressed; Escape clears both', async () => {
+    await mount(document.getElementById('app')!)
+    const app = document.querySelector<HTMLElement>('.app')!
+    const fsBtn = [...document.querySelectorAll('button')].find(b => b.textContent === 'Full screen') as HTMLButtonElement
+    fsBtn.click()
+    expect(app.dataset.fullscreen).toBe('true')
+    expect(fsBtn.getAttribute('aria-pressed')).toBe('true')
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+    expect(app.dataset.fullscreen).toBeUndefined()
+    expect(fsBtn.getAttribute('aria-pressed')).toBe('false')
+  })
+})
+
+describe('menu keyboard handling', () => {
+  it('Escape closes an open menu and returns focus to its trigger', async () => {
+    await mount(document.getElementById('app')!)
+    const trigger = document.getElementById('file-menu-trigger') as HTMLButtonElement
+    trigger.click()
+    expect(trigger.getAttribute('aria-expanded')).toBe('true')
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+    expect(trigger.getAttribute('aria-expanded')).toBe('false')
+    expect(document.activeElement).toBe(trigger)
   })
 })

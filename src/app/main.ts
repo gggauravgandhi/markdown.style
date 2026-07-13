@@ -24,21 +24,75 @@ function el<K extends keyof HTMLElementTagNameMap>(
   return node
 }
 
-function group(...children: Element[]): HTMLDivElement {
-  const node = el('div', { class: 'tb-group' })
-  node.append(...children)
-  return node
-}
-
 function knob(label: string, input: HTMLInputElement): HTMLLabelElement {
   const node = el('label', { class: 'knob-group' })
   node.append(el('span', { class: 'knob-label' }, label), input)
   return node
 }
 
+interface MenuItem {
+  label: string
+  action: () => void
+}
+
 export async function mount(root: HTMLElement): Promise<void> {
   const initial: AppState = { markdown: SAMPLE_MARKDOWN, themeId: themes[0]!.id, knobs: {} }
   const store = createStore(initial)
+
+  // --- menus ------------------------------------------------------------------
+  // dismiss fns for every menu built by this mount; enforces "only one open at a
+  // time" and lets the Escape handler below find whichever menu is open
+  const menuHandles: Array<{ wrapper: HTMLDivElement; dismiss: (returnFocus: boolean) => void }> = []
+
+  /** Vanilla menu: trigger + menu-list, both always in the DOM (display:none when closed). */
+  function buildMenu(
+    triggerId: string,
+    triggerLabel: string,
+    triggerClass: string,
+    items: MenuItem[],
+    wrapperClass = '',
+  ): HTMLDivElement {
+    const trigger = el('button', {
+      class: `btn ${triggerClass}`.trim(),
+      id: triggerId,
+      'aria-haspopup': 'menu',
+      'aria-expanded': 'false',
+    }, triggerLabel)
+    const list = el('div', { role: 'menu', 'aria-labelledby': triggerId, class: 'menu-list' })
+    const itemEls = items.map(({ label, action }) => {
+      const item = el('button', { role: 'menuitem', class: 'menu-item' }, label)
+      item.addEventListener('click', () => {
+        action()
+        dismiss(true)
+      })
+      return item
+    })
+    list.append(...itemEls)
+    const wrapper = el('div', { class: `menu ${wrapperClass}`.trim() })
+    wrapper.append(trigger, list)
+
+    function dismiss(returnFocus: boolean): void {
+      if (!wrapper.dataset.open) return
+      delete wrapper.dataset.open
+      trigger.setAttribute('aria-expanded', 'false')
+      if (returnFocus) trigger.focus()
+    }
+    function open(): void {
+      for (const other of menuHandles) if (other.wrapper !== wrapper) other.dismiss(false)
+      wrapper.dataset.open = 'true'
+      trigger.setAttribute('aria-expanded', 'true')
+      itemEls[0]?.focus()
+    }
+    trigger.addEventListener('click', () => {
+      if (wrapper.dataset.open) dismiss(true)
+      else open()
+    })
+    menuHandles.push({ wrapper, dismiss })
+    document.addEventListener('click', e => {
+      if (wrapper.dataset.open && !wrapper.contains(e.target as Node)) dismiss(true)
+    })
+    return wrapper
+  }
 
   // gallery deep links: /editor?theme=<id> applies the theme (knobs reset,
   // same as picking it in the dialog) and then leaves the URL clean
@@ -58,30 +112,10 @@ export async function mount(root: HTMLElement): Promise<void> {
   const accentInput = el('input', { type: 'color', 'aria-label': 'Accent color', class: 'knob-accent' })
   const fontRange = el('input', { type: 'range', min: '0.7', max: '1.5', step: '0.05', 'aria-label': 'Font size', class: 'knob' })
   const widthRange = el('input', { type: 'range', min: '480', max: '1400', step: '20', 'aria-label': 'Page width', class: 'knob' })
+  const fullscreenBtn = el('button', { class: 'btn', 'aria-pressed': 'false' }, 'Full screen')
   const spacer = el('span', { class: 'spacer' })
-  const openBtn = el('button', { class: 'btn' }, 'Open file')
-  const resetBtn = el('button', { class: 'btn btn-ghost' }, 'Reset to sample')
-  const copyBtn = el('button', { class: 'btn' }, 'Copy HTML')
-  const downloadBtn = el('button', { class: 'btn btn-secondary' }, 'Download HTML')
-  const printBtn = el('button', { class: 'btn btn-primary' }, 'Print or save as PDF')
+  const previewBarSpacer = el('span', { class: 'spacer' })
   const viewToggle = el('button', { class: 'btn view-toggle', 'aria-label': 'Toggle editor and preview' }, 'Preview')
-  toolbar.append(
-    brand,
-    group(themeBtn, randomBtn, knob('Accent', accentInput), knob('Text', fontRange), knob('Width', widthRange)),
-    spacer,
-    group(openBtn, resetBtn),
-    group(copyBtn, downloadBtn, printBtn),
-    viewToggle,
-  )
-
-  const panes = el('main', { class: 'panes' })
-  const editorPane = el('section', { class: 'pane pane-editor', 'aria-label': 'Markdown editor' })
-  const previewPane = el('section', { class: 'pane pane-preview', 'aria-label': 'Preview' })
-  // security invariant (spec §2): script-free content + no allow-scripts;
-  // allow-same-origin is required for the knob fast-path into contentDocument
-  const iframe = el('iframe', { sandbox: 'allow-same-origin', title: 'Document preview' })
-  previewPane.append(iframe)
-  panes.append(editorPane, previewPane)
 
   const notices = el('div', { class: 'notices', role: 'status', 'aria-live': 'polite' })
   const fileInput = el('input', { type: 'file', accept: '.md,.markdown,.txt', class: 'visually-hidden', 'aria-label': 'Open markdown file' })
@@ -93,6 +127,56 @@ export async function mount(root: HTMLElement): Promise<void> {
   dialog.append(dialogHead, themeCards)
   const dropHint = el('div', { class: 'drop-hint', 'aria-hidden': 'true' })
   dropHint.append(el('span', {}, 'Drop your markdown file'))
+
+  const fileMenu = buildMenu('file-menu-trigger', 'File', '', [
+    { label: 'New', action: () => setEditorText('') },
+    { label: 'Open…', action: () => fileInput.click() },
+    { label: 'Reset to sample', action: () => resetToSample() },
+  ])
+  const exportMenu = buildMenu(
+    'export-menu-trigger',
+    'Export',
+    'btn-primary',
+    [
+      { label: 'Download HTML', action: () => void withDocument((html, title) => downloadHtml(html, title)) },
+      {
+        label: 'Copy HTML',
+        action: () =>
+          void withDocument(async html => {
+            notice((await copyHtml(html)) ? 'HTML copied to clipboard' : 'Copy failed. Clipboard is unavailable.')
+          }),
+      },
+      {
+        label: 'Print or save as PDF',
+        action: () =>
+          void withDocument(html => {
+            if (!printDocument(html)) notice('Popup blocked. Allow popups for this site to print.')
+          }),
+      },
+    ],
+    'menu-export',
+  )
+  toolbar.append(brand, fileMenu, spacer, viewToggle, exportMenu)
+
+  const panes = el('main', { class: 'panes' })
+  const editorPane = el('section', { class: 'pane pane-editor', 'aria-label': 'Markdown editor' })
+  const previewPane = el('section', { class: 'pane pane-preview', 'aria-label': 'Preview' })
+  const previewBar = el('div', { class: 'preview-bar' })
+  previewBar.append(
+    themeBtn,
+    randomBtn,
+    knob('Accent', accentInput),
+    knob('Text', fontRange),
+    knob('Width', widthRange),
+    previewBarSpacer,
+    fullscreenBtn,
+  )
+  // security invariant (spec §2): script-free content + no allow-scripts;
+  // allow-same-origin is required for the knob fast-path into contentDocument
+  const iframe = el('iframe', { sandbox: 'allow-same-origin', title: 'Document preview' })
+  previewPane.append(previewBar, iframe)
+  panes.append(editorPane, previewPane)
+
   app.append(toolbar, panes, notices, dropHint, dialog, fileInput)
   root.append(app)
 
@@ -247,17 +331,6 @@ export async function mount(root: HTMLElement): Promise<void> {
     const { html, title } = await render(state.markdown, state.themeId, state.knobs)
     await action(html, title)
   }
-  downloadBtn.addEventListener('click', () => void withDocument((html, title) => downloadHtml(html, title)))
-  printBtn.addEventListener('click', () =>
-    void withDocument(html => {
-      if (!printDocument(html)) notice('Popup blocked. Allow popups for this site to print.')
-    }),
-  )
-  copyBtn.addEventListener('click', () =>
-    void withDocument(async html => {
-      notice((await copyHtml(html)) ? 'HTML copied to clipboard' : 'Copy failed. Clipboard is unavailable.')
-    }),
-  )
 
   // --- file open / drag-drop -------------------------------------------------------------
   async function acceptFile(file: File): Promise<void> {
@@ -273,7 +346,6 @@ export async function mount(root: HTMLElement): Promise<void> {
       notice('Could not read the file. Try again.') // spec §7: read failures toast
     }
   }
-  openBtn.addEventListener('click', () => fileInput.click())
   fileInput.addEventListener('change', () => {
     const file = fileInput.files?.[0]
     if (file) void acceptFile(file)
@@ -305,16 +377,36 @@ export async function mount(root: HTMLElement): Promise<void> {
   }
 
   // --- misc -----------------------------------------------------------------------------
-  resetBtn.addEventListener('click', () => {
+  function resetToSample(): void {
     store.set({ markdown: SAMPLE_MARKDOWN, themeId: themes[0]!.id, knobs: {} })
     setEditorText(SAMPLE_MARKDOWN)
     initKnobControls()
     void preview.renderNow(store.get())
-  })
+  }
   viewToggle.addEventListener('click', () => {
     const next = app.dataset.view === 'preview' ? 'editor' : 'preview'
     app.dataset.view = next
     viewToggle.textContent = next === 'preview' ? 'Editor' : 'Preview'
+  })
+
+  // --- fullscreen -------------------------------------------------------------------------
+  function setFullscreen(active: boolean): void {
+    if (active) app.dataset.fullscreen = 'true'
+    else delete app.dataset.fullscreen
+    fullscreenBtn.textContent = active ? 'Exit full screen' : 'Full screen'
+    fullscreenBtn.setAttribute('aria-pressed', String(active))
+  }
+  fullscreenBtn.addEventListener('click', () => setFullscreen(app.dataset.fullscreen !== 'true'))
+  // Escape closes an open menu first; only falls through to exiting fullscreen
+  // when no menu was open (menu Escape handling takes priority)
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Escape') return
+    const openMenu = menuHandles.find(m => m.wrapper.dataset.open)
+    if (openMenu) {
+      openMenu.dismiss(true)
+      return
+    }
+    if (app.dataset.fullscreen === 'true') setFullscreen(false)
   })
 
   initKnobControls()
