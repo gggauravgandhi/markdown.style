@@ -104,6 +104,12 @@ describe('generated page invariants', () => {
       expect(html, t.id).toContain('<blockquote')
       expect(html, t.id).toContain('type="checkbox"')
       expect(html, t.id).toContain('specimen-fn')
+      // byte strings unique to specimen.md (absent from showcase.md, the other
+      // embed on this page) — catches the specimen body being dropped or
+      // swapped for the sample, which the assertions above cannot
+      expect(html, t.id).toContain('A quoted aside, set apart from the body copy.')
+      expect(html, t.id).toContain('GFM pipe syntax')
+      expect(html, t.id).toContain('The citation backing that claim.')
     }
   })
 

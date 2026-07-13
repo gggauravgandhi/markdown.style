@@ -82,6 +82,7 @@ body { background: var(--app-bg); color: var(--app-fg); font: 14px/1.5 system-ui
   .app[data-view='editor'] .pane-preview,
   .app[data-view='split'] .pane-preview { display: none; }
   .app[data-view='preview'] .pane-preview { display: grid; }
+  .app[data-fullscreen='true'] .pane-preview { display: grid; }
 }
 
 .theme-dialog {

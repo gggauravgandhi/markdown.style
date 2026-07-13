@@ -44,7 +44,8 @@ export async function mount(root: HTMLElement): Promise<void> {
   // time" and lets the Escape handler below find whichever menu is open
   const menuHandles: Array<{ wrapper: HTMLDivElement; dismiss: (returnFocus: boolean) => void }> = []
 
-  /** Vanilla menu: trigger + menu-list, both always in the DOM (display:none when closed). */
+  /** Vanilla menu: trigger + menu-list, both always in the DOM (display:none when closed).
+      Disclosure pattern (not role="menu"/"menuitem" — we don't implement arrow-key nav). */
   function buildMenu(
     triggerId: string,
     triggerLabel: string,
@@ -52,15 +53,16 @@ export async function mount(root: HTMLElement): Promise<void> {
     items: MenuItem[],
     wrapperClass = '',
   ): HTMLDivElement {
+    const listId = `${triggerId}-list`
     const trigger = el('button', {
       class: `btn ${triggerClass}`.trim(),
       id: triggerId,
-      'aria-haspopup': 'menu',
       'aria-expanded': 'false',
+      'aria-controls': listId,
     }, triggerLabel)
-    const list = el('div', { role: 'menu', 'aria-labelledby': triggerId, class: 'menu-list' })
+    const list = el('div', { id: listId, 'aria-labelledby': triggerId, class: 'menu-list' })
     const itemEls = items.map(({ label, action }) => {
-      const item = el('button', { role: 'menuitem', class: 'menu-item' }, label)
+      const item = el('button', { class: 'menu-item' }, label)
       item.addEventListener('click', () => {
         action()
         dismiss(true)
@@ -87,12 +89,23 @@ export async function mount(root: HTMLElement): Promise<void> {
       if (wrapper.dataset.open) dismiss(true)
       else open()
     })
-    menuHandles.push({ wrapper, dismiss })
-    document.addEventListener('click', e => {
-      if (wrapper.dataset.open && !wrapper.contains(e.target as Node)) dismiss(true)
+    // disclosure pattern: Tab-ing (or otherwise moving focus) out of the wrapper
+    // entirely closes the menu, since we don't trap focus inside it
+    wrapper.addEventListener('focusout', e => {
+      if (!wrapper.contains(e.relatedTarget as Node)) dismiss(false)
     })
+    menuHandles.push({ wrapper, dismiss })
     return wrapper
   }
+  // one click listener for every menu built by this mount (not one per buildMenu
+  // call); dismiss() no-ops on menus that aren't open, and mount() runs once in
+  // production so this never accumulates duplicate listeners. Focus is left alone
+  // (fix C): an outside click may be the user clicking into the editor to type.
+  document.addEventListener('click', e => {
+    for (const { wrapper, dismiss } of menuHandles) {
+      if (!wrapper.contains(e.target as Node)) dismiss(false)
+    }
+  })
 
   // gallery deep links: /editor?theme=<id> applies the theme (knobs reset,
   // same as picking it in the dialog) and then leaves the URL clean
@@ -395,12 +408,18 @@ export async function mount(root: HTMLElement): Promise<void> {
     else delete app.dataset.fullscreen
     fullscreenBtn.textContent = active ? 'Exit full screen' : 'Full screen'
     fullscreenBtn.setAttribute('aria-pressed', String(active))
+    // fullscreen covers the toolbar and editor pane visually; inert keeps them
+    // out of tab order and off-limits to assistive tech while hidden
+    toolbar.toggleAttribute('inert', active)
+    editorPane.toggleAttribute('inert', active)
   }
   fullscreenBtn.addEventListener('click', () => setFullscreen(app.dataset.fullscreen !== 'true'))
-  // Escape closes an open menu first; only falls through to exiting fullscreen
-  // when no menu was open (menu Escape handling takes priority)
+  // Escape priority: the native <dialog> owns Escape while open (return immediately
+  // so we don't also close a menu or exit fullscreen on the same keystroke); then an
+  // open menu; only then fullscreen exit
   document.addEventListener('keydown', e => {
     if (e.key !== 'Escape') return
+    if (dialog.open) return
     const openMenu = menuHandles.find(m => m.wrapper.dataset.open)
     if (openMenu) {
       openMenu.dismiss(true)

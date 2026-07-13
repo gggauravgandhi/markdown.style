@@ -129,7 +129,7 @@ describe('export menu', () => {
     trigger.click()
     expect(trigger.getAttribute('aria-expanded')).toBe('true')
     expect(trigger.closest('.menu')!.hasAttribute('data-open')).toBe(true)
-    const download = [...document.querySelectorAll('[role="menuitem"]')].find(b => b.textContent === 'Download HTML')!
+    const download = [...document.querySelectorAll('.menu-item')].find(b => b.textContent === 'Download HTML')!
     download.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     await vi.waitFor(() => expect(document.querySelector('[role="status"]')!.textContent).toMatch(/empty/i))
     expect(trigger.getAttribute('aria-expanded')).toBe('false')
@@ -143,7 +143,7 @@ describe('file menu', () => {
     await mount(document.getElementById('app')!)
     const trigger = document.getElementById('file-menu-trigger') as HTMLButtonElement
     trigger.click()
-    const newItem = [...document.querySelectorAll('[role="menuitem"]')].find(b => b.textContent === 'New')!
+    const newItem = [...document.querySelectorAll('.menu-item')].find(b => b.textContent === 'New')!
     newItem.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     await vi.waitFor(() => expect(document.querySelector('.cm-content')!.textContent).toBe(''))
   })
@@ -153,13 +153,16 @@ describe('fullscreen toggle', () => {
   it('toggles app fullscreen state and aria-pressed; Escape clears both', async () => {
     await mount(document.getElementById('app')!)
     const app = document.querySelector<HTMLElement>('.app')!
+    const toolbar = document.querySelector<HTMLElement>('.toolbar')!
     const fsBtn = [...document.querySelectorAll('button')].find(b => b.textContent === 'Full screen') as HTMLButtonElement
     fsBtn.click()
     expect(app.dataset.fullscreen).toBe('true')
     expect(fsBtn.getAttribute('aria-pressed')).toBe('true')
+    expect(toolbar.hasAttribute('inert')).toBe(true) // covered chrome is inert while fullscreen
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
     expect(app.dataset.fullscreen).toBeUndefined()
     expect(fsBtn.getAttribute('aria-pressed')).toBe('false')
+    expect(toolbar.hasAttribute('inert')).toBe(false) // inert lifted on exit
   })
 })
 

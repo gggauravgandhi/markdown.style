@@ -16,7 +16,10 @@ ${sampleBody}
 /** markdown-it-footnote emits identical ids (id="fn1", id="fnref1") on every
     render. Theme pages already embed one footnote via the sample document, so
     a second embed needs its footnote ids namespaced to avoid duplicate DOM ids
-    breaking footnote navigation. */
+    breaking footnote navigation.
+    Ceiling: this is a blind regex over the rendered body, not markdown-aware —
+    if specimen.md ever demonstrates a literal id="fn or href="#fn inside a
+    code example, this would corrupt it. Revisit then. */
 function namespaceFootnotes(body: string): string {
   return body.replace(/id="fn/g, 'id="specimen-fn').replace(/href="#fn/g, 'href="#specimen-fn')
 }
