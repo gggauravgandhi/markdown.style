@@ -54,6 +54,7 @@ export async function mount(root: HTMLElement): Promise<void> {
   const toolbar = el('header', { class: 'toolbar' })
   const brand = el('a', { class: 'brand', href: '/' }, 'markdown.style')
   const themeBtn = el('button', { class: 'btn btn-theme', 'aria-haspopup': 'dialog' }, 'Theme')
+  const randomBtn = el('button', { class: 'btn', title: 'Try a random theme' }, 'Random')
   const accentInput = el('input', { type: 'color', 'aria-label': 'Accent color', class: 'knob-accent' })
   const fontRange = el('input', { type: 'range', min: '0.7', max: '1.5', step: '0.05', 'aria-label': 'Font size', class: 'knob' })
   const widthRange = el('input', { type: 'range', min: '480', max: '1400', step: '20', 'aria-label': 'Page width', class: 'knob' })
@@ -66,7 +67,7 @@ export async function mount(root: HTMLElement): Promise<void> {
   const viewToggle = el('button', { class: 'btn view-toggle', 'aria-label': 'Toggle editor and preview' }, 'Preview')
   toolbar.append(
     brand,
-    group(themeBtn, knob('Accent', accentInput), knob('Text', fontRange), knob('Width', widthRange)),
+    group(themeBtn, randomBtn, knob('Accent', accentInput), knob('Text', fontRange), knob('Width', widthRange)),
     spacer,
     group(openBtn, resetBtn),
     group(copyBtn, downloadBtn, printBtn),
@@ -166,6 +167,17 @@ export async function mount(root: HTMLElement): Promise<void> {
     })
   }
 
+  /** Switch theme with the same semantics as picking it in the dialog (knobs reset). */
+  function applyTheme(themeId: string): void {
+    store.set({ themeId, knobs: {} })
+    initKnobControls()
+    void preview.renderNow(store.get())
+  }
+  randomBtn.addEventListener('click', () => {
+    const pool = themes.filter(t => t.id !== store.get().themeId)
+    applyTheme(pool[Math.floor(Math.random() * pool.length)]!.id)
+  })
+
   // --- theme picker ----------------------------------------------------------------
   let thumbsBuilt = false
   async function fillThumb(card: Element): Promise<void> {
@@ -190,9 +202,7 @@ export async function mount(root: HTMLElement): Promise<void> {
         themeCards.append(card)
         cards.push(card)
         card.addEventListener('click', () => {
-          store.set({ themeId: theme.id, knobs: {} })
-          initKnobControls()
-          void preview.renderNow(store.get())
+          applyTheme(theme.id)
           dialog.close()
         })
       }

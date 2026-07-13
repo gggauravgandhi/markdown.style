@@ -71,6 +71,21 @@ describe('theme dialog', () => {
   }, 20_000)
 })
 
+describe('random theme button', () => {
+  it('applies a random theme that is never the current one', async () => {
+    await mount(document.getElementById('app')!)
+    const buttons = () => [...document.querySelectorAll('button')]
+    const randomBtn = buttons().find(b => b.textContent === 'Random')!
+    expect(randomBtn, 'Random button exists').toBeTruthy()
+    const themeLabel = () => buttons().find(b => b.textContent?.startsWith('Theme:'))!.textContent
+    for (let i = 0; i < 12; i++) {
+      const before = themeLabel()
+      randomBtn.click()
+      expect(themeLabel()).not.toBe(before) // never lands on the current theme
+    }
+  })
+})
+
 describe('drag and drop affordance', () => {
   it('shows the drop hint only while dragging over the app', async () => {
     await mount(document.getElementById('app')!)
