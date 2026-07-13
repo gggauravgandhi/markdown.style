@@ -58,12 +58,19 @@ ${related}
   })
 }
 
+/** Anchors nested inside the card's own <a> are invalid HTML — the parser
+    splits the card link apart, killing its clickability. Previews are inert
+    (aria-hidden, pointer-events: none), so demote their links to spans. */
+function inertLinks(body: string): string {
+  return body.replace(/<a\b[^>]*>/g, '<span>').replace(/<\/a>/g, '</span>')
+}
+
 export function buildThemesHub(samples: ReadonlyMap<string, string>): string {
   const card = (t: (typeof themes)[number]): string => `<li>
 <a class="theme-card-link" href="/themes/${t.id}">
   <div class="mini-preview" aria-hidden="true">
     <div class="mds-theme-${t.id}"><div class="mds-content">
-${samples.get(t.id) ?? ''}
+${inertLinks(samples.get(t.id) ?? '')}
     </div></div>
   </div>
   <span class="theme-card-meta"><strong>${escapeHtml(t.name)}</strong><span class="desc">${escapeHtml(t.description)}</span></span>

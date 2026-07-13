@@ -80,6 +80,14 @@ describe('generated page invariants', () => {
     }
   })
 
+  it('hub previews carry no nested anchors (nesting splits the card links)', async () => {
+    const hub = (await pagesPromise).get('/themes')!
+    // each preview's HTML sits between its mini-preview opener and the card meta
+    const previews = hub.split('class="mini-preview"').slice(1).map(s => s.split('theme-card-meta')[0]!)
+    expect(previews).toHaveLength(themes.length)
+    for (const p of previews) expect(p).not.toMatch(/<a\b/)
+  })
+
   it('the hub previews every theme inline and links each theme page', async () => {
     const pages = await pagesPromise
     const hub = pages.get('/themes')!
