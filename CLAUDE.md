@@ -33,11 +33,12 @@ Design context lives in `PRODUCT.md` / `DESIGN.md` (root) and `docs/superpowers/
 - No em dashes in registry descriptions or UI strings (tests enforce for descriptions and generated-page copy).
 - Theme pages embed two documents; specimen footnote ids are namespaced `specimen-fn*` — duplicate `id="fn1"` is a regression.
 - Sitemap ≤ 50 URLs; landing strip = the six `featured` themes exactly.
+- Never nest rendered markdown (it contains links) inside an `<a>` — parsers split the outer link. Hub previews demote inner anchors via `inertLinks()`; reuse it for any new linked preview.
 
 ## Code Style
 
 - Vanilla TS, no framework. DOM built via the `el()` helper in `main.ts`; match that pattern.
-- No new dependencies without explicit need (the two `@codemirror/*` + `@lezer/highlight` extras are deliberate declarations of transitives).
+- No new dependencies without explicit need (`@codemirror/language` and `@lezer/highlight` are deliberately declared transitives, not additions).
 - Editor chrome follows DESIGN.md: flat, border-defined, one accent (`--app-accent`), dark text on accent fills, 150ms ease-out transitions with `prefers-reduced-motion` off-switch.
 - Menus use the disclosure pattern (`aria-expanded` + `aria-controls`), not `role="menu"`.
 
