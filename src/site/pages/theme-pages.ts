@@ -3,6 +3,7 @@ import { renderBody } from '../../pipeline/render'
 import { CATEGORY_LABELS, getTheme, themes, type Category } from '../../themes/registry'
 import type { ThemeCopy } from './copy'
 import { themeCopy } from './copy'
+import { pageSchema } from './schema'
 import { scopedSampleCss } from './scope-css'
 import { escapeHtml, pageShell } from './shell'
 import { SPECIMENS, type Specimen } from './specimens'
@@ -118,12 +119,19 @@ ${related}
   <p class="answer">Part of the ${escapeHtml(CATEGORY_LABELS[theme.category])} collection: <a href="/themes#${theme.category}">see the rest of the category</a>.</p>
   <p><a class="btn-ghost" href="/themes">Browse all themes →</a></p>
 </section>`
+  const path = `/themes/${copy.id}`
   return pageShell({
     title: copy.title,
     description: copy.description,
-    path: `/themes/${copy.id}`,
+    path,
     main,
     extraCss: `${scopedSampleCss(theme)}\n${mathCssStr}`,
+    jsonLd: pageSchema({
+      path,
+      title: copy.title,
+      description: copy.description,
+      trail: [{ name: 'Themes', path: '/themes' }, { name: theme.name }],
+    }),
   })
 }
 
@@ -169,11 +177,15 @@ ${sections}
   <h2>How do I use one of these on my own document?</h2>
   <p class="answer">Open any theme page and click “Use this theme”, or go straight to the <a href="/editor">editor</a> and paste your markdown: the theme picker previews every theme live. See a worked example: <a href="/use-cases/chatgpt-report">a ChatGPT research answer styled into a report</a>, or the two-step paths to <a href="/convert/markdown-to-pdf">PDF</a> and <a href="/convert/markdown-to-html">a single HTML file</a>.</p>
 </section>`
+  const title = 'Themes: designed looks for LLM markdown, by category | markdown.style'
+  const description =
+    'Compare all markdown.style themes on the same real report, organized by use case: business reports, technical docs, academic papers, editorial longform, minimal, and bold.'
   return pageShell({
-    title: 'Themes: designed looks for LLM markdown, by category | markdown.style',
-    description: 'Compare all markdown.style themes on the same real report, organized by use case: business reports, technical docs, academic papers, editorial longform, minimal, and bold.',
+    title,
+    description,
     path: '/themes',
     main,
     extraCss: themes.map(t => scopedSampleCss(t)).join('\n'),
+    jsonLd: pageSchema({ path: '/themes', title, description, trail: [{ name: 'Themes' }], includeThemeList: true }),
   })
 }

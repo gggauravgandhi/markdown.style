@@ -4,16 +4,12 @@
 
 - **Title:** Your AI Already Wrote the Document. Stop Paying It to Format One.
 - **Subtitle:** How to turn ChatGPT, Claude, or Gemini markdown into a real PDF without another prompt.
-- **Target keywords:** ChatGPT markdown to PDF, AI markdown to PDF, convert markdown to PDF, styled markdown
-  PDF, markdown to HTML, markdown editor with themes, AI output to professional document.
+- **Target keywords:** ChatGPT markdown to PDF, AI markdown to PDF, convert markdown to PDF, styled markdown PDF, markdown to HTML, markdown editor with themes, AI output to professional document.
 - **Medium tags (pick five):** Artificial Intelligence, ChatGPT, Productivity, Markdown, Writing.
-- **Meta description:** Paste markdown from ChatGPT, Claude, or any AI assistant, choose a document style, and
-  export a polished PDF or HTML file. Free, local, no signup.
+- **Meta description:** Paste markdown from ChatGPT, Claude, or any AI assistant, choose a document style, and export a polished PDF or HTML file. Free, local, no signup.
 - **Word count:** about 1,250.
-- **Canonical:** if you cross post to Dev.to or Indie Hackers, set the canonical URL to the Medium version so
-  you do not split the ranking.
-- **Accuracy note:** the project is MIT licensed, so the open source claim is accurate. Repo:
-  https://github.com/gggauravgandhi/markdown.style
+- **Canonical:** if you cross post to Dev.to or Indie Hackers, set the canonical URL to the Medium version so you do not split the ranking.
+- **Accuracy note:** the project is MIT licensed, so the open source claim is accurate. Repo:  https://github.com/gggauravgandhi/markdown.style
 
 ---
 
@@ -21,55 +17,39 @@
 
 ### How to turn ChatGPT, Claude, or Gemini markdown into a real PDF without another prompt
 
-You asked an AI assistant for a technical spec, a research summary, or a quarterly report. It gave you
-something genuinely good. Clear headings, a comparison table, a code block, maybe a diagram.
+You asked an AI assistant for a technical spec, a research summary, or a quarterly report. It gave you something genuinely good. Clear headings, a comparison table, a code block, maybe a diagram.
 
 Then you tried to send it to somebody.
 
-That is the moment the whole thing falls apart. What you have is markdown, which is plain text with asterisks
-in it. What you need is a document. The gap between those two things has quietly become one of the most
-annoying chores in modern knowledge work.
+That is the moment the whole thing falls apart. What you have is markdown, which is plain text with asterisks in it. What you need is a document. The gap between those two things has quietly become one of the most annoying chores in modern knowledge work.
 
 ### The reformatting loop nobody talks about
 
-Most people solve it by asking the AI to do the formatting too. It seems reasonable. The AI wrote the words,
-so surely it can produce the file.
+Most people solve it by asking the AI to do the formatting too. It seems reasonable. The AI wrote the words, so surely it can produce the file.
 
 Here is how that actually goes.
 
-You ask for HTML. You get back several hundred lines of markup with inline styles, a font stack chosen
-apparently at random, and a table that overflows its container. You ask it to change the design. It
-regenerates the entire document, and somewhere in the process it rewords your third paragraph and drops a
-footnote. You ask for a PDF. It cannot make one, so it hands you HTML again and tells you to print it. Then
+You ask for HTML. You get back several hundred lines of markup with inline styles, a font stack chosen apparently at random, and a table that overflows its container. You ask it to change the design. It regenerates the entire document, and somewhere in the process it rewords your third paragraph and drops a footnote. You ask for a PDF. It cannot make one, so it hands you HTML again and tells you to print it. Then
 you fix a typo in the source, and every formatting change you made is gone, and you start over.
 
-Each turn of that loop costs tokens, costs time, and quietly risks your content. You are using a
-probabilistic text generator to do a deterministic layout job. It is the wrong tool, applied confidently.
+Each turn of that loop costs tokens, costs time, and quietly risks your content. You are using a probabilistic text generator to do a deterministic layout job. It is the wrong tool, applied confidently.
 
-The output usually is not even good. An LLM writing CSS from memory produces the same generic document every
-time: default fonts, blue links, tables that break across pages, code blocks sliced in half by a page break.
+The output usually is not even good. An LLM writing CSS from memory produces the same generic document every time: default fonts, blue links, tables that break across pages, code blocks sliced in half by a page break.
 It looks like what it is, which is a machine guessing at typography.
 
 ### The actual fix is boring
 
-Content generation is the hard part, and AI is genuinely excellent at it. Presentation is the easy part, and
-it does not require intelligence at all. It requires a stylesheet.
+Content generation is the hard part, and AI is genuinely excellent at it. Presentation is the easy part, and it does not require intelligence at all. It requires a stylesheet.
 
-So separate them. Generate the content once. Handle the presentation locally, as many times as you like, for
-nothing.
+So separate them. Generate the content once. Handle the presentation locally, as many times as you like, for nothing.
 
-That is the whole idea behind [markdown.style](https://markdown.style). You paste the markdown your AI gave
-you, pick a document style, and export. No account, no upload, no usage limits, no further prompting.
+That is the whole idea behind [markdown.style](https://markdown.style). You paste the markdown your AI gave you, pick a document style, and export. No account, no upload, no usage limits, no further prompting.
 
 ### What it does
 
-**Paste or open.** Drop in markdown from ChatGPT, Claude, Gemini, Copilot, or anything else. Open a `.md`
-file from your machine if you have one.
+**Paste or open.** Drop in markdown from ChatGPT, Claude, Gemini, Copilot, or anything else. Open a `.md` file from your machine if you have one.
 
-**Pick a document style.** This is the part that matters. There is a library of complete document styles
-grouped into six categories: business, technical, academic, editorial, minimal, and bold. A style is not a
-color scheme. It sets the typography, the heading hierarchy, the table rules, the code treatment, the
-blockquote design, the footnote layout, and the print behavior.
+**Pick a document style.** This is the part that matters. There is a library of complete document styles grouped into six categories: business, technical, academic, editorial, minimal, and bold. A style is not a color scheme. It sets the typography, the heading hierarchy, the table rules, the code treatment, the blockquote design, the footnote layout, and the print behavior.
 
 That distinction is the point. A product requirements document should not look like a research paper. A board
 report should not look like a terminal. A conference submission should not look like a startup blog. Choosing

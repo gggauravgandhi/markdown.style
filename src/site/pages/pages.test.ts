@@ -37,6 +37,62 @@ async function buildAll(): Promise<Map<string, string>> {
 
 const pagesPromise = buildAll()
 
+/** Every JSON-LD node on a page, parsed. Throws if the markup is malformed. */
+function jsonLd(html: string): Record<string, unknown>[] {
+  return [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].flatMap(m => {
+    const parsed = JSON.parse(m[1]!) as Record<string, unknown> | Record<string, unknown>[]
+    return Array.isArray(parsed) ? parsed : [parsed]
+  })
+}
+
+describe('structured data (AEO)', () => {
+  it('every page carries a WebPage node wired into the one WebSite entity', async () => {
+    for (const [route, html] of await pagesPromise) {
+      const page = jsonLd(html).find(n => n['@type'] === 'WebPage')
+      expect(page, route).toBeDefined()
+      // a dangling isPartOf is worse than none: it must match index.html's WebSite @id
+      expect((page!.isPartOf as { '@id': string })['@id'], route).toBe('https://markdown.style/#website')
+    }
+  })
+
+  it('every breadcrumb link resolves to a real route, and the last crumb never links', async () => {
+    for (const [route, html] of await pagesPromise) {
+      const crumbs = jsonLd(html).find(n => n['@type'] === 'BreadcrumbList')
+      expect(crumbs, route).toBeDefined()
+      const items = crumbs!.itemListElement as { position: number; name: string; item?: string }[]
+      expect(items.length, route).toBeGreaterThanOrEqual(2)
+      expect(items[0]!.name, route).toBe('markdown.style')
+      items.forEach((c, i) => expect(c.position, route).toBe(i + 1))
+      for (const c of items) {
+        if (!c.item) continue
+        const path = c.item.replace('https://markdown.style', '') || '/'
+        expect(ALL_ROUTES, `${route}: breadcrumb points at ${path}, which is not a route`).toContain(path)
+      }
+      expect(items.at(-1)!.item, `${route}: the current page must not link to itself`).toBeUndefined()
+    }
+  })
+
+  it('the hub enumerates every theme, counted from the registry', async () => {
+    const list = jsonLd((await pagesPromise).get('/themes')!).find(n => n['@type'] === 'ItemList')
+    expect(list).toBeDefined()
+    expect(list!.numberOfItems).toBe(themes.length)
+    const urls = (list!.itemListElement as { url: string }[]).map(i => i.url)
+    for (const t of themes) expect(urls).toContain(`https://markdown.style/themes/${t.id}`)
+  })
+
+  it('no deprecated or fabricated schema, anywhere', async () => {
+    // FAQPage and HowTo lost their rich results in 2023, so they buy nothing.
+    // aggregateRating and Review would mean inventing ratings we do not have.
+    // SearchAction advertises a sitelinks searchbox, and there is no site search.
+    for (const [route, html] of await pagesPromise) {
+      const blob = JSON.stringify(jsonLd(html))
+      for (const banned of ['FAQPage', 'HowTo', 'aggregateRating', 'Review', 'SearchAction']) {
+        expect(blob, `${route} must not claim ${banned}`).not.toContain(banned)
+      }
+    }
+  })
+})
+
 describe('generated page invariants', () => {
   it('every route builds and satisfies the static-page contract', async () => {
     const pages = await pagesPromise
@@ -44,7 +100,11 @@ describe('generated page invariants', () => {
     for (const [route, html] of pages) {
       expect(html, route).toMatch(/^<!doctype html>/i)
       expect(html, route).toContain(`<link rel="canonical" href="https://markdown.style${route}">`)
-      expect(html, route).not.toContain('<script') // zero JS on citable pages
+      // zero EXECUTABLE JS on citable pages. JSON-LD is inert data, not code, and is
+      // the one carve-out (CLAUDE.md). Any other <script tag is a regression.
+      for (const tag of html.match(/<script[^>]*>/g) ?? []) {
+        expect(tag, route).toBe('<script type="application/ld+json">')
+      }
       // self-contained: nothing may be FETCHED from another origin (sample
       // documents legitimately contain plain <a href> demo links, no request)
       expect(html, route).not.toMatch(/src="https?:\/\/(?!markdown\.style[/"])/)

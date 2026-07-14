@@ -1,5 +1,6 @@
 import { getTheme } from '../../themes/registry'
 import type { UseCaseCopy } from './copy'
+import { pageSchema } from './schema'
 import { scopedSampleCss } from './scope-css'
 import { escapeHtml, pageShell } from './shell'
 
@@ -38,11 +39,14 @@ ${sections}
   <h2>More ways in</h2>
   <p class="answer">Browse <a href="/themes">all themes</a>, or go straight to <a href="/convert/markdown-to-pdf">markdown → PDF</a> / <a href="/convert/markdown-to-html">markdown → HTML</a>.</p>
 </section>`
+  const path = `/use-cases/${copy.slug}`
   return pageShell({
     title: copy.title,
     description: copy.description,
-    path: `/use-cases/${copy.slug}`,
+    path,
     main,
     extraCss: scopedSampleCss(theme),
+    // no middle crumb: /use-cases is not a route, and a breadcrumb item must resolve
+    jsonLd: pageSchema({ path, title: copy.title, description: copy.description, trail: [{ name: copy.h1 }] }),
   })
 }

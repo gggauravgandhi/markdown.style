@@ -23,8 +23,10 @@ export function pageShell(opts: {
   path: string
   main: string
   extraCss?: string
+  /** JSON-LD from schema.ts. The only <script> a generated page may ever carry. */
+  jsonLd?: string
 }): string {
-  const { title, description, path, main, extraCss = '' } = opts
+  const { title, description, path, main, extraCss = '', jsonLd = '' } = opts
   const url = `${SITE_ORIGIN}${path}`
   return `<!doctype html>
 <html lang="en">
@@ -44,6 +46,7 @@ export function pageShell(opts: {
 ${siteCss}
 ${extraCss}
 </style>
+${jsonLd}
 </head>
 <body>
 <header class="site-header">

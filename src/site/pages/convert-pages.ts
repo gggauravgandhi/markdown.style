@@ -1,5 +1,6 @@
 import type { ConvertCopy } from './copy'
 import { convertPages, useCases } from './copy'
+import { pageSchema } from './schema'
 import { escapeHtml, pageShell } from './shell'
 
 export function buildConvertPage(copy: ConvertCopy): string {
@@ -28,5 +29,13 @@ ${workedExamples}
   </ul>
   <p class="answer">Prefer the other output? <a href="/convert/${other.slug}">${escapeHtml(other.h1)}</a>.</p>
 </section>`
-  return pageShell({ title: copy.title, description: copy.description, path: `/convert/${copy.slug}`, main })
+  const path = `/convert/${copy.slug}`
+  return pageShell({
+    title: copy.title,
+    description: copy.description,
+    path,
+    main,
+    // no middle crumb: /convert is not a route, and a breadcrumb item must resolve
+    jsonLd: pageSchema({ path, title: copy.title, description: copy.description, trail: [{ name: copy.h1 }] }),
+  })
 }
