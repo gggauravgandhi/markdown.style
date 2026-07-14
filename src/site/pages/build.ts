@@ -4,6 +4,7 @@ import { render, renderBody } from '../../pipeline/render'
 import { themes } from '../../themes/registry'
 import { convertPages, themeCopy, useCases } from './copy'
 import { buildConvertPage } from './convert-pages'
+import { buildLlms, buildRobots } from './crawl-files'
 import { ALL_ROUTES, routeToFile } from './routes'
 import { buildSitemap } from './sitemap'
 import { buildThemePage, buildThemesHub } from './theme-pages'
@@ -57,5 +58,7 @@ export async function buildAllPages(outDir: string): Promise<string[]> {
   }
 
   write('sitemap.xml', buildSitemap(ALL_ROUTES))
+  write('robots.txt', buildRobots())
+  write('llms.txt', buildLlms())
   return written.sort()
 }

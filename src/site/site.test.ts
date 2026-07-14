@@ -4,6 +4,8 @@ import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { themes } from '../themes/registry'
 import { useCases } from './pages/copy'
+import { buildLlms, buildRobots } from './pages/crawl-files'
+import { ALL_ROUTES } from './pages/routes'
 
 const root = join(import.meta.dirname, '..', '..')
 const read = (p: string): string => readFileSync(join(root, p), 'utf8')
@@ -88,7 +90,7 @@ describe('marketing pages', () => {
 
 describe('crawl files', () => {
   it('robots.txt allows everyone, names citation bots, points at the sitemap', () => {
-    const robots = read('public/robots.txt')
+    const robots = buildRobots()
     expect(robots).toMatch(/User-agent: \*\s+Allow: \//)
     for (const bot of ['OAI-SearchBot', 'ChatGPT-User', 'PerplexityBot', 'Claude-SearchBot', 'Claude-User', 'GPTBot', 'ClaudeBot']) {
       expect(robots).toContain(`User-agent: ${bot}`)
@@ -97,15 +99,36 @@ describe('crawl files', () => {
     expect(robots).toContain('Sitemap: https://markdown.style/sitemap.xml')
   })
 
-  it('the generated sitemap is the single source of routes (static copy removed)', () => {
-    expect(() => read('public/sitemap.xml')).toThrow() // generator owns it now
+  it('the generator owns sitemap.xml, robots.txt, and llms.txt: no static copies left', () => {
+    expect(() => read('public/sitemap.xml')).toThrow()
+    expect(() => read('public/robots.txt')).toThrow()
+    expect(() => read('public/llms.txt')).toThrow()
   })
 
   it('llms.txt describes the tool and lists key pages', () => {
-    const llms = read('public/llms.txt')
+    const llms = buildLlms()
     expect(llms).toContain('# markdown.style')
     expect(llms).toContain('https://markdown.style/editor')
     expect(llms).toContain('https://markdown.style/themes')
+  })
+
+  it('llms.txt theme count is derived, never a stale hardcoded number', () => {
+    const llms = buildLlms()
+    expect(llms).toContain(String(themes.length))
+    expect(llms.toLowerCase()).not.toContain('eight')
+  })
+
+  it('every URL llms.txt lists is a real route (no dead links in the crawler map)', () => {
+    const llms = buildLlms()
+    const paths = [...llms.matchAll(/https:\/\/markdown\.style(\/\S*)/g)].map(m => m[1]!)
+    expect(paths.length).toBeGreaterThan(0)
+    for (const p of paths) expect(ALL_ROUTES, p).toContain(p)
+  })
+
+  it('llms.txt makes no false export capability claim', () => {
+    const llms = buildLlms()
+    expect(llms).not.toContain('DOCX')
+    expect(llms.toLowerCase()).not.toMatch(/one[- ]click[^.]*pdf/)
   })
 })
 

@@ -19,6 +19,8 @@ describe('buildAllPages', () => {
       ...themes.map(t => `samples/${t.id}.html`),
       ...useCases.map(u => `samples/${u.slug}.html`),
       'sitemap.xml',
+      'robots.txt',
+      'llms.txt',
     ].sort()
     expect(written).toEqual(expected)
   })
