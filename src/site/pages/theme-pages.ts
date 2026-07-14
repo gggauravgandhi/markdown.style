@@ -54,7 +54,10 @@ function specimenPair(themeId: string, themeName: string, spec: Specimen, render
     renderedBody === null
       ? `<div class="specimen-note">Mermaid diagrams need a live browser to lay out, so this static gallery can't render one; try it in <a href="/editor?theme=${themeId}">the editor</a>.</div>`
       : specimenEmbed(themeId, renderedBody, `${spec.name} rendered in the ${themeName} theme`)
-  return `<section class="specimen">
+  // a <div>, not a <section>: site.css gives every <section> 40px of vertical
+  // padding and a border-top (the page's own section rhythm), which lands inside
+  // the card as a dead strip above the header
+  return `<div class="specimen">
   <h3>${escapeHtml(spec.name)}</h3>
   <div class="specimen-body">
     <div class="specimen-source">
@@ -66,7 +69,7 @@ function specimenPair(themeId: string, themeName: string, spec: Specimen, render
       ${render}
     </div>
   </div>
-</section>`
+</div>`
 }
 
 export async function buildThemePage(copy: ThemeCopy, sampleBody: string): Promise<string> {
