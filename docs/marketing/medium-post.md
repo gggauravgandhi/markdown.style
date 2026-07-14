@@ -12,8 +12,8 @@
 - **Word count:** about 1,250.
 - **Canonical:** if you cross post to Dev.to or Indie Hackers, set the canonical URL to the Medium version so
   you do not split the ranking.
-- **Accuracy note:** this post does not claim the project is open source, because the repo still has no
-  LICENSE file. Add one and you can put that line back in.
+- **Accuracy note:** the project is MIT licensed, so the open source claim is accurate. Repo:
+  https://github.com/gggauravgandhi/markdown.style
 
 ---
 
@@ -151,7 +151,8 @@ to look like it deserves to be read.
 
 ### Try it
 
-[markdown.style](https://markdown.style) is free, needs no account, and imposes no limits. Paste your last AI
-answer into it and see what it looks like when someone has actually thought about the typography.
+[markdown.style](https://markdown.style) is free, needs no account, and imposes no limits. It is MIT licensed
+and the [source is on GitHub](https://github.com/gggauravgandhi/markdown.style). Paste your last AI answer into
+it and see what it looks like when someone has actually thought about the typography.
 
 Your AI did the writing. It does not need to typeset the document too.

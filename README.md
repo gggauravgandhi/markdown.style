@@ -59,4 +59,4 @@ See [CLAUDE.md](CLAUDE.md) for the full set of invariants the tests enforce.
 
 ## License
 
-Not yet chosen. The repository is public but carries no LICENSE file, which means default copyright applies and nobody else has the right to reuse the code. Add one before calling the project open source anywhere.
+[MIT](LICENSE). Use it, fork it, ship it.

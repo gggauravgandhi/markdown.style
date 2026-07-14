@@ -1,5 +1,5 @@
 // @vitest-environment node
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { themes } from '../themes/registry'
@@ -47,6 +47,20 @@ describe('marketing pages', () => {
     expect(h1.toLowerCase()).toContain('polished document')
     expect(html).toContain('href="/editor"')
     expect(html.toLowerCase()).toContain('not uploaded')
+  })
+
+  it('every og:image target actually exists, so shared links are not blank cards', () => {
+    // og.png was referenced by index.html and by every generated page while the
+    // file did not exist: every share rendered an empty card, and no test noticed,
+    // because nothing checked that a meta tag points at real bytes.
+    const referenced = new Set<string>()
+    for (const page of [...MARKETING_PAGES, 'src/site/pages/shell.ts']) {
+      for (const [, url] of read(page).matchAll(/og:image" content="[^"]*?(\/[\w.-]+)"/g)) referenced.add(url!)
+    }
+    expect(referenced.size).toBeGreaterThan(0)
+    for (const url of referenced) {
+      expect(existsSync(join(root, 'public', url)), `public${url} is referenced by og:image but missing`).toBe(true)
+    }
   })
 
   it('landing links the real repo, so the open-source claim is verifiable (plan §15)', () => {

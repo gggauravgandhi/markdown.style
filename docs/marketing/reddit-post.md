@@ -1,19 +1,5 @@
 # Reddit launch post
 
-## Before you post: two things that will get the thread flamed
-
-1. **Do not call it open source yet.** The repo has no LICENSE file, so default copyright applies and nobody
-   can legally reuse the code. Reddit will ask "what license?" within about ten minutes, and "open source
-   with no license" is a reliable way to lose the thread. Either add a LICENSE (MIT is the usual pick) or do
-   not use the phrase. The post below deliberately does not claim it.
-2. **The site itself currently claims open source**, on the homepage and in llms.txt. Same problem. Add the
-   LICENSE and both become true.
-
-Also worth fixing before launch day: `og:image` points at `/og.png`, which does not exist, so the link
-renders a blank card everywhere it is shared. On Reddit that means no thumbnail.
-
----
-
 ## The post
 
 **Title options.** Pick one. Do not reuse the same title across subreddits.
@@ -43,6 +29,7 @@ What it does:
   markdown back out.
 - Free, no signup, no limits. Nothing is uploaded. Parsing, rendering and export all happen in your browser,
   and you can confirm that in the network tab.
+- MIT licensed, source is on GitHub: https://github.com/gggauravgandhi/markdown.style
 
 Being upfront about the limits, because you will find them anyway:
 
@@ -75,7 +62,7 @@ in the sub, and a removed post is worse than no post. Comment in a few threads b
 | r/InternetIsBeautiful | A free, no signup, genuinely useful web tool is the entire premise of the sub. | Strict. No signup walls, no marketing voice. High reward if it lands. |
 | r/ChatGPT | Your users are here, and the pain (reformatting AI output) is native to them. | Self promo is tolerated when the tool is free and useful. Lead with the problem, not the link. |
 | r/ClaudeAI | Same as above, smaller and friendlier. | Same. |
-| r/coolgithubprojects | Good fit, but only once the repo has a LICENSE. | Do not post before the LICENSE exists. |
+| r/coolgithubprojects | Good fit. MIT licensed, public repo. | Needs the repo link in the post. |
 
 ### Second wave, a few days later
 
@@ -91,9 +78,9 @@ in the sub, and a removed post is worse than no post. Comment in a few threads b
 ### Not Reddit, but the same launch week
 
 - **Hacker News**, as a Show HN. Suggested title: `Show HN: markdown.style, turn AI markdown into a styled
-  document in the browser`. HN will care about the no backend, no upload, script free output. HN will also
-  ask about the license immediately, so fix that first.
-- **Product Hunt**. Needs the og image and a few screenshots.
+  document in the browser`. HN will care about the no backend, no upload, script free output. HN will ask about the license
+  immediately, and the answer is MIT.
+- **Product Hunt**. The og image exists now, so the card renders. Add a few screenshots.
 - **Lobsters**, only if you have an invite. Tag: `web`.
 - **Indie Hackers** and **Dev.to**. Both accept the Medium post with light edits.
 
