@@ -10,7 +10,7 @@ Three strictly separated layers:
 
 - **Render pipeline** (`src/pipeline/`): markdown-it (+ footnote, task-lists, KaTeX, mermaid, shiki) → DOMPurify sanitize → assemble a self-contained HTML document. `render()` output must stay script-free and dependency-free: it IS the product.
 - **Editor app** (`src/app/`, mounted from `editor.html`): vanilla TS, CodeMirror 6, dark chrome. `app.css` styles chrome only; documents are styled exclusively by themes.
-- **Static site** (`index.html`, `src/site/`): marketing + SEO pages. `bun run build` = `vite build` **then** `bun scripts/build-pages.ts`, which renders per-theme samples/specimens and writes ~70 files into `dist/` (theme pages, hub, use-cases, convert hubs, sitemap).
+- **Static site** (`index.html`, `src/site/`): marketing + SEO pages. `bun run build` = `vite build` **then** `bun scripts/build-pages.ts`, which renders per-theme samples/specimens and writes ~70 files into `dist/` (theme pages, hub, use-cases, convert hubs, and the three crawl files `sitemap.xml` / `robots.txt` / `llms.txt`). All three crawl files are generated from the registry and `routes.ts`, never hand-written; `public/` now holds only `CNAME` and `specimen-chart.svg`.
 - **Themes** (`src/themes/`): `registry.ts` holds 30 themes across 6 categories (`category`, `featured` fields). Each theme is a standalone CSS file imported with `?raw`.
 
 Design context lives in `PRODUCT.md` / `DESIGN.md` (root) and `docs/superpowers/{specs,plans}/`.
@@ -26,13 +26,14 @@ Design context lives in `PRODUCT.md` / `DESIGN.md` (root) and `docs/superpowers/
 ## Hard Invariants (test-enforced; never weaken the tests)
 
 - Preview iframe sandbox is exactly `allow-same-origin`: never add `allow-scripts`. Theme-thumb iframes use `sandbox=""`.
-- Zero `<script>` (except JSON-LD) and zero external requests on marketing/generated pages (the AEO strategy). The privacy promise ("no analytics, no third-party requests") is load-bearing copy; analytics are Cloudflare edge-level only.
+- Zero `<script>` (except JSON-LD) and zero external REQUESTS on marketing/generated pages (the AEO strategy). The privacy promise ("no analytics, no third-party requests") is load-bearing copy; analytics are Cloudflare edge-level only. "Request" means a fetch: `src`/`srcset` on any element, `href` on `<link>`. An `<a href>` to another origin is navigation on click, not a fetch, so the outbound GitHub link is allowed and the test is scoped accordingly.
 - Registry: static `?raw` imports only; `scripts/build-pages.ts` runs under plain bun where Vite-isms (`import.meta.glob`) don't exist.
 - Theme CSS contract: define `--mds-bg/--mds-fg/--mds-font-body/--mds-font-heading`, include `@media print`, no flex/grid on `.mds-content` (Paged.js), decorative `::before/::after` content uses alt-text syntax (`content: '# ' / ''`), web-safe fonts only. Dark themes (carbon, terminal, neon) flip light in print.
 - Sample docs (`content/samples/`): no mermaid fences (mermaid needs a DOM; build-time render degrades to an error block). Math IS fine: KaTeX renders via `renderToString`, verified working under plain bun.
 - NO EM DASHES ANYWHERE. Not in copy, UI strings, theme descriptions, samples, docs, commit messages, or code comments. Every file. Use a comma, a colon, parentheses, or two sentences. A test enforces this across the repo; write the character as the escape sequence `\u2014` inside that test so it does not flag itself.
 - `bun run dev` serves ONLY index/editor/privacy/terms unless the dev middleware renders the generated pages. Vite's fallback silently returns index.html with a 200 for `/themes`, `/themes/*`, `/use-cases/*`, so a "page shows the wrong content" bug locally is usually this, not the page.
-- Theme pages embed two documents; specimen footnote ids are namespaced `specimen-fn*`: duplicate `id="fn1"` is a regression.
+- Theme pages embed one full sample document plus one card per entry in `src/site/pages/specimens.ts` (source markdown left, rendered-in-theme right). Every specimen render is namespaced `specimen-<id>-fn*`, because markdown-it-footnote emits `id="fn1"` on every render and 16 embeds on one page would otherwise collide. Duplicate `id="fn1"` is a regression.
+- Adding a component to the theme pages = one entry in `specimens.ts`. Nothing else. It must not be a mermaid fence (see above) and any image it references must exist in `public/` (test-enforced: a specimen once pointed at a nonexistent `/og.png` and shipped a broken image on all 30 pages with the suite green).
 - Sitemap ≤ 50 URLs; landing strip = the six `featured` themes exactly.
 - Never nest rendered markdown (it contains links) inside an `<a>`: parsers split the outer link. Hub previews demote inner anchors via `inertLinks()`; reuse it for any new linked preview.
 

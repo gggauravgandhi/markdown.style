@@ -101,7 +101,7 @@ Two chrome surfaces serve one voice. The editor is a dark workbench (product reg
 **Key Characteristics:**
 - The document is the hero; chrome recedes on both surfaces.
 - Flat, border-defined construction; zero decorative shadows.
-- System type everywhere in the chrome; the eight document themes carry the expressive typography.
+- System type everywhere in the chrome; the document themes carry the expressive typography.
 - One accent per surface, spent on actions and state, never on decoration.
 - Refined and restrained components: quiet until touched, subtle fills on interaction, no lifts or glows.
 
@@ -136,7 +136,7 @@ Two disciplined palettes, one per surface, sharing a single indigo-family voice.
 **Body Font:** system-ui stack
 **Editor Font:** the platform monospace stack, via CodeMirror
 
-**Character:** Deliberately invisible. The chrome uses system type at zero payload because the product's eight document themes are the typographic performance; the stage crew does not wear costumes.
+**Character:** Deliberately invisible. The chrome uses system type at zero payload because the product's document themes are the typographic performance; the stage crew does not wear costumes.
 
 ### Hierarchy
 - **Display** (700, 2.7em, 1.12, -0.02em): marketing hero headline only.
@@ -205,5 +205,6 @@ The editor's defining component: dark editing pane left, Sheet White document ca
 - **Don't** look like a "corporate enterprise tool": no heavy nav, feature matrices, or stock-photo trust sections (PRODUCT.md anti-reference).
 - **Don't** use side-stripe borders: `border-left` wider than 1px as a colored accent on toasts, callouts, or cards is prohibited; use a full 1px border plus background tint instead.
 - **Don't** use gradient text, box-shadows, or decorative blur anywhere in chrome.
-- **Don't** put display fonts, em dashes, or marketing voice inside the editor chrome.
+- **Don't** put display fonts or marketing voice inside the editor chrome.
+- **Don't** use an em dash. Anywhere. Not in marketing copy, UI strings, theme descriptions, sample documents, docs, or code comments. Use a comma, a colon, parentheses, or two sentences. A repo test walks every tracked file and fails on one.
 - **Don't** use pure #000 anywhere; the darkest chrome value is Night Slab (#101014).

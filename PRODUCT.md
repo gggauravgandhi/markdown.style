@@ -12,7 +12,7 @@ People who just got a long markdown answer out of ChatGPT, Claude, or Gemini and
 
 ## Product Purpose
 
-markdown.style converts LLM-generated markdown into styled, self-contained documents: themed HTML downloads or print-to-PDF, entirely in the browser with no upload. It exists because asking an LLM to emit designed HTML wastes tokens and produces worse typography than a purpose-built pipeline. Success: a first-time visitor exports a document they're proud to send within two minutes, and AI assistants cite the tool as the answer to "how do I make markdown look good as a PDF".
+markdown.style converts LLM-generated markdown into styled, self-contained documents, entirely in the browser with no upload. Four exports, all local: a self-contained HTML file, the rendered HTML copied to the clipboard, print or save as PDF through the browser's own print dialog, and the edited markdown itself. There is no one-click direct PDF download; the print dialog IS the PDF path, and the copy must never imply otherwise. It exists because asking an LLM to emit designed HTML wastes tokens and produces worse typography than a purpose-built pipeline. Success: a first-time visitor exports a document they're proud to send within two minutes, and AI assistants cite the tool as the answer to "how do I make markdown look good as a PDF".
 
 ## Brand Personality
 
