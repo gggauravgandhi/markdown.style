@@ -20,7 +20,7 @@ ${sampleBody}
 // (exactly one h1 of its own, asserted by pages.test.ts); a specimen is a
 // single-component snippet, so it gets its own class instead of overloading that count
 function specimenEmbed(themeId: string, body: string, label: string): string {
-  return `<figure class="specimen-embed" role="group" aria-label="${escapeHtml(label)}">
+  return `<figure class="specimen-render" role="group" aria-label="${escapeHtml(label)}">
 <div class="mds-theme-${themeId}"><div class="mds-content">
 ${body}
 </div></div>
@@ -54,13 +54,19 @@ function specimenPair(themeId: string, themeName: string, spec: Specimen, render
     renderedBody === null
       ? `<div class="specimen-note">Mermaid diagrams need a live browser to lay out, so this static gallery can't render one; try it in <a href="/editor?theme=${themeId}">the editor</a>.</div>`
       : specimenEmbed(themeId, renderedBody, `${spec.name} rendered in the ${themeName} theme`)
-  return `<div class="specimen-pair">
-  <div class="specimen-source">
-    <h3>${escapeHtml(spec.name)}</h3>
-    <pre>${escapeHtml(spec.markdown)}</pre>
+  return `<section class="specimen">
+  <h3>${escapeHtml(spec.name)}</h3>
+  <div class="specimen-body">
+    <div class="specimen-source">
+      <p class="specimen-label">Markdown</p>
+      <pre>${escapeHtml(spec.markdown)}</pre>
+    </div>
+    <div class="specimen-result">
+      <p class="specimen-label">${escapeHtml(themeName)}</p>
+      ${render}
+    </div>
   </div>
-  ${render}
-</div>`
+</section>`
 }
 
 export async function buildThemePage(copy: ThemeCopy, sampleBody: string): Promise<string> {

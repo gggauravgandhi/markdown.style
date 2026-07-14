@@ -95,7 +95,10 @@ describe('generated page invariants', () => {
       expect(html, t.id).toContain('id="specimen-footnote-fn')
       const fn1Count = (html.match(/id="fn1"/g) ?? []).length
       expect(fn1Count, t.id).toBeLessThanOrEqual(1)
-      for (const s of SPECIMENS) expect(html, `${t.id}: ${s.id}`).toContain(`class="specimen-pair"`)
+      // one card per specimen: the old assertion looked for the same class string
+      // once per specimen, so it would have passed with a single card on the page
+      expect((html.match(/class="specimen"/g) ?? []).length, t.id).toBe(SPECIMENS.length)
+      for (const s of SPECIMENS) expect(html, `${t.id}: ${s.id}`).toContain(`<h3>${s.name}</h3>`)
     }
   })
 
