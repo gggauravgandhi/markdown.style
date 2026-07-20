@@ -119,11 +119,15 @@ describe('crawl files', () => {
     expect(() => read('public/llms.txt')).toThrow()
   })
 
-  it('llms.txt describes the tool and lists key pages', () => {
+  it('llms.txt follows the llmstxt.org format: an H1, and links as [name](url)', () => {
+    // the PageSpeed audit fails a bare "- Name: url" list with "no links". The spec
+    // wants a single H1, then H2 sections whose items are real markdown links.
     const llms = buildLlms()
-    expect(llms).toContain('# markdown.style')
-    expect(llms).toContain('https://markdown.style/editor')
-    expect(llms).toContain('https://markdown.style/themes')
+    expect(llms.match(/^# .+/m), 'needs exactly one H1').toHaveLength(1)
+    const links = [...llms.matchAll(/\[[^\]]+\]\((https?:\/\/[^)]+)\)/g)]
+    expect(links.length, 'must contain markdown links, not bare URLs').toBeGreaterThan(0)
+    expect(llms).toContain('[Editor](https://markdown.style/editor)')
+    expect(llms).toContain('[Theme gallery](https://markdown.style/themes)')
   })
 
   it('llms.txt theme count is derived, never a stale hardcoded number', () => {
@@ -132,9 +136,11 @@ describe('crawl files', () => {
     expect(llms.toLowerCase()).not.toContain('eight')
   })
 
-  it('every URL llms.txt lists is a real route (no dead links in the crawler map)', () => {
+  it('every markdown.style URL llms.txt lists is a real route (no dead links in the crawler map)', () => {
     const llms = buildLlms()
-    const paths = [...llms.matchAll(/https:\/\/markdown\.style(\/\S*)/g)].map(m => m[1]!)
+    // URLs live inside [name](url) now, so stop at the closing paren, and skip
+    // off-site links (the GitHub repo) which are not routes of ours to validate.
+    const paths = [...llms.matchAll(/\]\(https:\/\/markdown\.style(\/[^)]*)\)/g)].map(m => m[1]!)
     expect(paths.length).toBeGreaterThan(0)
     for (const p of paths) expect(ALL_ROUTES, p).toContain(p)
   })
